@@ -34,7 +34,6 @@ std::unique_ptr<AST> Parser::parsePrimary()
         case Token::TOK_KWD:
             return parseKwd();
         default:
-            std::cout << "parseExpr() from parsePrimary()\n";
             std::unique_ptr<AST> exprAST = parseExpr();
             eat(Token::TOK_SCOLON);
             return exprAST;
@@ -45,14 +44,14 @@ std::unique_ptr<AST> Parser::parseKwd()
 {
     // assuming it's a variable declaration for now
     eat(Token::TOK_KWD);
-    std::cout << "parseExpr() from parseKwd()\n";
-    return parseExpr();
+    std::unique_ptr<AST> exprAST = parseExpr();
+    eat(Token::TOK_SCOLON);
+    return exprAST;
 }
 
 std::unique_ptr<NumberAST> Parser::parseNum() 
 {
     std::unique_ptr<NumberAST> numAST = std::make_unique<NumberAST>(std::stod(tok.value));
-    std::cout << "parseNum(" << numAST->val << ")\n";
     eat(Token::TOK_NUM);
     return numAST;
 }
@@ -89,30 +88,30 @@ std::unique_ptr<AST> Parser::parseExpr()
 std::unique_ptr<AST> Parser::parseSubExpr(std::unique_ptr<AST> L, int prec)
 {
     Operator nextOp = tok.toOperator();
-    while (prec < nextOp)
+    while (nextOp >= prec)
     {
+        std::cout << nextOp << " >= " << prec << '\n';
         Operator currOp = nextOp;
         eat();
         std::unique_ptr<AST> R = parseTerm();
+        nextOp = tok.toOperator();
         while ((nextOp > currOp) || ((currOp == nextOp) && (nextOp.getAssoc() == Operator::A_RIGHT)))
         {
-            // std::cout << "INNER LOOP\n";
-            // if (getPrec(nextOp) > getPrec(currOp))
+            // if (nextOp > currOp)
             // {
-            //     std::cout << operatorStrings[nextOp] << " > " << operatorStrings[currOp] << '\n';
+            //     std::cout << operatorStrings[nextOp.getType()] << " > " << operatorStrings[currOp.getType()] << '\n';
             // }
             // else 
             // {
-            //     std::cout << operatorStrings[nextOp] << " == " << operatorStrings[currOp] << '\n';
+            //     std::cout << operatorStrings[nextOp.getType()] << " == " << operatorStrings[currOp.getType()] << '\n';
             // }
             auto RHS = std::unique_ptr<AST>(R->clone());
             int nextPrec = currOp.getType() == Operator::OP_EXP ? currOp.getPrec() : currOp.getPrec()+1;
             R = parseSubExpr(std::move(RHS), nextPrec);
             nextOp = tok.toOperator();
-            std::cout << nextOp << '\n';
         }
         auto LHS = std::unique_ptr<AST>(L->clone());
-        L = std::make_unique<ExpressionAST>(std::move(LHS), std::move(R), currOp);
+        L = std::make_unique<ExpressionAST>(std::move(LHS), std::move(R), currOp.getType());
     }
     return L;
 }
