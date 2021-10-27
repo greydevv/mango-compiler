@@ -1,0 +1,20 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/Users/greysonmurray/Developer/cpp/compiler-tests'
+ 
+clang++ -g -Wall -std=c++17 -I/usr/local/Cellar/llvm/12.0.1/include -std=c++14 -stdlib=libc++   -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -o src/visitors/ASTStringifier.o -c src/visitors/ASTStringifier.cpp
+clang++ -g -Wall -std=c++17 -I/usr/local/Cellar/llvm/12.0.1/include -std=c++14 -stdlib=libc++   -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -o src/visitors/CodegenVisitor.o -c src/visitors/CodegenVisitor.cpp
+clang++ -g -Wall -std=c++17 -I/usr/local/Cellar/llvm/12.0.1/include -std=c++14 -stdlib=libc++   -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -o src/Operator.o -c src/Operator.cpp
+clang++ -g -Wall -std=c++17 -I/usr/local/Cellar/llvm/12.0.1/include -std=c++14 -stdlib=libc++   -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -o src/Lexer.o -c src/Lexer.cpp
+clang++ -g -Wall -std=c++17 -I/usr/local/Cellar/llvm/12.0.1/include -std=c++14 -stdlib=libc++   -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -o src/io.o -c src/io.cpp
+clang++ -g -Wall -std=c++17 -I/usr/local/Cellar/llvm/12.0.1/include -std=c++14 -stdlib=libc++   -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -o src/compile.o -c src/compile.cpp
+clang++ -g -Wall -std=c++17 -I/usr/local/Cellar/llvm/12.0.1/include -std=c++14 -stdlib=libc++   -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -o src/ast/VariableAST.o -c src/ast/VariableAST.cpp
+clang++ -g -Wall -std=c++17 -I/usr/local/Cellar/llvm/12.0.1/include -std=c++14 -stdlib=libc++   -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -o src/ast/AST.o -c src/ast/AST.cpp
+clang++ -g -Wall -std=c++17 -I/usr/local/Cellar/llvm/12.0.1/include -std=c++14 -stdlib=libc++   -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -o src/ast/ExpressionAST.o -c src/ast/ExpressionAST.cpp
+clang++ -g -Wall -std=c++17 -I/usr/local/Cellar/llvm/12.0.1/include -std=c++14 -stdlib=libc++   -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -o src/ast/NumberAST.o -c src/ast/NumberAST.cpp
+clang++ -g -Wall -std=c++17 -I/usr/local/Cellar/llvm/12.0.1/include -std=c++14 -stdlib=libc++   -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -o src/ast/ModuleAST.o -c src/ast/ModuleAST.cpp
+clang++ -g -Wall -std=c++17 -I/usr/local/Cellar/llvm/12.0.1/include -std=c++14 -stdlib=libc++   -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -o src/Parser.o -c src/Parser.cpp
+clang++ -g -Wall -std=c++17 -I/usr/local/Cellar/llvm/12.0.1/include -std=c++14 -stdlib=libc++   -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -o src/main.o -c src/main.cpp
+clang++ -g -Wall -std=c++17 -I/usr/local/Cellar/llvm/12.0.1/include -std=c++14 -stdlib=libc++   -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -o src/Token.o -c src/Token.cpp
+clang++ -g -Wall -std=c++17 -I/usr/local/Cellar/llvm/12.0.1/include -std=c++14 -stdlib=libc++   -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS -L/usr/local/Cellar/llvm/12.0.1/lib -Wl,-search_paths_first -Wl,-headerpad_max_install_names -lLLVM-12 -o out src/visitors/ASTStringifier.o src/visitors/CodegenVisitor.o src/Operator.o src/Lexer.o src/io.o src/compile.o src/ast/VariableAST.o src/ast/AST.o src/ast/ExpressionAST.o src/ast/NumberAST.o src/ast/ModuleAST.o src/Parser.o src/main.o src/Token.o
+make: Leaving directory '/Users/greysonmurray/Developer/cpp/compiler-tests'
+ 
