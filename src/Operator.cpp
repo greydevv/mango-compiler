@@ -85,37 +85,38 @@ bool Operator::operator>(const Operator& other)
     return prec > other.prec;
 }
 
-bool Operator::operator==(const Operator& other)
+bool operator==(int i, const Operator& op)
 {
-    return prec == other.prec;
+    return i == op.prec;
 }
 
-bool Operator::operator!=(const Operator& other)
+bool operator!=(int i, const Operator& op)
 {
-    return prec != other.prec;
+    return i != op.prec;
 }
 
-bool Operator::operator<=(const Operator& other)
+bool operator<=(int i, const Operator& op)
 {
-    return prec <= other.prec;
+    return i <= op.prec;
 }
 
-bool Operator::operator>=(const Operator& other)
+bool operator>=(int i, const Operator& op)
 {
-    return prec >= other.prec;
+    return i >= op.prec;
 }
 
-bool Operator::operator< (const Operator& other)
+bool operator< (int i, const Operator& op)
 {
-    return prec < other.prec;
+    return i < op.prec;
 }
 
-bool Operator::operator> (const Operator& other)
+bool operator> (int i, const Operator& op)
 {
-    return prec > other.prec;
+    return i > op.prec;
 }
 
 std::ostream& operator<<(std::ostream& os, const Operator& op)
 {
     os << '<' << operatorStrings[op.type] << '>';
+    return os;
 }

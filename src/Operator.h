@@ -51,7 +51,7 @@ class Operator final
     private:
         op_type type;
         int prec;
-        int assoc;
+        op_assoc assoc;
 
         Operator(op_type type, int prec, op_assoc assoc);
 };
