@@ -59,7 +59,6 @@ std::unique_ptr<NumberAST> Parser::parseNum()
 std::unique_ptr<VariableAST> Parser::parseId() 
 {
     std::unique_ptr<VariableAST> varAST = std::make_unique<VariableAST>(tok.value);
-    std::cout << "parseId(" << varAST->id << ")\n";
     eat(Token::TOK_ID);
     return varAST;
 }
@@ -90,21 +89,12 @@ std::unique_ptr<AST> Parser::parseSubExpr(std::unique_ptr<AST> L, int prec)
     Operator nextOp = tok.toOperator();
     while (nextOp >= prec)
     {
-        std::cout << nextOp << " >= " << prec << '\n';
         Operator currOp = nextOp;
         eat();
         std::unique_ptr<AST> R = parseTerm();
         nextOp = tok.toOperator();
         while ((nextOp > currOp) || ((currOp == nextOp) && (nextOp.getAssoc() == Operator::A_RIGHT)))
         {
-            // if (nextOp > currOp)
-            // {
-            //     std::cout << operatorStrings[nextOp.getType()] << " > " << operatorStrings[currOp.getType()] << '\n';
-            // }
-            // else 
-            // {
-            //     std::cout << operatorStrings[nextOp.getType()] << " == " << operatorStrings[currOp.getType()] << '\n';
-            // }
             auto RHS = std::unique_ptr<AST>(R->clone());
             int nextPrec = currOp.getType() == Operator::OP_EXP ? currOp.getPrec() : currOp.getPrec()+1;
             R = parseSubExpr(std::move(RHS), nextPrec);
