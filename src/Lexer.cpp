@@ -101,8 +101,8 @@ Token::token_type Lexer::lexTokenType()
 bool Lexer::isKwd(const std::string& s)
 {
     // only supports two keywords at the moment
-    return ( s == "int"
-             || s == "return");
+    return (s == "int"
+            || s == "return");
 }
 
 void Lexer::next()

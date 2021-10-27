@@ -1,9 +1,9 @@
 #ifndef OPERATOR_H
 #define OPERATOR_H
 
+#include <ostream>
 #include <map>
 #include <string>
-#include "Token.h"
 
 class Operator final
 {
@@ -46,6 +46,12 @@ class Operator final
         friend bool operator>=(int i, const Operator& op);
         friend bool operator< (int i, const Operator& op);
         friend bool operator> (int i, const Operator& op);
+        friend bool operator==(const Operator& op, int i);
+        friend bool operator!=(const Operator& op, int i);
+        friend bool operator<=(const Operator& op, int i);
+        friend bool operator>=(const Operator& op, int i);
+        friend bool operator< (const Operator& op, int i);
+        friend bool operator> (const Operator& op, int i);
         friend std::ostream& operator<<(std::ostream& os, const Operator& op);
     
     private:

@@ -1,5 +1,4 @@
-#include <iostream>
-#include "Token.h"
+#include <ostream>
 #include "Operator.h"
 
 Operator::Operator(op_type type, int prec, op_assoc assoc)
@@ -113,6 +112,36 @@ bool operator< (int i, const Operator& op)
 bool operator> (int i, const Operator& op)
 {
     return i > op.prec;
+}
+
+bool operator==(const Operator& op, int i)
+{
+    return op.prec == i;
+}
+
+bool operator!=(const Operator& op, int i)
+{
+    return op.prec != i;
+}
+
+bool operator<=(const Operator& op, int i)
+{
+    return op.prec <= i;
+}
+
+bool operator>=(const Operator& op, int i)
+{
+    return op.prec >= i;
+}
+
+bool operator< (const Operator& op, int i)
+{
+    return op.prec < i;
+}
+
+bool operator> (const Operator& op, int i)
+{
+    return op.prec > i;
 }
 
 std::ostream& operator<<(std::ostream& os, const Operator& op)

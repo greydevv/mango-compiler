@@ -1,4 +1,6 @@
+#include <iostream>
 #include "Token.h"
+#include "Operator.h"
 
 Token::Token(token_type type, SourceLocation loc)
     : type(type), value(tokenValues.at(type)), loc(loc) {}

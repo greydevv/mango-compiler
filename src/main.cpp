@@ -4,5 +4,5 @@
 
 int main(int argc, char const *argv[])
 {
-    return compile("/Users/greysonmurray/Developer/cpp/compiler-tests/sample/expressions");
+    return compile("/Users/greysonmurray/Developer/cpp/compiler/sample/expressions");
 }
