@@ -14,10 +14,13 @@ class ASTStringifier
 {
     public:
         ASTStringifier() {};
-        std::string toString(ExpressionAST* ast);
-        std::string toString(ModuleAST* ast);
-        std::string toString(VariableAST* ast);
-        std::string toString(NumberAST* ast);
+        std::string toString(ExpressionAST* ast, int tabs = 0);
+        std::string toString(ModuleAST* ast, int tabs = 0);
+        std::string toString(VariableAST* ast, int tabs = 0);
+        std::string toString(NumberAST* ast, int tabs = 0);
+    
+    private:
+        std::string indent(std::string str, int tabs = 1);
 };
 
 #endif
