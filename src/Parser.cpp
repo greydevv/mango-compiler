@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include <vector>
 #include "Token.h"
 #include "Operator.h"
