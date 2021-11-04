@@ -1,5 +1,3 @@
-#include <sstream>
-#include <fstream>
 #include <iostream>
 #include <string>
 #include "io.h"
@@ -31,25 +29,25 @@ Token Lexer::nextToken()
 
 Token Lexer::lexAlpha()
 {
-    std::ostringstream s;
+    std::string s;
     while (isalnum(c))
     {
-        s << c;
+        s += c;
         next();
     }
-    Token::token_type type = isKwd(s.str()) ? Token::TOK_KWD : Token::TOK_ID;
-    return Token(type, s.str(), loc);
+    Token::token_type type = isKwd(s) ? Token::TOK_KWD : Token::TOK_ID;
+    return Token(type, s, loc);
 }
 
 Token Lexer::lexNum()
 {
-    std::ostringstream s;
+    std::string s;
     while (isalnum(c))
     {
-        s << c;
+        s += c;
         next();
     }
-    return Token(Token::TOK_NUM, s.str(), loc);
+    return Token(Token::TOK_NUM, s, loc);
 }
 
 Token Lexer::lexOther()
@@ -94,7 +92,10 @@ Token::token_type Lexer::lexTokenType()
         case '\0':
             return Token::TOK_EOF;
         default:
-            return Token::TOK_UND;
+            std::cout << "[Dev Warning] Lexer returning TOK_UND with value of <" << c << "> and (ASCII: " << int(c) << ")\n";
+            next();
+
+            return lexTokenType();
     }
 }
 
