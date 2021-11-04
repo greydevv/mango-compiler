@@ -13,9 +13,9 @@ llvm::Value* NumberAST::accept(CodegenVisitor& cg)
     return cg.codegen(this);
 }
 
-std::string NumberAST::accept(ASTStringifier& sf) 
+std::string NumberAST::accept(ASTStringifier& sf, int tabs) 
 {
-    return sf.toString(this);
+    return sf.toString(this, tabs);
 }
 
 NumberAST* NumberAST::cloneImpl()

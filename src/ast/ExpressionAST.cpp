@@ -17,9 +17,9 @@ llvm::Value* ExpressionAST::accept(CodegenVisitor& cg)
     return cg.codegen(this);
 }
 
-std::string ExpressionAST::accept(ASTStringifier& sf) 
+std::string ExpressionAST::accept(ASTStringifier& sf, int tabs) 
 {
-    return sf.toString(this);
+    return sf.toString(this, tabs);
 }
 
 ExpressionAST* ExpressionAST::cloneImpl()

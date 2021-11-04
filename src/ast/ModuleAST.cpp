@@ -3,6 +3,11 @@
 #include "../visitors/CodegenVisitor.h"
 #include "../visitors/ASTStringifier.h"
 
+ModuleAST::ModuleAST()
+{
+    children.reserve(1);
+}
+
 ModuleAST::ModuleAST(const ModuleAST& other)
 {
     for (auto& child : other.children)
@@ -21,9 +26,9 @@ llvm::Value* ModuleAST::accept(CodegenVisitor& cg)
     return cg.codegen(this);
 }
 
-std::string ModuleAST::accept(ASTStringifier& sf) 
+std::string ModuleAST::accept(ASTStringifier& sf, int tabs) 
 {
-    return sf.toString(this);
+    return sf.toString(this, tabs);
 }
 
 ModuleAST* ModuleAST::cloneImpl()

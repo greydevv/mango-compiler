@@ -14,9 +14,9 @@ llvm::Value* VariableAST::accept(CodegenVisitor& cg)
     return cg.codegen(this);
 }
 
-std::string VariableAST::accept(ASTStringifier& sf) 
+std::string VariableAST::accept(ASTStringifier& sf, int tabs) 
 {
-    return sf.toString(this);
+    return sf.toString(this, tabs);
 }
 
 VariableAST* VariableAST::cloneImpl()

@@ -10,7 +10,7 @@ class AST
     public:
         virtual ~AST() {};
         virtual llvm::Value* accept(CodegenVisitor& cg) = 0;
-        virtual std::string accept(ASTStringifier& sf) = 0;
+        virtual std::string accept(ASTStringifier& sf, int tabs = 0) = 0;
         virtual AST* clone();
     protected:
         virtual AST* cloneImpl() = 0;
