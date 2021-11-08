@@ -1,7 +1,15 @@
-.DS_Store
+# Project 
+main.cpp
+
+# Compilation / Executables
 *.dSYM
 *.o
 out
+
+# Editor
 .vscode/**
 compile_commands.json
 .cache
+
+# MacOS
+.DS_Store
