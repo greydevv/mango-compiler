@@ -18,7 +18,11 @@ Operator Token::toOperator()
         case Token::TOK_PLUS:
             return Operator::opAdd();
         case Token::TOK_MINUS:
-            return Operator::opSub();
+            return Operator::opSubtract();
+        case Token::TOK_STAR:
+            return Operator::opMultiply();
+        case Token::TOK_FSLASH:
+            return Operator::opDivide();
         default:
             return Operator::opUnknown();
     } 
@@ -40,6 +44,10 @@ Token::token_type Token::typeFromChar(char c)
             return Token::TOK_PLUS;
         case '-':
             return Token::TOK_MINUS;
+        case '*':
+            return Token::TOK_STAR;
+        case '/':
+            return Token::TOK_FSLASH;
         default:
             return Token::TOK_UND;
     }

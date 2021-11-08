@@ -31,6 +31,8 @@ class Token
             TOK_COLON,
             TOK_PLUS,
             TOK_MINUS,
+            TOK_STAR,
+            TOK_FSLASH,
             TOK_EOF,
             TOK_UND,
         };
@@ -62,6 +64,8 @@ static const std::string tokenStrings[] = {
     "TOK_COLON",
     "TOK_PLUS",
     "TOK_MINUS",
+    "TOK_STAR",
+    "TOK_FSLASH",
     "TOK_EOF",
     "TOK_UND",
 };
@@ -82,6 +86,8 @@ static const std::map<Token::token_type, std::string> tokenValues = {
     {Token::TOK_COLON, ":"},
     {Token::TOK_PLUS, "+"},
     {Token::TOK_MINUS, "-"},
+    {Token::TOK_STAR, "*"},
+    {Token::TOK_FSLASH, "/"},
     {Token::TOK_EOF, "\0"},
     {Token::TOK_UND, ""}
 };
