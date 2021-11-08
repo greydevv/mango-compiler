@@ -87,12 +87,16 @@ Token::token_type Lexer::lexTokenType()
             }
             return Token::TOK_MINUS;
         }
+        case '*':
+            return Token::TOK_STAR;
+        case '/':
+            return Token::TOK_FSLASH;
         case '=':
             return Token::TOK_EQUALS;
         case '\0':
             return Token::TOK_EOF;
         default:
-            std::cout << "[Dev Warning] Lexer returning TOK_UND with value of <" << c << "> and (ASCII: " << int(c) << ")\n";
+            std::cout << "[Dev Warning] Lexer returning TOK_UND with value of <" << c << "> and (ASCII: " << int(c) << ") (Line " << loc.y << " at position " << loc.x << ")\n";
             next();
 
             return lexTokenType();
