@@ -18,7 +18,3 @@ $(EXEC): $(OBJS)
 clean:
 	@rm -f $(shell find src -type f -name '*.o')
 	@rm -f $(EXEC)
-
-.PHONY: verbose
-verbose:
-	@echo $(SRCS)
