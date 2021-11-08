@@ -29,7 +29,7 @@ Operator Operator::opAdd()
     return Operator(Operator::OP_ADD, 2, Operator::A_LEFT);
 }
 
-Operator Operator::opSub()
+Operator Operator::opSubtract()
 {
     return Operator(Operator::OP_SUB, 2, Operator::A_LEFT);
 }

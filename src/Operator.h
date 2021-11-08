@@ -29,7 +29,7 @@ class Operator final
         op_assoc getAssoc();
         static Operator opEqual();
         static Operator opAdd();
-        static Operator opSub();
+        static Operator opSubtract();
         static Operator opMultiply();
         static Operator opDivide();
         static Operator opPower();
