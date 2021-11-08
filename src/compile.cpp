@@ -17,7 +17,7 @@ int compile(const std::string& fname)
     }
     Parser parser(readFile(fs));
     std::unique_ptr<ModuleAST> ast = parser.parse();
-    
+
     std::cout << stringify(ast.get());
 
     return parser.getErrState();
