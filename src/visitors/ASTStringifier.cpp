@@ -9,11 +9,23 @@
 #include "../ast/NumberAST.h"
 #include "ASTStringifier.h"
 
+ASTStringifier::ASTStringifier(bool simpleExpr)
+    : simpleExpr(simpleExpr) {}
+
 std::string ASTStringifier::toString(ExpressionAST* ast, int tabs) {
     std::ostringstream s;
-    s << "ExpressionAST(" << operatorValues.at(ast->op) << "):\n";
-    s << indent(ast->LHS->accept(*this, tabs+1), tabs+1) << '\n';
-    s << indent(ast->RHS->accept(*this, tabs+1), tabs+1);
+    if (simpleExpr)
+    {
+        s << '(' << ast->LHS->accept(*this, tabs);
+        s << ' ' << operatorValues.at(ast->op) << ' ';
+        s << ast->RHS->accept(*this, tabs) << ')';
+    }
+    else
+    {
+        s << "ExpressionAST(" << operatorValues.at(ast->op) << "):\n";
+        s << indent(ast->LHS->accept(*this, tabs+1), tabs+1) << '\n';
+        s << indent(ast->RHS->accept(*this, tabs+1), tabs+1);
+    }
     return s.str();
 }
 
@@ -29,13 +41,27 @@ std::string ASTStringifier::toString(ModuleAST* ast, int tabs) {
 
 std::string ASTStringifier::toString(NumberAST* ast, int tabs) {
     std::ostringstream s;
-    s << "NumberAST(" << ast->val << ')';
+    if (simpleExpr)
+    {
+        s << ast->val;
+    }
+    else
+    {
+        s << "NumberAST(" << ast->val << ')';
+    }
     return s.str();
 }
 
 std::string ASTStringifier::toString(VariableAST* ast, int tabs) {
     std::ostringstream s;
-    s << "VariableAST(" << ast->id << ')';
+    if (simpleExpr)
+    {
+        s << ast->id;
+    }
+    else
+    {
+        s << "VariableAST(" << ast->id << ')';
+    }
     return s.str();
 }
 
