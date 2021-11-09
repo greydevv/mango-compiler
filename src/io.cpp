@@ -13,6 +13,6 @@ std::string readFile(std::ifstream& in)
 
 std::string stringify(ModuleAST* ast) 
 {
-    ASTStringifier stringifier = ASTStringifier();
+    ASTStringifier stringifier = ASTStringifier(true);
     return stringifier.toString(ast);
 }
