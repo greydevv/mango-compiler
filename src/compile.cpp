@@ -15,10 +15,9 @@ int compile(const std::string& fname)
         std::cout << "File not Found: " << fname << '\n';
         return 1;
     }
-    Parser parser(readFile(fs));
+    std::string src = readFile(fs);
+    Parser parser(src);
     std::unique_ptr<ModuleAST> ast = parser.parse();
-
     std::cout << stringify(ast.get());
-
     return parser.getErrState();
 }
