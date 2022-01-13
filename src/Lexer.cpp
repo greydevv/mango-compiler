@@ -7,6 +7,17 @@
 Lexer::Lexer(const std::string& src)
     : src(src), pos(0), c(src[pos]), loc({0,1}) {}
 
+void Lexer::debugRead()
+{
+    while (c != '\0')
+    {
+        std::cout << (int) c << ' ';
+        pos++;
+        c = src[pos];
+    }
+    std::cout << '\n';
+}
+
 Token Lexer::nextToken()
 {
     if (isspace(c))

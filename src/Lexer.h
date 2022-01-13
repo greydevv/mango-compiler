@@ -8,6 +8,7 @@ class Lexer
 {
     public:
         Lexer(const std::string& src);
+        void debugRead();
         Token nextToken();
 
     private:
