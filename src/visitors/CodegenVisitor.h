@@ -7,6 +7,9 @@ class ExpressionAST;
 class ModuleAST;
 class VariableAST;
 class NumberAST;
+class FunctionAST;
+class CompoundAST;
+class PrototypeAST;
 
 class CodegenVisitor
 {
@@ -16,6 +19,9 @@ class CodegenVisitor
         llvm::Value* codegen(ModuleAST* ast);
         llvm::Value* codegen(VariableAST* ast);
         llvm::Value* codegen(NumberAST* ast);
+        llvm::Value* codegen(FunctionAST* ast);
+        llvm::Value* codegen(CompoundAST* ast);
+        llvm::Value* codegen(PrototypeAST* ast);
 };
 
 #endif
