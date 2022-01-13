@@ -1,7 +1,9 @@
 #include <memory>
 #include <vector>
+#include "AST.h"
 #include "CompoundAST.h"
 #include "../visitors/CodegenVisitor.h"
+#include "../visitors/ASTStringifier.h"
 
 CompoundAST::CompoundAST(const CompoundAST& other)
 {
@@ -13,12 +15,22 @@ CompoundAST::CompoundAST(const CompoundAST& other)
 
 void CompoundAST::addChild(std::unique_ptr<AST> child)
 {
-    children.push_back(child);
+    children.push_back(std::move(child));
 }
 
 llvm::Value* CompoundAST::accept(CodegenVisitor& cg)
 {
     return cg.codegen(this);
+}
+
+std::string CompoundAST::accept(ASTStringifier& sf, int tabs)
+{
+    return sf.toString(this, tabs);
+}
+
+CompoundAST* CompoundAST::cloneImpl()
+{
+    return new CompoundAST(*this);
 }
 
 

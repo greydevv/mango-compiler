@@ -1,5 +1,5 @@
-#ifndef FUNCTION_AST_H
-#define FUNCTION_AST_H
+#ifndef PROTOTYPE_AST_H
+#define PROTOTYPE_AST_H
 
 #include <vector>
 #include <memory>
@@ -7,13 +7,21 @@
 #include "VariableAST.h"
 #include "../visitors/CodegenVisitor.h"
 #include "../visitors/ASTStringifier.h"
+#include "llvm/IR/Value.h"
 
 class PrototypeAST : public AST
 {
     public:
+        std::string name;
+        std::string ret_type;
         std::vector<std::unique_ptr<VariableAST>> params;
 
-
+        // PrototypeAST(const std::string name, const std::string ret_type, std::vector<std::unique_ptr<VariableAST>> params);
+        PrototypeAST() {};
+        PrototypeAST(const PrototypeAST& other);
+        void addParam(std::unique_ptr<VariableAST> param);
+        virtual llvm::Value* accept(CodegenVisitor& cg) override;
+        virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:
         virtual PrototypeAST* cloneImpl() override;
 };

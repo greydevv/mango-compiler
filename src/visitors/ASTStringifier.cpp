@@ -7,6 +7,9 @@
 #include "../ast/ModuleAST.h"
 #include "../ast/VariableAST.h"
 #include "../ast/NumberAST.h"
+#include "../ast/CompoundAST.h"
+#include "../ast/FunctionAST.h"
+#include "../ast/PrototypeAST.h"
 #include "ASTStringifier.h"
 
 ASTStringifier::ASTStringifier(bool simpleExpr)
@@ -63,6 +66,18 @@ std::string ASTStringifier::toString(VariableAST* ast, int tabs) {
         s << "VariableAST(" << ast->id << ')';
     }
     return s.str();
+}
+
+std::string ASTStringifier::toString(CompoundAST* ast, int tabs) {
+    return "CompoundAST (Not Implemented)";
+}
+
+std::string ASTStringifier::toString(FunctionAST* ast, int tabs) {
+    return "FunctionAST (Not Implemented)";
+}
+
+std::string ASTStringifier::toString(PrototypeAST* ast, int tabs) {
+    return "PrototypeAST (Not Implemented)";
 }
 
 std::string ASTStringifier::indent(std::string str, int tabs)

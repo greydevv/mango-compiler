@@ -1,5 +1,5 @@
-#ifndef FUNCTION_AST_H
-#define FUNCTION_AST_H
+#ifndef COMPOUND_AST_H
+#define COMPOUND_AST_H
 
 #include <memory>
 #include <vector>

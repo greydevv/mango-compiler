@@ -8,6 +8,7 @@
 #include "CompoundAST.h"
 #include "../visitors/CodegenVisitor.h"
 #include "../visitors/ASTStringifier.h"
+#include "llvm/IR/Value.h"
 
 class FunctionAST : public AST
 {
@@ -15,11 +16,12 @@ class FunctionAST : public AST
         std::unique_ptr<PrototypeAST> proto;
         std::unique_ptr<CompoundAST> body;
 
-        FunctionAST(std::unique_ptr<PrototypeAST> proto, std::unique_ptr<CompoundAST>, body);
-        virtual llvm::Function* accept(CodegenVisitor& cg) override;
+        FunctionAST(std::unique_ptr<PrototypeAST> proto, std::unique_ptr<CompoundAST> body);
+        FunctionAST(const FunctionAST& other);
+        virtual llvm::Value* accept(CodegenVisitor& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:
-        virtual ExpressionAST* cloneImpl() override;
+        virtual FunctionAST* cloneImpl() override;
 };
 
 #endif
