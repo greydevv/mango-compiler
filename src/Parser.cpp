@@ -72,6 +72,13 @@ std::unique_ptr<AST> Parser::parseTerm()
             return parseNum();
         case Token::TOK_ID:
             return parseId();
+        case Token::TOK_OPAREN:
+            {
+                eat();
+                std::unique_ptr<AST> expr = parseExpr();
+                eat(Token::TOK_CPAREN);
+                return expr;
+            }
         default:
             setErrState(1);
             std::cout << "[Dev Error] Not an operand:  " << tok << '\n';
