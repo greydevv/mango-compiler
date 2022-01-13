@@ -3,11 +3,6 @@
 #include "../visitors/CodegenVisitor.h"
 #include "../visitors/ASTStringifier.h"
 
-ModuleAST::ModuleAST()
-{
-    children.reserve(1);
-}
-
 ModuleAST::ModuleAST(const ModuleAST& other)
 {
     for (auto& child : other.children)
