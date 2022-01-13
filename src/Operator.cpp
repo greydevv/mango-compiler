@@ -36,22 +36,22 @@ Operator Operator::opSubtract()
 
 Operator Operator::opMultiply()
 {
-    return Operator(Operator::OP_SUB, 3, Operator::A_LEFT);
+    return Operator(Operator::OP_MUL, 3, Operator::A_LEFT);
 }
 
 Operator Operator::opDivide()
 {
-    return Operator(Operator::OP_SUB, 3, Operator::A_LEFT);
+    return Operator(Operator::OP_DIV, 3, Operator::A_LEFT);
 }
 
 Operator Operator::opPower()
 {
-    return Operator(Operator::OP_SUB, 4, Operator::A_LEFT);
+    return Operator(Operator::OP_EXP, 4, Operator::A_LEFT);
 }
 
 Operator Operator::opUnknown()
 {
-    return Operator(Operator::OP_SUB, -1, Operator::A_LEFT);
+    return Operator(Operator::OP_NOP, -1, Operator::A_LEFT);
 }
 
 bool Operator::operator==(const Operator& other)
