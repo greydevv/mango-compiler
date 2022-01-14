@@ -2,6 +2,7 @@
 #define CODEGEN_H
 
 #include "llvm/IR/Value.h"
+#include "llvm/IR/IRBuilder.h"
 
 class ExpressionAST;
 class ModuleAST;
@@ -14,7 +15,7 @@ class PrototypeAST;
 class CodegenVisitor
 {
     public:
-        CodegenVisitor() {};
+        CodegenVisitor(const std::string& fname, std::unique_ptr<ModuleAST> ast);
         llvm::Value* codegen(ExpressionAST* ast);
         llvm::Value* codegen(ModuleAST* ast);
         llvm::Value* codegen(VariableAST* ast);
@@ -22,6 +23,13 @@ class CodegenVisitor
         llvm::Value* codegen(FunctionAST* ast);
         llvm::Value* codegen(CompoundAST* ast);
         llvm::Value* codegen(PrototypeAST* ast);
+
+    private:
+        std::unique_ptr<ModuleAST> ast;
+        std::unique_ptr<llvm::LLVMContext> ctx;
+        std::unique_ptr<llvm::IRBuilder<>> builder;
+        std::unique_ptr<llvm::Module> mainModule;
+        std::map<std::string, llvm::AllocaInst*> namedValues;
 };
 
 #endif

@@ -8,6 +8,11 @@
 #include "../ast/PrototypeAST.h"
 #include "llvm/IR/Value.h"
 
+CodegenVisitor::CodegenVisitor(const std::string& fname, std::unique_ptr<ModuleAST> ast) 
+    : ast(std::move(ast)),
+      ctx(std::make_unique<llvm::LLVMContext>()),
+      builder(std::make_unique<llvm::IRBuilder<>>(*ctx)) {}
+
 llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast) {
     return nullptr;    
 }
