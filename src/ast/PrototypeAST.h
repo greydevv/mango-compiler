@@ -13,7 +13,7 @@ class PrototypeAST : public AST
 {
     public:
         std::string name;
-        std::string ret_type;
+        std::string retType;
         std::vector<std::unique_ptr<VariableAST>> params;
 
         // PrototypeAST(const std::string name, const std::string ret_type, std::vector<std::unique_ptr<VariableAST>> params);
