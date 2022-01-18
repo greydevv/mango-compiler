@@ -53,6 +53,10 @@ std::unique_ptr<AST> Parser::parseKwd()
     {
         return parseReturnStmt();
     }
+    else if (tok.value == "func")
+    {
+        return parseFuncDef();
+    }
     else if (tok.isType())
     {
         eat(Token::TOK_KWD);
@@ -69,12 +73,12 @@ std::unique_ptr<AST> Parser::parseKwd()
 
 std::unique_ptr<AST> Parser::parseId()
 {
-    // assuming it's a function definition
-    return parseFuncDef();
+    return parseExpr();
 }
 
 std::unique_ptr<FunctionAST> Parser::parseFuncDef()
 {
+    eat(Token::TOK_KWD);
     return std::make_unique<FunctionAST>(parseFuncProto(), parseCompound());
 }
 
