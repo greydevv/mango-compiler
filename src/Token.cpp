@@ -33,16 +33,23 @@ Type Token::toType()
 {
     if (value == "void")
     {
-        return Type::tVoid;
+        return Type::eVoid;
     }
     else if (value == "int")
     {
-        return Type::tInt;
+        return Type::eInt;
     }
     else
     {
-        return Type::tUnd;
+        return Type::eUnd;
     }
+}
+
+bool Token::isType()
+{
+    return (value == "int"
+            || value == "return"
+            || value == "func");
 }
 
 Token::token_type Token::typeFromChar(char c)

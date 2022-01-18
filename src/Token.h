@@ -46,6 +46,7 @@ class Token final
         Token(token_type type, const std::string& value, SourceLocation loc);
         Operator toOperator();
         Type toType();
+        bool isType();
         static token_type typeFromChar(char c);
         bool operator==(token_type other_type);
         bool operator!=(token_type other_type);

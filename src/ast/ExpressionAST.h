@@ -7,6 +7,13 @@
 #include "../visitors/CodegenVisitor.h"
 #include "../visitors/ASTStringifier.h"
 
+enum class ExprCtx
+{
+    eStore,
+    eReference,
+    eReturn
+};
+
 class ExpressionAST : public AST
 {
     public:
