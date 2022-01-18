@@ -18,6 +18,32 @@ void Lexer::debugRead()
     std::cout << '\n';
 }
 
+Token Lexer::peekToken(int offset)
+{
+    // store previous data
+    int prevPos = pos;
+    char prevChar = c;
+    SourceLocation prevLoc = loc;
+
+    // get next token
+    Token tok = nextToken();
+    if (offset > 1)
+    {
+        // subtract 1 from offset because first peek is already done above
+        for (int i = 0; i < offset-1; i++)
+        {
+            tok = nextToken();
+        }
+    }
+
+    // reset data
+    pos = prevPos;
+    c = prevChar;
+    loc = prevLoc;
+
+    return tok;
+}
+
 Token Lexer::nextToken()
 {
     if (isspace(c))
@@ -116,9 +142,10 @@ Token::token_type Lexer::lexTokenType()
 
 bool Lexer::isKwd(const std::string& s)
 {
-    // only supports two keywords at the moment
+    // reserved keywords
     return (s == "int"
-            || s == "return");
+            || s == "return"
+            || s == "func");
 }
 
 void Lexer::next()

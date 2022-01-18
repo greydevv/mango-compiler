@@ -9,6 +9,7 @@ class Lexer
     public:
         Lexer(const std::string& src);
         void debugRead();
+        Token peekToken(int offset = 1);
         Token nextToken();
 
     private:
