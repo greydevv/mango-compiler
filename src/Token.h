@@ -4,6 +4,7 @@
 #include <sstream>
 #include <map>
 #include "Operator.h"
+#include "Types.h"
 
 struct SourceLocation
 {
@@ -11,7 +12,7 @@ struct SourceLocation
     int y; // character on line
 };
 
-class Token
+class Token final
 {
     public:
         enum token_type
@@ -44,7 +45,10 @@ class Token
         Token(token_type type, SourceLocation loc);
         Token(token_type type, const std::string& value, SourceLocation loc);
         Operator toOperator();
+        Type toType();
         static token_type typeFromChar(char c);
+        bool operator==(token_type other_type);
+        bool operator!=(token_type other_type);
         friend std::ostream& operator<<(std::ostream& os, const Token& tok);
 };
 

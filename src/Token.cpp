@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Token.h"
 #include "Operator.h"
+#include "Types.h"
 
 Token::Token(token_type type, SourceLocation loc)
     : type(type), value(tokenValues.at(type)), loc(loc) {}
@@ -26,6 +27,22 @@ Operator Token::toOperator()
         default:
             return Operator::opUnknown();
     } 
+}
+
+Type Token::toType()
+{
+    if (value == "void")
+    {
+        return Type::tVoid;
+    }
+    else if (value == "int")
+    {
+        return Type::tInt;
+    }
+    else
+    {
+        return Type::tUnd;
+    }
 }
 
 Token::token_type Token::typeFromChar(char c)
@@ -64,4 +81,14 @@ std::ostream& operator<<(std::ostream& os, const Token& tok)
         os << '<' << tokenStrings[tok.type] << ": " << tok.value << " (line: " << tok.loc.y << ": " << tok.loc.x << ")>";
     }
     return os;
+}
+
+bool Token::operator==(token_type other_type)
+{
+    return type == other_type;
+}
+
+bool Token::operator!=(token_type other_type)
+{
+    return type != other_type;
 }

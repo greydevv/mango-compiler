@@ -1,22 +1,21 @@
 #include "PrototypeAST.h"
 #include "VariableAST.h"
+#include "../Types.h"
 #include "../visitors/CodegenVisitor.h"
 #include "../visitors/ASTStringifier.h"
 #include "llvm/IR/Value.h"
 
-// PrototypeAST::PrototypeAST(const std::string name, const std::string ret_type, std::vector<std::unique_ptr<VariableAST>> params)
-//     : name(name), ret_type(ret_type)
-// {
-//     for (auto& )
-// }
+PrototypeAST::PrototypeAST(const std::string name, Type retType, std::vector<std::unique_ptr<VariableAST>> params)
+    : name(name), retType(retType), params(std::move(params)) {}
 
 PrototypeAST::PrototypeAST(const PrototypeAST& other)
 {
     params = std::vector<std::unique_ptr<VariableAST>>();
-    // for (auto& param : other.params)
-    // {
-    //     params.push_back(std::unique_ptr<AST>(param->clone()));
-    // }
+    // TODO: implement this method
+//     for (auto& param : other.params)
+//     {
+//         params.push_back(std::unique_ptr<VariableAST>(param->clone())
+//     }
 }
 
 void PrototypeAST::addParam(std::unique_ptr<VariableAST> param)

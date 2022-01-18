@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include "AST.h"
+#include "../Types.h"
 #include "VariableAST.h"
 #include "../visitors/CodegenVisitor.h"
 #include "../visitors/ASTStringifier.h"
@@ -13,11 +14,10 @@ class PrototypeAST : public AST
 {
     public:
         std::string name;
-        std::string retType;
+        Type retType;
         std::vector<std::unique_ptr<VariableAST>> params;
 
-        // PrototypeAST(const std::string name, const std::string ret_type, std::vector<std::unique_ptr<VariableAST>> params);
-        PrototypeAST() {};
+        PrototypeAST(const std::string name, Type ret_type, std::vector<std::unique_ptr<VariableAST>> params);
         PrototypeAST(const PrototypeAST& other);
         void addParam(std::unique_ptr<VariableAST> param);
         virtual llvm::Value* accept(CodegenVisitor& cg) override;
