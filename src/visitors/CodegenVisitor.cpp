@@ -6,6 +6,7 @@
 #include "../ast/FunctionAST.h"
 #include "../ast/CompoundAST.h"
 #include "../ast/PrototypeAST.h"
+#include "../ast/ReturnAST.h"
 #include "llvm/IR/Value.h"
 
 CodegenVisitor::CodegenVisitor(const std::string& fname, std::unique_ptr<ModuleAST> ast) 
@@ -38,5 +39,9 @@ llvm::Value* CodegenVisitor::codegen(CompoundAST* ast) {
 }
 
 llvm::Value* CodegenVisitor::codegen(PrototypeAST* ast) {
+    return nullptr;
+}
+
+llvm::Value* CodegenVisitor::codegen(ReturnAST* ast) {
     return nullptr;
 }

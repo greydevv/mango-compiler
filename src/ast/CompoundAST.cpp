@@ -13,6 +13,9 @@ CompoundAST::CompoundAST(const CompoundAST& other)
     }
 }
 
+CompoundAST::CompoundAST(std::vector<std::unique_ptr<AST>> children)
+    : children(std::move(children)) {}
+
 void CompoundAST::addChild(std::unique_ptr<AST> child)
 {
     children.push_back(std::move(child));

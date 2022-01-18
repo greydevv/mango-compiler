@@ -13,6 +13,7 @@
 #include "ast/NumberAST.h"
 #include "ast/FunctionAST.h"
 #include "ast/PrototypeAST.h"
+#include "ast/ReturnAST.h"
 
 Parser::Parser(const std::string& src)
     : lexer(Lexer(src)), tok(Token::TOK_EOF, {0,0})
@@ -48,11 +49,22 @@ std::unique_ptr<AST> Parser::parsePrimary()
 
 std::unique_ptr<AST> Parser::parseKwd()
 {
-    // assuming it's a variable declaration for now
-    eat(Token::TOK_KWD);
-    std::unique_ptr<AST> exprAST = parseExpr();
-    eat(Token::TOK_SCOLON);
-    return exprAST;
+    if (tok.value == "return")
+    {
+        return parseReturnStmt();
+    }
+    else if (tok.isType())
+    {
+        eat(Token::TOK_KWD);
+        std::unique_ptr<AST> exprAST = parseExpr();
+        eat(Token::TOK_SCOLON);
+        return exprAST;
+    }
+    else
+    {
+        std::cout << "NOT IMPLEMENTED";
+        exit(1);
+    }
 }
 
 std::unique_ptr<AST> Parser::parseId()
@@ -63,17 +75,7 @@ std::unique_ptr<AST> Parser::parseId()
 
 std::unique_ptr<FunctionAST> Parser::parseFuncDef()
 {
-    std::unique_ptr<PrototypeAST> proto = parseFuncProto();
-    eat(Token::TOK_OBRACK);
-    // temporary loop to ignore body
-    while (tok != Token::TOK_CBRACK)
-    {
-        eat();
-    }
-    std::unique_ptr<CompoundAST> body;
-    eat(Token::TOK_CBRACK);
-
-    return std::make_unique<FunctionAST>(std::move(proto), std::move(body));
+    return std::make_unique<FunctionAST>(parseFuncProto(), parseCompound());
 }
 
 std::unique_ptr<PrototypeAST> Parser::parseFuncProto()
@@ -82,7 +84,7 @@ std::unique_ptr<PrototypeAST> Parser::parseFuncProto()
 
     eat(Token::TOK_ID);
     std::vector<std::unique_ptr<VariableAST>> params = parseFuncParams();
-    Type retType = Type::tVoid;
+    Type retType = Type::eVoid;
     if (tok == Token::TOK_RARROW)
     {
         eat(Token::TOK_RARROW);
@@ -115,6 +117,26 @@ std::vector<std::unique_ptr<VariableAST>> Parser::parseFuncParams()
     }
     eat(Token::TOK_CPAREN);
     return params;
+}
+
+std::unique_ptr<CompoundAST> Parser::parseCompound()
+{
+    eat(Token::TOK_OBRACK);
+    std::vector<std::unique_ptr<AST>> children;
+    while (tok != Token::TOK_CBRACK)
+    {
+        children.push_back(parsePrimary());
+    }
+    eat(Token::TOK_CBRACK);
+    return std::make_unique<CompoundAST>(std::move(children));
+}
+
+std::unique_ptr<ReturnAST> Parser::parseReturnStmt()
+{
+    eat(Token::TOK_KWD);
+    std::unique_ptr<AST> expr = parseExpr();
+    eat(Token::TOK_SCOLON);
+    return std::make_unique<ReturnAST>(std::move(expr));
 }
 
 std::unique_ptr<NumberAST> Parser::parseNum() 

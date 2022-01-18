@@ -12,7 +12,7 @@ class CompoundAST : public AST
     public:
         std::vector<std::unique_ptr<AST>> children;
 
-        CompoundAST() {};
+        CompoundAST(std::vector<std::unique_ptr<AST>> children);
         CompoundAST(const CompoundAST& other);
         void addChild(std::unique_ptr<AST> child);
         virtual llvm::Value* accept(CodegenVisitor& cg) override;

@@ -12,6 +12,7 @@ class NumberAST;
 class CompoundAST;
 class FunctionAST;
 class PrototypeAST;
+class ReturnAST;
 
 class ASTStringifier
 {
@@ -24,6 +25,7 @@ class ASTStringifier
         std::string toString(CompoundAST* ast, int tabs = 0);
         std::string toString(FunctionAST* ast, int tabs = 0);
         std::string toString(PrototypeAST* ast, int tabs = 0);
+        std::string toString(ReturnAST* ast, int tabs = 0);
     
     private:
         bool simpleExpr;

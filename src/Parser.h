@@ -30,6 +30,8 @@ class Parser
         std::unique_ptr<FunctionAST> parseFuncDef();
         std::unique_ptr<PrototypeAST> parseFuncProto();
         std::vector<std::unique_ptr<VariableAST>> parseFuncParams();
+        std::unique_ptr<CompoundAST> parseCompound();
+        std::unique_ptr<ReturnAST> parseReturnStmt();
         std::unique_ptr<VariableAST> parseIdTerm();
         std::unique_ptr<AST> parseTerm();
         std::unique_ptr<AST> parseExpr();

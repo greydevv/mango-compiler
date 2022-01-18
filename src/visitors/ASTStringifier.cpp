@@ -10,6 +10,7 @@
 #include "../ast/CompoundAST.h"
 #include "../ast/FunctionAST.h"
 #include "../ast/PrototypeAST.h"
+#include "../ast/ReturnAST.h"
 #include "ASTStringifier.h"
 
 ASTStringifier::ASTStringifier(bool simpleExpr)
@@ -70,7 +71,25 @@ std::string ASTStringifier::toString(VariableAST* ast, int tabs) {
 }
 
 std::string ASTStringifier::toString(CompoundAST* ast, int tabs) {
-    return "CompoundAST (Not Implemented)";
+    std::ostringstream s;
+    if (simpleExpr)
+    {
+        s << "{ \n";
+        for (int i = 0; i < ast->children.size(); i++)
+        {
+            s << indent(ast->children[i]->accept(*this, tabs+1), tabs+1) << '\n';
+        }
+        s << "}";
+    }
+    else
+    {
+        s << "CompoundAST:\n";
+        for (int i = 0; i < ast->children.size(); i++)
+        {
+            s << indent(ast->children[i]->accept(*this, tabs+1), tabs+1) << '\n';
+        }
+    }
+    return s.str();
 }
 
 std::string ASTStringifier::toString(FunctionAST* ast, int tabs) {
@@ -83,6 +102,7 @@ std::string ASTStringifier::toString(FunctionAST* ast, int tabs) {
     {
         s << "FunctionAST:\n";
         s << indent(ast->proto->accept(*this, tabs+1), tabs+1);
+        s << indent(ast->body->accept(*this, tabs+1), tabs+1);
     }
     return s.str();
 }
@@ -120,4 +140,19 @@ std::string ASTStringifier::toString(PrototypeAST* ast, int tabs) {
 std::string ASTStringifier::indent(std::string str, int tabs)
 {
     return str.insert(0, tabs*2, ' ');
+}
+
+std::string ASTStringifier::toString(ReturnAST* ast, int tabs)
+{
+    std::ostringstream s;
+    if (simpleExpr)
+    {
+        s << "return " << ast->expr->accept(*this) << '\n';
+    }
+    else
+    {
+        s << "ReturnAST:\n";
+        s << indent(ast->expr->accept(*this, tabs+1), tabs+1);
+    }
+    return s.str();
 }

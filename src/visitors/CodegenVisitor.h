@@ -11,6 +11,7 @@ class NumberAST;
 class FunctionAST;
 class CompoundAST;
 class PrototypeAST;
+class ReturnAST;
 
 class CodegenVisitor
 {
@@ -23,6 +24,7 @@ class CodegenVisitor
         llvm::Value* codegen(FunctionAST* ast);
         llvm::Value* codegen(CompoundAST* ast);
         llvm::Value* codegen(PrototypeAST* ast);
+        llvm::Value* codegen(ReturnAST* ast);
 
     private:
         std::unique_ptr<ModuleAST> ast;
