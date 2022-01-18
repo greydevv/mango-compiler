@@ -1,5 +1,32 @@
 # C++ Compiler
-This is a compiler written in C++ for my currently unnamed language. 
+
+Compiler for a custom programming language.
 
 ### Warning
 This compiler is still under development.
+
+### Language
+
+
+#### Examples
+```
+func add(int a, int b) -> int
+{
+    return a + b;
+}
+```
+
+AST of the above snippet:
+```
+FunctionAST:
+  PrototypeAST(add)
+    Returns: int
+    Parameters:
+      VariableAST(a)
+      VariableAST(b)
+  CompoundAST:
+    ReturnAST:
+      ExpressionAST(+):
+        VariableAST(a)
+        VariableAST(b)
+```
