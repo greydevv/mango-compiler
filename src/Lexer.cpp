@@ -20,7 +20,9 @@ void Lexer::debugRead()
 
 Token Lexer::peekToken(int offset)
 {
-    // store previous data
+    // TODO: handle overflowing past EOF
+
+    // store previous lexer position
     int prevPos = pos;
     char prevChar = c;
     SourceLocation prevLoc = loc;
@@ -36,7 +38,7 @@ Token Lexer::peekToken(int offset)
         }
     }
 
-    // reset data
+    // reset lexer position
     pos = prevPos;
     c = prevChar;
     loc = prevLoc;
