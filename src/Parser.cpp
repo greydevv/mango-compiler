@@ -4,12 +4,15 @@
 #include <vector>
 #include "Token.h"
 #include "Operator.h"
+#include "Types.h"
 #include "Lexer.h"
 #include "Parser.h"
 #include "ast/ModuleAST.h"
 #include "ast/ExpressionAST.h"
 #include "ast/VariableAST.h"
 #include "ast/NumberAST.h"
+#include "ast/FunctionAST.h"
+#include "ast/PrototypeAST.h"
 
 Parser::Parser(const std::string& src)
     : lexer(Lexer(src)), tok(Token::TOK_EOF, {0,0})
@@ -31,9 +34,11 @@ std::unique_ptr<AST> Parser::parsePrimary()
 {
     switch (tok.type)
     {
-        // could be either a funcdef, control flow, or variable statement
         case Token::TOK_KWD:
             return parseKwd();
+        case Token::TOK_ID:
+            // either variable redefinition, reference, or funcdef
+            return parseId();
         default:
             std::unique_ptr<AST> exprAST = parseExpr();
             eat(Token::TOK_SCOLON);
@@ -50,6 +55,68 @@ std::unique_ptr<AST> Parser::parseKwd()
     return exprAST;
 }
 
+std::unique_ptr<AST> Parser::parseId()
+{
+    // assuming it's a function definition
+    return parseFuncDef();
+}
+
+std::unique_ptr<FunctionAST> Parser::parseFuncDef()
+{
+    std::unique_ptr<PrototypeAST> proto = parseFuncProto();
+    eat(Token::TOK_OBRACK);
+    // temporary loop to ignore body
+    while (tok != Token::TOK_CBRACK)
+    {
+        eat();
+    }
+    std::unique_ptr<CompoundAST> body;
+    eat(Token::TOK_CBRACK);
+
+    return std::make_unique<FunctionAST>(std::move(proto), std::move(body));
+}
+
+std::unique_ptr<PrototypeAST> Parser::parseFuncProto()
+{
+    std::string name = tok.value;
+
+    eat(Token::TOK_ID);
+    std::vector<std::unique_ptr<VariableAST>> params = parseFuncParams();
+    Type retType = Type::tVoid;
+    if (tok == Token::TOK_RARROW)
+    {
+        eat(Token::TOK_RARROW);
+        retType = tok.toType();
+        eat(Token::TOK_KWD);
+    }
+    return std::make_unique<PrototypeAST>(name, retType, std::move(params));
+}
+
+std::vector<std::unique_ptr<VariableAST>> Parser::parseFuncParams()
+{
+    std::vector<std::unique_ptr<VariableAST>> params;
+    eat(Token::TOK_OPAREN);
+    while (true)
+    {
+        // TODO: parse type (currently just eating it for AST construction
+        // purposes)
+        eat(Token::TOK_KWD);
+        std::unique_ptr<VariableAST> param = std::make_unique<VariableAST>(tok.value);
+        params.push_back(std::move(param));
+        eat(Token::TOK_ID);
+        if (tok == Token::TOK_COMMA)
+        {
+            eat(Token::TOK_COMMA);
+        }
+        else
+        {
+            break;
+        }
+    }
+    eat(Token::TOK_CPAREN);
+    return params;
+}
+
 std::unique_ptr<NumberAST> Parser::parseNum() 
 {
     std::unique_ptr<NumberAST> numAST = std::make_unique<NumberAST>(std::stod(tok.value));
@@ -57,7 +124,7 @@ std::unique_ptr<NumberAST> Parser::parseNum()
     return numAST;
 }
 
-std::unique_ptr<VariableAST> Parser::parseId() 
+std::unique_ptr<VariableAST> Parser::parseIdTerm() 
 {
     std::unique_ptr<VariableAST> varAST = std::make_unique<VariableAST>(tok.value);
     eat(Token::TOK_ID);
@@ -71,10 +138,10 @@ std::unique_ptr<AST> Parser::parseTerm()
         case Token::TOK_NUM:
             return parseNum();
         case Token::TOK_ID:
-            return parseId();
+            return parseIdTerm();
         case Token::TOK_OPAREN:
             {
-                eat();
+                eat(Token::TOK_OPAREN);
                 std::unique_ptr<AST> expr = parseExpr();
                 eat(Token::TOK_CPAREN);
                 return expr;
