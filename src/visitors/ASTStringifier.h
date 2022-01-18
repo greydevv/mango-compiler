@@ -5,8 +5,8 @@
 #include <memory>
 #include <string>
 
-class ExpressionAST;
 class ModuleAST;
+class ExpressionAST;
 class VariableAST;
 class NumberAST;
 class CompoundAST;
@@ -17,8 +17,8 @@ class ASTStringifier
 {
     public:
         ASTStringifier(bool simpleExpr = false);
-        std::string toString(ExpressionAST* ast, int tabs = 0);
         std::string toString(ModuleAST* ast, int tabs = 0);
+        std::string toString(ExpressionAST* ast, int tabs = 0);
         std::string toString(VariableAST* ast, int tabs = 0);
         std::string toString(NumberAST* ast, int tabs = 0);
         std::string toString(CompoundAST* ast, int tabs = 0);
