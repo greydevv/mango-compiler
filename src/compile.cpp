@@ -6,6 +6,7 @@
 #include "Lexer.h"
 #include "Parser.h"
 #include "ast/ModuleAST.h"
+#include "Exception.h"
 
 int compile(const std::string& fname)
 {
@@ -17,7 +18,13 @@ int compile(const std::string& fname)
     }
     std::string src = readFile(fs);
     Parser parser(src);
-    std::unique_ptr<ModuleAST> ast = parser.parse();
-    std::cout << stringify(ast.get());
+    try {
+        std::unique_ptr<ModuleAST> ast = parser.parse();
+        std::cout << stringify(ast.get());
+        // CodegenVisitor cg(fname, std::move(ast));
+        // cg.codegen();
+    } catch (const BaseException& e) {
+        std::cout << e.what() << '\n';
+    }
     return parser.getErrState();
 }

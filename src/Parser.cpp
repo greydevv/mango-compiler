@@ -14,6 +14,7 @@
 #include "ast/FunctionAST.h"
 #include "ast/PrototypeAST.h"
 #include "ast/ReturnAST.h"
+#include "Exception.h"
 
 Parser::Parser(const std::string& src)
     : lexer(Lexer(src)), tok(Token::TOK_EOF, {0,0})
@@ -38,7 +39,7 @@ std::unique_ptr<AST> Parser::parsePrimary()
         case Token::TOK_KWD:
             return parseKwd();
         case Token::TOK_ID:
-            // either variable redefinition, reference, or funcdef
+            // either variable redefinition, reference
             return parseId();
         default:
             std::unique_ptr<AST> exprAST = parseExpr();
@@ -212,8 +213,11 @@ bool Parser::eat(Token::token_type expectedType)
     bool badToken = (tok.type != expectedType);
     if (badToken)
     {
+        // std::cout << "[Dev Warning] Unexpected token: got " << tokenStrings[tok.type] << " but expected " << tokenStrings[expectedType] << '\n';
         setErrState(1);
-        std::cout << "[Dev Warning] Unexpected token: got " << tokenStrings[tok.type] << " but expected " << tokenStrings[expectedType] << '\n';
+        std::ostringstream s;
+        s << "expected '" << tokenValues.at(expectedType) << "' but got '" << tok.value << "' instead."; 
+        throw SyntaxError(s.str(), tok.loc);
     }
     getToken();
     return badToken;
