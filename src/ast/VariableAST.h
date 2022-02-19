@@ -6,12 +6,19 @@
 #include "../visitors/CodegenVisitor.h"
 #include "../visitors/ASTStringifier.h"
 
+enum class VarCtx
+{
+    eReference, // referencing a variable
+    eStore, // declaring a variable
+};
+
 class VariableAST : public AST 
 {
     public:
         std::string id;
+        bool store;
 
-        VariableAST(const std::string& id);
+        VariableAST(const std::string& id, bool store = false);
         VariableAST(const VariableAST& other);
         virtual llvm::Value* accept(CodegenVisitor& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;

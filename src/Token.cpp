@@ -3,6 +3,9 @@
 #include "Operator.h"
 #include "Types.h"
 
+SourceLocation::SourceLocation(int x, int y)
+    : x(x), y(y) {}
+
 Token::Token(token_type type, SourceLocation loc)
     : type(type), value(tokenValues.at(type)), loc(loc) {}
 

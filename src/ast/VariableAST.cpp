@@ -3,8 +3,8 @@
 #include "../visitors/CodegenVisitor.h"
 #include "../visitors/ASTStringifier.h"
 
-VariableAST::VariableAST(const std::string& id)
-    : id(id) {}
+VariableAST::VariableAST(const std::string& id, bool store)
+    : id(id), store(store) {}
 
 VariableAST::VariableAST(const VariableAST& other)
     : id(other.id) {}

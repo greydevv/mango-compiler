@@ -3,6 +3,7 @@
 #include "../Operator.h"
 #include "../visitors/CodegenVisitor.h"
 #include "../visitors/ASTStringifier.h"
+#include "llvm/IR/Value.h"
 
 ExpressionAST::ExpressionAST(std::unique_ptr<AST> LHS, std::unique_ptr<AST> RHS, Operator::op_type op) 
     : LHS(std::move(LHS)), RHS(std::move(RHS)), op(op) {}

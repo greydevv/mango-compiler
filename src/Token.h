@@ -10,6 +10,8 @@ struct SourceLocation
 {
     int x; // line
     int y; // character on line
+
+    SourceLocation(int x, int y);
 };
 
 class Token final
