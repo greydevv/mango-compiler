@@ -78,9 +78,9 @@ static const std::string tokenStrings[] = {
 };
 
 static const std::map<Token::token_type, std::string> tokenValues = {
-    {Token::TOK_NUM, ""},
-    {Token::TOK_ID, ""},
-    {Token::TOK_KWD, ""},
+    {Token::TOK_NUM, "number"},
+    {Token::TOK_ID, "identifier"},
+    {Token::TOK_KWD, "kwd"},
     {Token::TOK_TYPE, ""},
     {Token::TOK_OPAREN, "("},
     {Token::TOK_CPAREN, ")"},
