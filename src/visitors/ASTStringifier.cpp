@@ -128,7 +128,8 @@ std::string ASTStringifier::toString(PrototypeAST* ast, int tabs) {
     {
         s << "PrototypeAST(" << ast->name << ")\n";
         s << indent("Returns: ", tabs+1) << typeToString(ast->retType) << '\n';
-        s << indent("Parameters: ", tabs+1) << '\n';
+        if (ast->params.size() > 0)
+            s << indent("Parameters: ", tabs+1) << '\n';
         for (auto& param : ast->params)
         {
             s << indent(param->accept(*this, tabs+2), tabs+2) << '\n';
