@@ -50,7 +50,6 @@ std::unique_ptr<AST> Parser::parsePrimary()
 
 std::unique_ptr<AST> Parser::parseKwd()
 {
-    std::cout << "PARSING KEYWORD: " << tok.value << "\n";
     if (tok.value == "return")
     {
         return parseReturnStmt();
@@ -237,10 +236,12 @@ void Parser::getToken()
     tok = lexer.nextToken();
 }
 
-int Parser::getErrState() {
+int Parser::getErrState()
+{
     return errState;
 }
 
-void Parser::setErrState(int errState) {
+void Parser::setErrState(int errState) 
+{
     this->errState = errState;
 }
