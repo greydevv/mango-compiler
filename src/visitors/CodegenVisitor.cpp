@@ -1,3 +1,5 @@
+#include <iostream>
+#include <memory>
 #include <sstream>
 #include <string>
 #include "CodegenVisitor.h"
@@ -16,10 +18,72 @@
 #include "llvm/ADT/APFloat.h"
 #include "llvm/IR/Verifier.h"
 
+#include "llvm/IR/LegacyPassManager.h"
+#include "llvm/Support/FileSystem.h"
+#include "llvm/Support/Host.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/Support/TargetRegistry.h"
+#include "llvm/Support/TargetSelect.h"
+#include "llvm/Target/TargetMachine.h"
+#include "llvm/Target/TargetOptions.h"
+
 CodegenVisitor::CodegenVisitor(const std::string& fname, std::unique_ptr<ModuleAST> ast) 
     : ast(std::move(ast)),
       ctx(std::make_unique<llvm::LLVMContext>()),
-      builder(std::make_unique<llvm::IRBuilder<>>(*ctx)) {}
+      builder(std::make_unique<llvm::IRBuilder<>>(*ctx)) 
+{
+    mainModule = std::make_unique<llvm::Module>(fname, *ctx);
+}
+
+void CodegenVisitor::print()
+{
+    mainModule->print(llvm::errs(), nullptr);
+}
+
+int CodegenVisitor::emitObjectCode()
+{
+    auto targetTriple = llvm::sys::getDefaultTargetTriple();
+    llvm::InitializeAllTargetInfos();
+    llvm::InitializeAllTargets();
+    llvm::InitializeAllTargetMCs();
+    llvm::InitializeAllAsmParsers();
+    llvm::InitializeAllAsmPrinters();
+    
+    std::string error;
+    auto target = llvm::TargetRegistry::lookupTarget(targetTriple, error);
+    if (!target) {
+        llvm::errs() << error;
+        return 1;
+    }
+    auto cpu = "generic";
+    auto features = "";
+
+    llvm::TargetOptions opt;
+    auto rm = llvm::Optional<llvm::Reloc::Model>();
+    auto targetMachine = target->createTargetMachine(targetTriple, cpu, features, opt, rm);
+    mainModule->setDataLayout(targetMachine->createDataLayout());
+    mainModule->setTargetTriple(targetTriple);
+    auto filename = "output.o";
+    std::error_code ec;
+    llvm::raw_fd_ostream dest(filename, ec, llvm::sys::fs::OF_None);
+
+    if (ec) {
+        llvm::errs() << "Could not open file: " << ec.message();
+        return 1;
+    }
+    
+    llvm::legacy::PassManager pass;
+    auto ftype = llvm::CGFT_ObjectFile;
+
+    if (targetMachine->addPassesToEmitFile(pass, dest, nullptr, ftype)) {
+        llvm::errs() << "TargetMachine can't emit a file of this type";
+        return 1;
+    }
+
+    pass.run(*mainModule);
+    dest.flush();
+    return 0;
+}
 
 llvm::Value* CodegenVisitor::codegen() {
     return ast->accept(*this);
@@ -92,10 +156,12 @@ llvm::Function* CodegenVisitor::codegen(FunctionAST* ast) {
         namedValues[param.getName().str()] = &param;
     }
     
-    if (llvm::Value* retVal = ast->body->accept(*this)) {
-      builder->CreateRet(retVal);
-      llvm::verifyFunction(*func);
-      return func;
+    llvm::Value* retVal = ast->body->accept(*this);
+    if (retVal)
+    {
+        builder->CreateRet(retVal);
+        llvm::verifyFunction(*func);
+        return func;
     }
 
     func->eraseFromParent();
@@ -103,7 +169,7 @@ llvm::Function* CodegenVisitor::codegen(FunctionAST* ast) {
 }
 
 llvm::Value* CodegenVisitor::codegen(CompoundAST* ast) {
-    return nullptr;
+    return ast->children[0]->accept(*this);
 }
 
 llvm::Function* CodegenVisitor::codegen(PrototypeAST* ast) {
@@ -111,15 +177,14 @@ llvm::Function* CodegenVisitor::codegen(PrototypeAST* ast) {
     llvm::FunctionType *funcType = llvm::FunctionType::get(llvm::Type::getDoubleTy(*ctx), doubles, false);
     llvm::Function *func = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, ast->name, mainModule.get());
 
-    unsigned i = 0;
+    int i = 0;
     for (auto& param : func->args())
     {
         param.setName(ast->params[i++]->id);
     }
-
     return func;
 }
 
 llvm::Value* CodegenVisitor::codegen(ReturnAST* ast) {
-    return nullptr;
+    return ast->expr->accept(*this);
 }

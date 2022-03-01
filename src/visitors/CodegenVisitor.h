@@ -19,6 +19,8 @@ class CodegenVisitor
 {
     public:
         CodegenVisitor(const std::string& fname, std::unique_ptr<ModuleAST> ast);
+        void print();
+        int emitObjectCode();
         llvm::Value* codegen();
         llvm::Value* codegen(ExpressionAST* ast);
         llvm::Value* codegen(ModuleAST* ast);
