@@ -24,6 +24,7 @@ class Lexer
         Token lexOther();
         Token::token_type lexTokenType();
         bool isKwd(const std::string& s);
+        bool isType(const std::string& s);
         char peek(int offset = 1);
         void next();
         void skipWhitespace();

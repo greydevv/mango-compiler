@@ -81,7 +81,7 @@ static const std::map<Token::token_type, std::string> tokenValues = {
     {Token::TOK_NUM, "number"},
     {Token::TOK_ID, "identifier"},
     {Token::TOK_KWD, "kwd"},
-    {Token::TOK_TYPE, ""},
+    {Token::TOK_TYPE, "type"},
     {Token::TOK_OPAREN, "("},
     {Token::TOK_CPAREN, ")"},
     {Token::TOK_OBRACK, "{"},

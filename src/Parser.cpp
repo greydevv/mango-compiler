@@ -94,7 +94,7 @@ std::unique_ptr<PrototypeAST> Parser::parseFuncProto()
     {
         eat(Token::TOK_RARROW);
         retType = tok.toType();
-        eat(Token::TOK_KWD);
+        eat(Token::TOK_TYPE);
     }
     return std::make_unique<PrototypeAST>(name, retType, std::move(params));
 }
@@ -108,7 +108,7 @@ std::vector<std::unique_ptr<VariableAST>> Parser::parseFuncParams()
         while (true)
         {
             // TODO: parse type (currently just eating it for testing purposes)
-            eat(Token::TOK_KWD);
+            eat(Token::TOK_TYPE);
             std::unique_ptr<VariableAST> param = std::make_unique<VariableAST>(tok.value);
             params.push_back(std::move(param));
             eat(Token::TOK_ID);

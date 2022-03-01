@@ -103,7 +103,13 @@ Token Lexer::lexAlpha()
         s += c;
         next();
     }
-    Token::token_type type = isKwd(s) ? Token::TOK_KWD : Token::TOK_ID;
+    Token::token_type type;
+    if (isKwd(s))
+        type = Token::TOK_KWD;
+    else if (isType(s))
+        type = Token::TOK_TYPE;
+    else
+        type = Token::TOK_ID;
     return Token(type, s, tmpLoc);
 }
 
@@ -177,9 +183,13 @@ Token::token_type Lexer::lexTokenType()
 bool Lexer::isKwd(const std::string& s)
 {
     // reserved keywords
-    return (s == "int"
-            || s == "return"
+    return (s == "return"
             || s == "func");
+}
+
+bool Lexer::isType(const std::string& s)
+{
+    return (s == "int");
 }
 
 void Lexer::next()
