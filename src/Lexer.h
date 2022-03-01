@@ -11,6 +11,7 @@ class Lexer
         void debugRead(bool pretty = false);
         Token peekToken(int offset = 1);
         Token nextToken();
+        std::string getLine(int lineNo);
 
     private:
         const std::string& src;

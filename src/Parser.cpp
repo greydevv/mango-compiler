@@ -218,7 +218,9 @@ bool Parser::eat(Token::token_type expectedType)
         // std::cout << "[Dev Warning] Unexpected token: got " << tokenStrings[tok.type] << " but expected " << tokenStrings[expectedType] << '\n';
         setErrState(1);
         std::ostringstream s;
-        s << "expected '" << tokenValues.at(expectedType) << "' but got '" << tok.value << "' instead."; 
+        s << "expected '" << tokenValues.at(expectedType) << "' but got '" << tok.value << "' instead.\n"; 
+        s << lexer.getLine(tok.loc.y) << '\n';
+        s << std::string(tok.loc.x, ' ') << std::string(tok.value.size(), '^');
         throw SyntaxError(s.str(), tok.loc);
     }
     getToken();

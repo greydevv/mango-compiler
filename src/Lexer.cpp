@@ -96,13 +96,15 @@ Token Lexer::lexAlpha()
 {
     // TODO: refactor below while loop into separate function
     std::string s;
+    // want loc of token to start at beginning of token's value
+    SourceLocation tmpLoc(loc.x, loc.y);
     while (isalnum(c))
     {
         s += c;
         next();
     }
     Token::token_type type = isKwd(s) ? Token::TOK_KWD : Token::TOK_ID;
-    return Token(type, s, loc);
+    return Token(type, s, tmpLoc);
 }
 
 Token Lexer::lexNum()
@@ -217,4 +219,30 @@ void Lexer::skipComment()
     {
         skipWhitespace();
     }
+}
+
+std::string Lexer::getLine(int lineNo)
+{
+    char srcChar = src[0];
+    int srcPos = 0;
+    for (int i = 0; i < lineNo-1; i++)
+    {
+        while (srcChar != '\n' && srcChar != '\0')
+        {
+            srcPos++;
+            srcChar = src[srcPos];
+        }
+        srcPos++;
+        srcChar = src[srcPos];
+    }
+
+    std::string line;
+    while (srcChar != '\n' && srcChar != '\0')
+    {
+        line += srcChar;
+        srcPos++;
+        srcChar = src[srcPos];
+    }
+
+    return line;
 }
