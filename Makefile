@@ -18,3 +18,7 @@ $(EXEC): $(OBJS)
 clean:
 	@rm -f $(shell find src -type f -name '*.o')
 	@rm -f $(EXEC)
+
+.PHONY: output
+output:
+	$(CXX) output.cpp output.o -o output
