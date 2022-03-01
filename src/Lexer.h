@@ -8,7 +8,7 @@ class Lexer
 {
     public:
         Lexer(const std::string& src);
-        void debugRead();
+        void debugRead(bool pretty = false);
         Token peekToken(int offset = 1);
         Token nextToken();
 
@@ -26,6 +26,7 @@ class Lexer
         char peek(int offset = 1);
         void next();
         void skipWhitespace();
+        void skipComment();
 };
 
 #endif

@@ -5,17 +5,37 @@
 #include "Lexer.h"
 
 Lexer::Lexer(const std::string& src)
-    : src(src), pos(0), c(src[pos]), loc({0,1}) {}
-
-void Lexer::debugRead()
+    : src(src), pos(0), c(src[pos]), loc({0,1})
 {
+    // std::cout << "========== START DEBUG READ ==========\n";
+    // debugRead(true);
+    // std::cout << "=========== END DEBUG READ ===========\n";
+}
+
+void Lexer::debugRead(bool pretty)
+{
+    int debugLineNo = 1;
     while (c != '\0')
     {
-        std::cout << (int) c << ' ';
+        if (pretty)
+        {
+            std::cout << debugLineNo << ": ";
+            while (c != '\n' && c != '\0')
+            {
+                std::cout << c;
+                pos++;
+                c = src[pos];
+            }
+            std::cout << '\n';
+            debugLineNo++;
+        }
+        else
+        {
+            std::cout << (int) c << ' ';
+        }
         pos++;
         c = src[pos];
     }
-    std::cout << '\n';
 }
 
 Token Lexer::peekToken(int offset)
@@ -50,7 +70,13 @@ Token Lexer::nextToken()
 {
     if (isspace(c))
     {
+        // remove whitespace
         skipWhitespace();
+    }
+    if (c == '/' && peek() == '/')
+    {
+        // remove comments
+        skipComment();
     }
     if (isalpha(c))
     {
@@ -68,6 +94,7 @@ Token Lexer::nextToken()
 
 Token Lexer::lexAlpha()
 {
+    // TODO: refactor below while loop into separate function
     std::string s;
     while (isalnum(c))
     {
@@ -80,6 +107,7 @@ Token Lexer::lexAlpha()
 
 Token Lexer::lexNum()
 {
+    // TODO: refactor below while loop into separate function
     std::string s;
     while (isalnum(c))
     {
@@ -129,7 +157,9 @@ Token::token_type Lexer::lexTokenType()
         case '*':
             return Token::TOK_STAR;
         case '/':
+        {
             return Token::TOK_FSLASH;
+        }
         case '=':
             return Token::TOK_EQUALS;
         case '\0':
@@ -172,5 +202,19 @@ void Lexer::skipWhitespace()
             loc.x = 0;
         }
         next();
+    }
+}
+
+void Lexer::skipComment()
+{
+    while (c != '\n' && c != '\0')
+    {
+        next();
+    }
+    loc.y++;
+    loc.x = 0;
+    if (isspace(c))
+    {
+        skipWhitespace();
     }
 }
