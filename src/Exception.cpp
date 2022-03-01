@@ -18,7 +18,7 @@ SyntaxError::SyntaxError(const std::string& msg, SourceLocation loc)
 std::string SyntaxError::buildMsg() const
 {
     std::ostringstream s;
-    s << "Line " << loc.y << " : SyntaxError: " << msg;
+    s << "Line " << loc.y << ", " << loc.x << ": SyntaxError: " << msg;
     return s.str();
 }
 
