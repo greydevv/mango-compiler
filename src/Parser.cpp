@@ -50,6 +50,7 @@ std::unique_ptr<AST> Parser::parsePrimary()
 
 std::unique_ptr<AST> Parser::parseKwd()
 {
+    std::cout << "PARSING KEYWORD: " << tok.value << "\n";
     if (tok.value == "return")
     {
         return parseReturnStmt();
@@ -103,21 +104,23 @@ std::vector<std::unique_ptr<VariableAST>> Parser::parseFuncParams()
 {
     std::vector<std::unique_ptr<VariableAST>> params;
     eat(Token::TOK_OPAREN);
-    while (true)
+    if (tok.type != Token::TOK_CPAREN)
     {
-        // TODO: parse type (currently just eating it for AST construction
-        // purposes)
-        eat(Token::TOK_KWD);
-        std::unique_ptr<VariableAST> param = std::make_unique<VariableAST>(tok.value);
-        params.push_back(std::move(param));
-        eat(Token::TOK_ID);
-        if (tok == Token::TOK_COMMA)
+        while (true)
         {
-            eat(Token::TOK_COMMA);
-        }
-        else
-        {
-            break;
+            // TODO: parse type (currently just eating it for testing purposes)
+            eat(Token::TOK_KWD);
+            std::unique_ptr<VariableAST> param = std::make_unique<VariableAST>(tok.value);
+            params.push_back(std::move(param));
+            eat(Token::TOK_ID);
+            if (tok == Token::TOK_COMMA)
+            {
+                eat(Token::TOK_COMMA);
+            }
+            else
+            {
+                break;
+            }
         }
     }
     eat(Token::TOK_CPAREN);
