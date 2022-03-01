@@ -30,3 +30,12 @@ FunctionAST:
         VariableAST(a)
         VariableAST(b)
 ```
+
+Emitted LLVM-IR:
+```
+define double @add(double %a, double %b) {
+entry:
+  %addtmp = fadd double %a, %b
+  ret double %addtmp
+}
+```
