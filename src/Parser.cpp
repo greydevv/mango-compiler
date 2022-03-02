@@ -86,7 +86,6 @@ std::unique_ptr<FunctionAST> Parser::parseFuncDef()
 std::unique_ptr<PrototypeAST> Parser::parseFuncProto()
 {
     std::string name = tok.value;
-
     eat(Token::TOK_ID);
     std::vector<std::unique_ptr<VariableAST>> params = parseFuncParams();
     Type retType = Type::eVoid;
@@ -220,7 +219,8 @@ bool Parser::eat(Token::token_type expectedType)
         std::ostringstream s;
         s << "expected '" << tokenValues.at(expectedType) << "' but got '" << tok.value << "' instead.\n"; 
         s << lexer.getLine(tok.loc.y) << '\n';
-        s << std::string(tok.loc.x, ' ') << std::string(tok.value.size(), '^');
+        // subtract 1 as the Token's loc.x is the character it starts at
+        s << std::string(tok.loc.x-1, ' ') << std::string(tok.value.size(), '^');
         throw SyntaxError(s.str(), tok.loc);
     }
     getToken();
