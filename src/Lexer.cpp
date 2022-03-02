@@ -5,7 +5,7 @@
 #include "Lexer.h"
 
 Lexer::Lexer(const std::string& src)
-    : src(src), pos(0), c(src[pos]), loc({0,1})
+    : src(src), pos(0), c(src[pos]), loc({1,1})
 {
     // std::cout << "========== START DEBUG READ ==========\n";
     // debugRead(true);
@@ -103,13 +103,12 @@ Token Lexer::lexAlpha()
         s += c;
         next();
     }
-    Token::token_type type;
+
+    Token::token_type type = Token::TOK_ID;
     if (isKwd(s))
         type = Token::TOK_KWD;
     else if (isType(s))
         type = Token::TOK_TYPE;
-    else
-        type = Token::TOK_ID;
     return Token(type, s, tmpLoc);
 }
 
