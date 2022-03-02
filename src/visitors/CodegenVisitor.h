@@ -2,6 +2,7 @@
 #define CODEGEN_H
 
 #include <string>
+#include "../Types.h"
 #include "llvm/IR/Value.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/Value.h"
@@ -32,6 +33,7 @@ class CodegenVisitor
         llvm::Value* codegen(ReturnAST* ast);
 
     private:
+        llvm::Type* typeToLlvm(Type type);
         std::unique_ptr<ModuleAST> ast;
         std::unique_ptr<llvm::LLVMContext> ctx;
         std::unique_ptr<llvm::IRBuilder<>> builder;

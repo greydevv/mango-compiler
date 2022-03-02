@@ -15,7 +15,7 @@
 #include "../ast/ReturnAST.h"
 #include "llvm/IR/Value.h"
 #include "llvm/IR/Constants.h"
-#include "llvm/ADT/APFloat.h"
+#include "llvm/ADT/APInt.h"
 #include "llvm/IR/Verifier.h"
 
 #include "llvm/IR/LegacyPassManager.h"
@@ -97,13 +97,25 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast) {
         return nullptr;
     }
 
+    /*
+     * CreateOp Notes:
+     * ===============
+     *
+     * NSW = No Signed Wrap
+     * NUS = No Unsigned Wrap
+     *
+     * NEVER DELETE THIS LINK LOL:
+     * https://stackoverflow.com/questions/61207663/how-to-use-llvmirbuilder-create-add-sub-mul-div 
+     *
+     */
+
     switch (ast->op) {
         case Operator::OP_ADD:
-            return builder->CreateFAdd(L, R, "addtmp");
+            return builder->CreateAdd(L, R, "addtmp");
         case Operator::OP_SUB:
-            return builder->CreateFSub(L, R, "subtmp");
+            return builder->CreateSub(L, R, "subtmp");
         case Operator::OP_MUL:
-            return builder->CreateFMul(L, R, "multmp");
+            return builder->CreateMul(L, R, "multmp");
         default:
             throw SyntaxError("invalid binary operator", SourceLocation(0,0));
     }
@@ -118,7 +130,7 @@ llvm::Value* CodegenVisitor::codegen(ModuleAST* ast) {
 }
 
 llvm::Value* CodegenVisitor::codegen(NumberAST* ast) {
-    return llvm::ConstantFP::get(*ctx, llvm::APFloat(ast->val));
+    return llvm::ConstantInt::get(*ctx, llvm::APInt(32, ast->val));
 }
 
 llvm::Value* CodegenVisitor::codegen(VariableAST* ast) {
@@ -173,8 +185,10 @@ llvm::Value* CodegenVisitor::codegen(CompoundAST* ast) {
 }
 
 llvm::Function* CodegenVisitor::codegen(PrototypeAST* ast) {
-    std::vector<llvm::Type*> doubles(ast->params.size(), llvm::Type::getDoubleTy(*ctx));
-    llvm::FunctionType *funcType = llvm::FunctionType::get(llvm::Type::getDoubleTy(*ctx), doubles, false);
+    std::vector<llvm::Type*> paramTypes;
+    for (auto& param : ast->params)
+        paramTypes.push_back(typeToLlvm(Type::eInt));
+    llvm::FunctionType *funcType = llvm::FunctionType::get(typeToLlvm(ast->retType), paramTypes, false);
     llvm::Function *func = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, ast->name, mainModule.get());
 
     int i = 0;
@@ -187,4 +201,18 @@ llvm::Function* CodegenVisitor::codegen(PrototypeAST* ast) {
 
 llvm::Value* CodegenVisitor::codegen(ReturnAST* ast) {
     return ast->expr->accept(*this);
+}
+
+llvm::Type* CodegenVisitor::typeToLlvm(Type type)
+{
+    switch (type)
+    {
+        case Type::eInt:
+            return llvm::Type::getInt32Ty(*ctx);
+        case Type::eVoid:
+            return llvm::Type::getVoidTy(*ctx);
+        default:
+            std::cout << "ERROR - UNHANDLED CODEGEN TYPE. STOP.\n";
+            exit(1);
+    }
 }
