@@ -44,10 +44,16 @@ std::unique_ptr<AST> Parser::parsePrimary()
             return parseId();
         case Token::TOK_TYPE:
         {
+            // assuming variable declaration
             eat(Token::TOK_TYPE);
-            std::unique_ptr<AST> exprAST = parseExpr();
+            // get type of variable declaration
+            Type allocType = typeFromString(tok.value);
+            auto allocVar = std::make_unique<VariableAST>(tok.value, allocType, VarCtx::eAlloc);
+            eat(Token::TOK_ID);
+            eat(Token::TOK_EQUALS);
+            auto allocExpr = std::make_unique<ExpressionAST>(std::move(allocVar), parseExpr(), Operator::OP_EQL);
             eat(Token::TOK_SCOLON);
-            return exprAST;
+            return allocExpr;
         }
         default:
             std::unique_ptr<AST> exprAST = parseExpr();

@@ -9,8 +9,9 @@
 
 enum class VarCtx
 {
-    eReference, // referencing a variable
-    eStore, // declaring a variable
+    eReference, // referencing a variable (3 * a * 20)
+    eStore, // storing new value in a variable (a = ...)
+    eAlloc, // allocating a vairable (int a = ...) 
 };
 
 class VariableAST : public AST 
