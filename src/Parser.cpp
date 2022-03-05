@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+#include <system_error>
 #include <vector>
 #include "Token.h"
 #include "Operator.h"
@@ -41,6 +42,13 @@ std::unique_ptr<AST> Parser::parsePrimary()
         case Token::TOK_ID:
             // either variable redefinition, reference
             return parseId();
+        case Token::TOK_TYPE:
+        {
+            eat(Token::TOK_TYPE);
+            std::unique_ptr<AST> exprAST = parseExpr();
+            eat(Token::TOK_SCOLON);
+            return exprAST;
+        }
         default:
             std::unique_ptr<AST> exprAST = parseExpr();
             eat(Token::TOK_SCOLON);
@@ -58,16 +66,9 @@ std::unique_ptr<AST> Parser::parseKwd()
     {
         return parseFuncDef();
     }
-    else if (tok.isType())
-    {
-        eat(Token::TOK_KWD);
-        std::unique_ptr<AST> exprAST = parseExpr();
-        eat(Token::TOK_SCOLON);
-        return exprAST;
-    }
     else
     {
-        std::cout << "NOT IMPLEMENTED";
+        std::cout << "[Dev Error] Keyword handling for '" << tok.value << "' not yet implemented in parser.\n";
         exit(1);
     }
 }
@@ -201,6 +202,8 @@ std::unique_ptr<AST> Parser::parseSubExpr(std::unique_ptr<AST> L, int prec)
             auto RHS = std::unique_ptr<AST>(R->clone());
             int nextPrec = currOp.getType() == Operator::OP_EXP ? currOp.getPrec() : currOp.getPrec()+1;
             R = parseSubExpr(std::move(RHS), nextPrec);
+            // TODO: fix infinite loop when parsing double right-associative
+            // operators
             nextOp = tok.toOperator();
         }
         auto LHS = std::unique_ptr<AST>(L->clone());
@@ -220,6 +223,7 @@ bool Parser::eat(Token::token_type expectedType)
         s << "expected '" << tokenValues.at(expectedType) << "' but got '" << tok.value << "' instead.\n"; 
         s << lexer.getLine(tok.loc.y) << '\n';
         // subtract 1 as the Token's loc.x is the character it starts at
+        // so, fill spaces up until that point (loc.x-1)
         s << std::string(tok.loc.x-1, ' ') << std::string(tok.value.size(), '^');
         throw SyntaxError(s.str(), tok.loc);
     }
