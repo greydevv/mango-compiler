@@ -181,13 +181,16 @@ llvm::Function* CodegenVisitor::codegen(FunctionAST* ast) {
 }
 
 llvm::Value* CodegenVisitor::codegen(CompoundAST* ast) {
-    return ast->children[0]->accept(*this);
+    int size = ast->children.size();
+    return ast->children[size-1]->accept(*this);
 }
 
 llvm::Function* CodegenVisitor::codegen(PrototypeAST* ast) {
     std::vector<llvm::Type*> paramTypes;
     for (auto& param : ast->params)
-        paramTypes.push_back(typeToLlvm(Type::eInt));
+    {
+        paramTypes.push_back(typeToLlvm(param->type));
+    }
     llvm::FunctionType *funcType = llvm::FunctionType::get(typeToLlvm(ast->retType), paramTypes, false);
     llvm::Function *func = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, ast->name, mainModule.get());
 
