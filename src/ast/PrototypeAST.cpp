@@ -11,11 +11,12 @@ PrototypeAST::PrototypeAST(const std::string name, Type retType, std::vector<std
 PrototypeAST::PrototypeAST(const PrototypeAST& other)
 {
     params = std::vector<std::unique_ptr<VariableAST>>();
-    // TODO: implement this method
-//     for (auto& param : other.params)
-//     {
-//         params.push_back(std::unique_ptr<VariableAST>(param->clone())
-//     }
+    // TODO: test this method - not sure if below is totally safe
+    for (auto& param : other.params)
+    {
+        VariableAST& cloneParam = static_cast<VariableAST&>(*param->clone());
+        params.push_back(std::make_unique<VariableAST>(cloneParam));
+    }
 }
 
 void PrototypeAST::addParam(std::unique_ptr<VariableAST> param)
