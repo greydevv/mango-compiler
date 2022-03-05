@@ -3,11 +3,11 @@
 #include "../visitors/CodegenVisitor.h"
 #include "../visitors/ASTStringifier.h"
 
-VariableAST::VariableAST(const std::string& id, bool store)
-    : id(id), store(store) {}
+VariableAST::VariableAST(const std::string& id, Type type, VarCtx ctx)
+    : id(id), type(type), ctx(ctx) {}
 
 VariableAST::VariableAST(const VariableAST& other)
-    : id(other.id) {}
+    : id(other.id), type(other.type), ctx(other.ctx) {}
 
 llvm::Value* VariableAST::accept(CodegenVisitor& cg) 
 {
