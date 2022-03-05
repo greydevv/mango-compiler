@@ -114,8 +114,9 @@ std::vector<std::unique_ptr<VariableAST>> Parser::parseFuncParams()
         while (true)
         {
             // TODO: parse type (currently just eating it for testing purposes)
+            Type paramType = typeFromString(tok.value);
             eat(Token::TOK_TYPE);
-            std::unique_ptr<VariableAST> param = std::make_unique<VariableAST>(tok.value);
+            auto param = std::make_unique<VariableAST>(tok.value, paramType, VarCtx::eParam);
             params.push_back(std::move(param));
             eat(Token::TOK_ID);
             if (tok == Token::TOK_COMMA)
