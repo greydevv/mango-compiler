@@ -16,7 +16,7 @@ std::string typeToString(Type t);
 static std::map<Type, std::string> typeValues = {
     {Type::eVoid, "void"},
     {Type::eInt, "int"},
-    {Type::eUnd, "UND"},
+    {Type::eUnd, "undefined"},
 };
 
 #endif
