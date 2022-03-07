@@ -45,9 +45,9 @@ std::unique_ptr<AST> Parser::parsePrimary()
         case Token::TOK_TYPE:
         {
             // assuming variable declaration
-            eat(Token::TOK_TYPE);
             // get type of variable declaration
             Type allocType = typeFromString(tok.value);
+            eat(Token::TOK_TYPE);
             auto allocVar = std::make_unique<VariableAST>(tok.value, allocType, VarCtx::eAlloc);
             eat(Token::TOK_ID);
             eat(Token::TOK_EQUALS);
