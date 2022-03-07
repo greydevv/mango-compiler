@@ -40,7 +40,7 @@ class CodegenVisitor
         std::unique_ptr<llvm::IRBuilder<>> builder;
         std::unique_ptr<llvm::Module> mainModule;
         std::map<std::string, llvm::AllocaInst*> namedValues;
-        llvm::AllocaInst* createEntryBlockAlloca(llvm::Function* func, llvm::Argument* param);
+        llvm::AllocaInst* createEntryBlockAlloca(llvm::Function* func, llvm::Value* param);
 };
 
 #endif

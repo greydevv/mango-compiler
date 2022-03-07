@@ -220,7 +220,7 @@ llvm::Type* CodegenVisitor::typeToLlvm(Type type)
     }
 }
 
-llvm::AllocaInst* CodegenVisitor::createEntryBlockAlloca(llvm::Function* func, llvm::Argument* param)
+llvm::AllocaInst* CodegenVisitor::createEntryBlockAlloca(llvm::Function* func, llvm::Value* param)
 {
     llvm::BasicBlock& bb = func->getEntryBlock();
     llvm::IRBuilder<> tmpBuilder(&bb, bb.begin());
