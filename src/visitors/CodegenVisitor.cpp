@@ -30,10 +30,8 @@
 CodegenVisitor::CodegenVisitor(const std::string& fname, std::unique_ptr<ModuleAST> ast) 
     : ast(std::move(ast)),
       ctx(std::make_unique<llvm::LLVMContext>()),
-      builder(std::make_unique<llvm::IRBuilder<>>(*ctx)) 
-{
-    mainModule = std::make_unique<llvm::Module>(fname, *ctx);
-}
+      builder(std::make_unique<llvm::IRBuilder<>>(*ctx)),
+      mainModule(std::make_unique<llvm::Module>(fname, *ctx)) {}
 
 void CodegenVisitor::print()
 {
@@ -113,9 +111,9 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast) {
         case Operator::OP_ADD:
             return builder->CreateAdd(L, R, "addtmp");
         case Operator::OP_SUB:
-            return builder->CreateSub(L, R, "subtmp");
+            return builder->CreateNSWSub(L, R, "subtmp");
         case Operator::OP_MUL:
-            return builder->CreateMul(L, R, "multmp");
+            return builder->CreateNSWMul(L, R, "multmp");
         default:
             throw SyntaxError("invalid binary operator", SourceLocation(0,0));
     }
@@ -134,14 +132,14 @@ llvm::Value* CodegenVisitor::codegen(NumberAST* ast) {
 }
 
 llvm::Value* CodegenVisitor::codegen(VariableAST* ast) {
-    llvm::Value* val = namedValues[ast->id];
+    llvm::AllocaInst* val = namedValues[ast->id];
     if (!val)
     {
         std::ostringstream s;
         s << "unknown variable name '" << ast->id << '\'';
         throw ReferenceError(s.str(), SourceLocation(0,0));
     }
-    return val;
+    return builder->CreateLoad(val->getAllocatedType(), val, ast->id);
 }
 
 llvm::Function* CodegenVisitor::codegen(FunctionAST* ast) {
@@ -165,7 +163,9 @@ llvm::Function* CodegenVisitor::codegen(FunctionAST* ast) {
     namedValues.clear();
     for (auto& param : func->args())
     {
-        namedValues[param.getName().str()] = &param;
+        llvm::AllocaInst* argAlloca = createEntryBlockAlloca(func, &param);
+        builder->CreateStore(&param, argAlloca);
+        namedValues[param.getName().str()] = argAlloca;
     }
     
     llvm::Value* retVal = ast->body->accept(*this);
@@ -218,4 +218,11 @@ llvm::Type* CodegenVisitor::typeToLlvm(Type type)
             std::cout << "ERROR - UNHANDLED CODEGEN TYPE. STOP.\n";
             exit(1);
     }
+}
+
+llvm::AllocaInst* CodegenVisitor::createEntryBlockAlloca(llvm::Function* func, llvm::Argument* param)
+{
+    llvm::BasicBlock& bb = func->getEntryBlock();
+    llvm::IRBuilder<> tmpBuilder(&bb, bb.begin());
+    return tmpBuilder.CreateAlloca(param->getType(), 0, param->getName());
 }

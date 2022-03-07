@@ -5,6 +5,7 @@
 #include "../Types.h"
 #include "llvm/IR/Value.h"
 #include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/Instructions.h"
 #include "llvm/IR/Value.h"
 
 class ExpressionAST;
@@ -38,7 +39,8 @@ class CodegenVisitor
         std::unique_ptr<llvm::LLVMContext> ctx;
         std::unique_ptr<llvm::IRBuilder<>> builder;
         std::unique_ptr<llvm::Module> mainModule;
-        std::map<std::string, llvm::Value*> namedValues;
+        std::map<std::string, llvm::AllocaInst*> namedValues;
+        llvm::AllocaInst* createEntryBlockAlloca(llvm::Function* func, llvm::Argument* param);
 };
 
 #endif
