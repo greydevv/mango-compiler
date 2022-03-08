@@ -246,10 +246,10 @@ std::unique_ptr<AST> Parser::parseSubExpr(std::unique_ptr<AST> L, int prec)
             if (nextOp.getType() == Operator::OP_EQL)
                 throw SyntaxError(fname, "expression is not assignable\n", tok.loc);
             auto RHS = std::unique_ptr<AST>(R->clone());
-            int nextPrec = currOp.getType() == Operator::OP_EXP ? currOp.getPrec() : currOp.getPrec()+1;
-            R = parseSubExpr(std::move(RHS), nextPrec);
-            // TODO: fix infinite loop when parsing double right-associative
-            // operators
+            if (currOp.getAssoc() == Operator::A_RIGHT)
+                R = parseSubExpr(std::move(RHS), currOp.getPrec());
+            else
+                R = parseSubExpr(std::move(RHS), currOp.getPrec()+1);
             nextOp = tok.toOperator();
         }
         auto LHS = std::unique_ptr<AST>(L->clone());
