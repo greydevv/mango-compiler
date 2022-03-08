@@ -8,4 +8,6 @@
 std::string readFile(std::ifstream& in);
 std::string stringify(ModuleAST* ast);
 
+std::string underlineError(const std::string& line, int x, int len);
+
 #endif
