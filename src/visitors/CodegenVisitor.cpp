@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -32,7 +33,8 @@ CodegenVisitor::CodegenVisitor(const std::string& fname, std::unique_ptr<ModuleA
     : ast(std::move(ast)),
       ctx(std::make_unique<llvm::LLVMContext>()),
       builder(std::make_unique<llvm::IRBuilder<>>(*ctx)),
-      mainModule(std::make_unique<llvm::Module>(fname, *ctx)) {}
+      mainModule(std::make_unique<llvm::Module>(fname, *ctx)),
+      currFunc(nullptr) {}
 
 void CodegenVisitor::print()
 {
@@ -95,25 +97,31 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast)
     // in this case, we don't want to codegen LHS as a separate expression
     if (ast->op == Operator::OP_EQL)
     {
-        auto varAST = dynamic_cast<VariableAST*>(ast->LHS->clone());
-        if (varAST->ctx == VarCtx::eAlloc)
+        auto varAst = dynamic_cast<VariableAST*>(ast->LHS->clone());
+        llvm::Value* rhs = ast->RHS->accept(*this);
+        if (varAst->ctx == VarCtx::eAlloc)
         {
-            throw NotImplementedError("variable allocation\n", SourceLocation(0,0));
+            if (namedValues[varAst->id])
+                throw ReferenceError("cannot redefine variable", SourceLocation(0,0));
+            // make all allocations in entry block of function
+            llvm::AllocaInst* varAlloca = createEntryBlockAlloca(currFunc, rhs);
+            namedValues[varAst->id] = varAlloca;
+            // store value at current insert point
+            builder->CreateStore(rhs, varAlloca);
         }
         else
         {
-            llvm::Value* rhs = ast->RHS->accept(*this);
-            llvm::Value* var = namedValues[varAST->id];
+            llvm::Value* var = namedValues[varAst->id];
             if (!var)
             {
                 std::ostringstream s;
-                s << "unknown variable name '" << (varAST->id) << '\'';
+                s << "unknown variable name '" << (varAst->id) << '\'';
                 throw ReferenceError(s.str(), SourceLocation(0,0));
             }
             builder->CreateStore(rhs, var);
             // createEntryBlockAlloca(llvm::Function *func, llvm::Value *param)
-            return rhs;
         }
+        return rhs;
     }
     llvm::Value* L = ast->LHS->accept(*this);
     llvm::Value* R = ast->RHS->accept(*this);
@@ -199,6 +207,7 @@ llvm::Function* CodegenVisitor::codegen(FunctionAST* ast)
         namedValues[param.getName().str()] = argAlloca;
     }
     
+    currFunc = func;
     llvm::Value* retVal = ast->body->accept(*this);
     if (retVal)
     {
@@ -286,9 +295,9 @@ llvm::Type* CodegenVisitor::typeToLlvm(Type type)
     }
 }
 
-llvm::AllocaInst* CodegenVisitor::createEntryBlockAlloca(llvm::Function* func, llvm::Value* param)
+llvm::AllocaInst* CodegenVisitor::createEntryBlockAlloca(llvm::Function* func, llvm::Value* val)
 {
     llvm::BasicBlock& bb = func->getEntryBlock();
     llvm::IRBuilder<> tmpBuilder(&bb, bb.begin());
-    return tmpBuilder.CreateAlloca(param->getType(), 0, param->getName());
+    return tmpBuilder.CreateAlloca(val->getType(), 0, val->getName());
 }
