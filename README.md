@@ -18,17 +18,18 @@ func add(int a, int b) -> int
 
 AST of the above snippet:
 ```
-FunctionAST:
-  PrototypeAST(add)
-    Returns: int
-    Parameters:
-      VariableAST(a)
-      VariableAST(b)
-  CompoundAST:
-    ReturnAST:
-      ExpressionAST(+):
-        VariableAST(a)
-        VariableAST(b)
+ModuleAST:
+  FunctionAST:
+    PrototypeAST(add)
+      Returns: int
+      Parameters:
+        VariableAST(a, int)
+        VariableAST(b, int)
+    CompoundAST:
+      ReturnAST:
+        ExpressionAST(+):
+          VariableAST(a)
+          VariableAST(b)
 ```
 
 Emitted LLVM-IR:
