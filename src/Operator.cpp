@@ -46,7 +46,8 @@ Operator Operator::opDivide()
 
 Operator Operator::opPower()
 {
-    return Operator(Operator::OP_EXP, 4, Operator::A_LEFT);
+    // TODO: should I support this?
+    return Operator(Operator::OP_EXP, 4, Operator::A_RIGHT);
 }
 
 Operator Operator::opUnknown()
