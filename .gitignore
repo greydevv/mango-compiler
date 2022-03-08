@@ -5,6 +5,7 @@ main.cpp
 *.dSYM
 *.o
 out
+main
 output
 
 # Editor
