@@ -14,7 +14,7 @@ PrototypeAST::PrototypeAST(const PrototypeAST& other)
     // TODO: test this method - not sure if below is totally safe
     for (auto& param : other.params)
     {
-        VariableAST& cloneParam = static_cast<VariableAST&>(*param->clone());
+        VariableAST& cloneParam = dynamic_cast<VariableAST&>(*param->clone());
         params.push_back(std::make_unique<VariableAST>(cloneParam));
     }
 }
