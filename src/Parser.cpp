@@ -235,12 +235,16 @@ std::unique_ptr<AST> Parser::parseSubExpr(std::unique_ptr<AST> L, int prec)
     Operator nextOp = tok.toOperator();
     while (nextOp >= prec)
     {
+        if (nextOp.getType() == Operator::OP_EQL)
+            throw SyntaxError("expression is not assignable\n", tok.loc);
         Operator currOp = nextOp;
         eat();
         std::unique_ptr<AST> R = parseTerm();
         nextOp = tok.toOperator();
         while ((nextOp > currOp) || ((currOp == nextOp) && (nextOp.getAssoc() == Operator::A_RIGHT)))
         {
+            if (nextOp.getType() == Operator::OP_EQL)
+                throw SyntaxError("expression is not assignable\n", tok.loc);
             auto RHS = std::unique_ptr<AST>(R->clone());
             int nextPrec = currOp.getType() == Operator::OP_EXP ? currOp.getPrec() : currOp.getPrec()+1;
             R = parseSubExpr(std::move(RHS), nextPrec);
