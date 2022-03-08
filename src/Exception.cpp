@@ -28,6 +28,16 @@ ReferenceError::ReferenceError(const std::string& msg, SourceLocation loc)
 std::string ReferenceError::buildMsg() const
 {
     std::ostringstream s;
-    s << "Line " << loc.y << " : ReferenceError: " << msg;
+    s << "<file>:" << loc.y << ":" << loc.x << " ReferenceError: " << msg;
+    return s.str();
+}
+
+NotImplementedError::NotImplementedError(const std::string& msg, SourceLocation loc)
+    : BaseException(msg, loc) {}
+
+std::string NotImplementedError::buildMsg() const
+{
+    std::ostringstream s;
+    s << "<file>:" << loc.y << ":" << loc.x << " NotImplementedError: " << msg;
     return s.str();
 }

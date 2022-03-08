@@ -31,4 +31,11 @@ class ReferenceError : public BaseException
         virtual std::string buildMsg() const override;
 };
 
+class NotImplementedError : public BaseException
+{
+    public:
+        NotImplementedError(const std::string& msg, SourceLocation loc);
+        virtual std::string buildMsg() const override;
+};
+
 #endif
