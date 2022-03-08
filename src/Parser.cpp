@@ -15,6 +15,7 @@
 #include "ast/FunctionAST.h"
 #include "ast/PrototypeAST.h"
 #include "ast/ReturnAST.h"
+#include "ast/CallAST.h"
 #include "Exception.h"
 
 Parser::Parser(const std::string& src)
@@ -109,18 +110,43 @@ std::unique_ptr<PrototypeAST> Parser::parseFuncProto()
 
 std::vector<std::unique_ptr<VariableAST>> Parser::parseFuncParams()
 {
+    // TODO: refactor this and parseFuncParams into a method like parseCsv
     std::vector<std::unique_ptr<VariableAST>> params;
     eat(Token::TOK_OPAREN);
     if (tok.type != Token::TOK_CPAREN)
     {
         while (true)
         {
-            // TODO: parse type (currently just eating it for testing purposes)
             Type paramType = typeFromString(tok.value);
             eat(Token::TOK_TYPE);
             auto param = std::make_unique<VariableAST>(tok.value, paramType, VarCtx::eParam);
             params.push_back(std::move(param));
             eat(Token::TOK_ID);
+            if (tok == Token::TOK_COMMA)
+            {
+                eat(Token::TOK_COMMA);
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
+    eat(Token::TOK_CPAREN);
+    return params;
+}
+
+std::vector<std::unique_ptr<AST>> Parser::parseCallParams()
+{
+    // TODO: refactor this and parseFuncParams into a method like parseCsv
+    std::vector<std::unique_ptr<AST>> params;
+    eat(Token::TOK_OPAREN);
+    if (tok.type != Token::TOK_CPAREN)
+    {
+        while (true)
+        {
+            std::unique_ptr<AST> param = parseExpr();
+            params.push_back(std::move(param));
             if (tok == Token::TOK_COMMA)
             {
                 eat(Token::TOK_COMMA);
@@ -162,10 +188,17 @@ std::unique_ptr<NumberAST> Parser::parseNum()
     return numAST;
 }
 
-std::unique_ptr<VariableAST> Parser::parseIdTerm() 
+std::unique_ptr<AST> Parser::parseIdTerm() 
 {
-    std::unique_ptr<VariableAST> varAST = std::make_unique<VariableAST>(tok.value);
+    std::string id = tok.value;
     eat(Token::TOK_ID);
+    // check if function call
+    if (tok.type == Token::TOK_OPAREN)
+    {
+        auto callAST = std::make_unique<CallAST>(id, parseCallParams());
+        return callAST;
+    }
+    auto varAST = std::make_unique<VariableAST>(id);
     return varAST;
 }
 
