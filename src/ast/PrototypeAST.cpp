@@ -5,7 +5,7 @@
 #include "../visitors/ASTStringifier.h"
 #include "llvm/IR/Value.h"
 
-PrototypeAST::PrototypeAST(const std::string name, Type retType, std::vector<std::unique_ptr<VariableAST>> params)
+PrototypeAST::PrototypeAST(const std::string& name, Type retType, std::vector<std::unique_ptr<VariableAST>> params)
     : name(name), retType(retType), params(std::move(params)) {}
 
 PrototypeAST::PrototypeAST(const PrototypeAST& other)
