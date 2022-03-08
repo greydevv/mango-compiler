@@ -8,11 +8,13 @@
 class BaseException : public std::exception
 {
     public:
-        BaseException(const std::string& msg, SourceLocation loc);
+        BaseException(const std::string& fname, const std::string& msg, SourceLocation loc);
+        std::ostringstream getErrMetaStream() const;
         virtual std::string buildMsg() const = 0;
         virtual const char* what() const throw();
 
     protected:
+        std::string fname;
         std::string msg;
         SourceLocation loc;
 };
@@ -20,21 +22,21 @@ class BaseException : public std::exception
 class SyntaxError : public BaseException
 {
     public:
-        SyntaxError(const std::string& msg, SourceLocation loc);
+        SyntaxError(const std::string& fname, const std::string& msg, SourceLocation loc);
         virtual std::string buildMsg() const override;
 };
 
 class ReferenceError : public BaseException
 {
     public:
-        ReferenceError(const std::string& msg, SourceLocation loc);
+        ReferenceError(const std::string& fname, const std::string& msg, SourceLocation loc);
         virtual std::string buildMsg() const override;
 };
 
 class NotImplementedError : public BaseException
 {
     public:
-        NotImplementedError(const std::string& msg, SourceLocation loc);
+        NotImplementedError(const std::string& fname, const std::string& msg, SourceLocation loc);
         virtual std::string buildMsg() const override;
 };
 

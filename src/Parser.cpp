@@ -236,7 +236,7 @@ std::unique_ptr<AST> Parser::parseSubExpr(std::unique_ptr<AST> L, int prec)
     while (nextOp >= prec)
     {
         if (nextOp.getType() == Operator::OP_EQL)
-            throw SyntaxError("expression is not assignable\n", tok.loc);
+            throw SyntaxError(fname, "expression is not assignable\n", tok.loc);
         Operator currOp = nextOp;
         eat();
         std::unique_ptr<AST> R = parseTerm();
@@ -244,7 +244,7 @@ std::unique_ptr<AST> Parser::parseSubExpr(std::unique_ptr<AST> L, int prec)
         while ((nextOp > currOp) || ((currOp == nextOp) && (nextOp.getAssoc() == Operator::A_RIGHT)))
         {
             if (nextOp.getType() == Operator::OP_EQL)
-                throw SyntaxError("expression is not assignable\n", tok.loc);
+                throw SyntaxError(fname, "expression is not assignable\n", tok.loc);
             auto RHS = std::unique_ptr<AST>(R->clone());
             int nextPrec = currOp.getType() == Operator::OP_EXP ? currOp.getPrec() : currOp.getPrec()+1;
             R = parseSubExpr(std::move(RHS), nextPrec);
@@ -271,7 +271,7 @@ bool Parser::eat(Token::token_type expectedType)
         // subtract 1 as the Token's loc.x is the character it starts at
         // so, fill spaces up until that point (loc.x-1)
         s << std::string(tok.loc.x-1, ' ') << std::string(tok.value.size(), '^');
-        throw SyntaxError(s.str(), tok.loc);
+        throw SyntaxError(fname, s.str(), tok.loc);
     }
     getToken();
     return badToken;

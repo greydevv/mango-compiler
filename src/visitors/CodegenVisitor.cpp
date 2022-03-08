@@ -19,7 +19,6 @@
 #include "llvm/IR/Constants.h"
 #include "llvm/ADT/APInt.h"
 #include "llvm/IR/Verifier.h"
-
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Host.h"
@@ -103,7 +102,7 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast)
         if (varAst->ctx == VarCtx::eAlloc)
         {
             if (namedValues[varAst->id])
-                throw ReferenceError("cannot redefine variable", SourceLocation(0,0));
+                throw ReferenceError(mainModule->getModuleIdentifier(), "cannot redefine variable", SourceLocation(0,0));
             // make all allocations in entry block of function
             llvm::AllocaInst* varAlloca = createEntryBlockAlloca(currFunc, rhs);
             namedValues[varAst->id] = varAlloca;
@@ -117,7 +116,7 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast)
             {
                 std::ostringstream s;
                 s << "unknown variable name '" << (varAst->id) << '\'';
-                throw ReferenceError(s.str(), SourceLocation(0,0));
+                throw ReferenceError(mainModule->getModuleIdentifier(), s.str(), SourceLocation(0,0));
             }
             builder->CreateStore(rhs, var);
             // createEntryBlockAlloca(llvm::Function *func, llvm::Value *param)
@@ -151,7 +150,7 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast)
         case Operator::OP_MUL:
             return builder->CreateNSWMul(L, R, "multmp");
         default:
-            throw SyntaxError("invalid binary operator", SourceLocation(0,0));
+            throw SyntaxError(mainModule->getModuleIdentifier(), "invalid binary operator", SourceLocation(0,0));
     }
 }
 
@@ -176,7 +175,7 @@ llvm::Value* CodegenVisitor::codegen(VariableAST* ast)
     {
         std::ostringstream s;
         s << "unknown variable name '" << ast->id << '\'';
-        throw ReferenceError(s.str(), SourceLocation(0,0));
+        throw ReferenceError(mainModule->getModuleIdentifier(), s.str(), SourceLocation(0,0));
     }
     return builder->CreateLoad(val->getAllocatedType(), val, ast->id);
 }
@@ -195,7 +194,7 @@ llvm::Function* CodegenVisitor::codegen(FunctionAST* ast)
     }
     if (!func->empty())
     {
-        throw ReferenceError("cannot redefine function", SourceLocation(0,0));
+        throw ReferenceError(mainModule->getModuleIdentifier(), "cannot redefine function", SourceLocation(0,0));
     }
     llvm::BasicBlock* BB = llvm::BasicBlock::Create(*ctx, "entry", func);
     builder->SetInsertPoint(BB);
@@ -262,7 +261,7 @@ llvm::Value* CodegenVisitor::codegen(CallAST* ast)
     {
         std::ostringstream s;
         s << "unknown function name '" << ast->id << "'\n";
-        throw ReferenceError(s.str(), SourceLocation(0,0));
+        throw ReferenceError(mainModule->getModuleIdentifier(), s.str(), SourceLocation(0,0));
     }
     if (callee->arg_size() != ast->params.size())
     {
@@ -270,7 +269,7 @@ llvm::Value* CodegenVisitor::codegen(CallAST* ast)
         s << "incorrect number of arguments passed to function. got " << ast->params.size();
         s << " but expected " << callee->arg_size() << ".\n";
         // TODO: make new error for this (Python uses TypeError)
-        throw SyntaxError(s.str(), SourceLocation(0,0));
+        throw SyntaxError(mainModule->getModuleIdentifier(), s.str(), SourceLocation(0,0));
     }
     std::vector<llvm::Value*> argValues;
     for (int i = 0; i < ast->params.size(); i++)

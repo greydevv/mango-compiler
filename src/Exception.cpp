@@ -2,8 +2,15 @@
 #include "Exception.h"
 #include "Token.h"
 
-BaseException::BaseException(const std::string& msg, SourceLocation loc)
-    : msg(msg), loc(loc) {}
+BaseException::BaseException(const std::string& fname, const std::string& msg, SourceLocation loc)
+    : fname(fname), msg(msg), loc(loc) {}
+
+std::ostringstream BaseException::getErrMetaStream() const
+{
+    std::ostringstream s;
+    s << fname << '\n' << loc.y << ':' << loc.x;
+    return s;
+}
 
 const char* BaseException::what() const throw()
 {
@@ -12,32 +19,34 @@ const char* BaseException::what() const throw()
     return what_cstr;
 }
 
-SyntaxError::SyntaxError(const std::string& msg, SourceLocation loc)
-    : BaseException(msg, loc) {}
+SyntaxError::SyntaxError(const std::string& fname, const std::string& msg, SourceLocation loc)
+    : BaseException(fname, msg, loc) {}
 
 std::string SyntaxError::buildMsg() const
 {
-    std::ostringstream s;
-    s << "<file>:" << loc.y << ":" << loc.x << " SyntaxError: " << msg;
+    std::ostringstream s = getErrMetaStream();
+    s << " SyntaxError: " << msg;
     return s.str();
 }
 
-ReferenceError::ReferenceError(const std::string& msg, SourceLocation loc)
-    : BaseException(msg, loc) {}
+ReferenceError::ReferenceError(const std::string& fname, const std::string& msg, SourceLocation loc)
+    : BaseException(fname, msg, loc) {}
 
 std::string ReferenceError::buildMsg() const
 {
-    std::ostringstream s;
-    s << "<file>:" << loc.y << ":" << loc.x << " ReferenceError: " << msg;
+    std::ostringstream s = getErrMetaStream();
+    s << " SyntaxError: " << msg;
     return s.str();
 }
 
-NotImplementedError::NotImplementedError(const std::string& msg, SourceLocation loc)
-    : BaseException(msg, loc) {}
+NotImplementedError::NotImplementedError(const std::string& fname, const std::string& msg, SourceLocation loc)
+    : BaseException(fname, msg, loc) {}
 
 std::string NotImplementedError::buildMsg() const
 {
-    std::ostringstream s;
-    s << "<file>:" << loc.y << ":" << loc.x << " NotImplementedError: " << msg;
+    std::ostringstream s = getErrMetaStream();
+    s << " NotImplementedError: " << msg;
     return s.str();
 }
+
+

@@ -17,14 +17,14 @@ int compile(const std::string& fname)
         return 1;
     }
     std::string src = readFile(fs);
-    Parser parser(src);
+    Parser parser(fname, src);
     try {
         std::unique_ptr<ModuleAST> ast = parser.parse();
         std::cout << stringify(ast.get());
-        CodegenVisitor cg(fname, std::move(ast));
-        cg.codegen();
-        cg.emitObjectCode();
-        cg.print();
+        // CodegenVisitor cg(fname, std::move(ast));
+        // cg.codegen();
+        // cg.emitObjectCode();
+        // cg.print();
     } catch (const BaseException& e) {
         std::cout << e.what() << '\n';
     }
