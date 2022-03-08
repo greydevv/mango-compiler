@@ -97,6 +97,7 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast)
     // in this case, we don't want to codegen LHS as a separate expression
     if (ast->op == Operator::OP_EQL)
     {
+        // should only be using equals when variable is LHS
         auto varAst = dynamic_cast<VariableAST*>(ast->LHS->clone());
         llvm::Value* rhs = ast->RHS->accept(*this);
         if (varAst->ctx == VarCtx::eAlloc)
