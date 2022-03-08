@@ -40,4 +40,6 @@ class NotImplementedError : public BaseException
         virtual std::string buildMsg() const override;
 };
 
+std::string getFileNameFromPath(const std::string& fullPath);
+
 #endif

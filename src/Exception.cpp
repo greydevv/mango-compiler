@@ -1,4 +1,5 @@
 #include <string>
+#include <filesystem>
 #include "Exception.h"
 #include "Token.h"
 
@@ -8,7 +9,7 @@ BaseException::BaseException(const std::string& fname, const std::string& msg, S
 std::ostringstream BaseException::getErrMetaStream() const
 {
     std::ostringstream s;
-    s << fname << '\n' << loc.y << ':' << loc.x;
+    s << getFileNameFromPath(fname) << ':' << loc.y << ':' << loc.x;
     return s;
 }
 
@@ -49,4 +50,7 @@ std::string NotImplementedError::buildMsg() const
     return s.str();
 }
 
-
+std::string getFileNameFromPath(const std::string& fullPath)
+{
+    return fullPath.substr(fullPath.find_last_of('/')+1);
+}

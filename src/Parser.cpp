@@ -217,11 +217,14 @@ std::unique_ptr<AST> Parser::parseTerm()
                 eat(Token::TOK_CPAREN);
                 return expr;
             }
+        case Token::TOK_SCOLON:
+            // specific error message
+            throw SyntaxError(fname, "expected expression.", tok.loc);
         default:
-            setErrState(1);
-            std::cout << "[Dev Error] Not an operand:  " << tok << '\n';
-            eat(tok.type);
-            exit(1);
+            {
+                std::string errMsg = '\'' + tok.value + "' is not a valid operand.";
+                throw SyntaxError(fname, errMsg, tok.loc);
+            }
     }
 }
 
