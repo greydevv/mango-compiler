@@ -88,6 +88,20 @@ llvm::Value* CodegenVisitor::codegen() {
 }
 
 llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast) {
+    if (ast->op == Operator::OP_EQL)
+    {
+        std::string name = dynamic_cast<VariableAST*>(ast->LHS->clone())->id;
+        llvm::Value* var = namedValues[name];
+        if (!var)
+        {
+            std::ostringstream s;
+            s << "unknown variable name '" << name << '\'';
+            throw ReferenceError(s.str(), SourceLocation(0,0));
+        }
+        builder->CreateStore(var, ast->RHS->accept(*this));
+        // createEntryBlockAlloca(llvm::Function *func, llvm::Value *param)
+        return ast->RHS->accept(*this);
+    }
     llvm::Value* L = ast->LHS->accept(*this);
     llvm::Value* R = ast->RHS->accept(*this);
     if (!L || !R)
