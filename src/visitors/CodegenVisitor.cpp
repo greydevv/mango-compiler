@@ -84,11 +84,13 @@ int CodegenVisitor::emitObjectCode()
     return 0;
 }
 
-llvm::Value* CodegenVisitor::codegen() {
+llvm::Value* CodegenVisitor::codegen() 
+{
     return ast->accept(*this);
 }
 
-llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast) {
+llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast) 
+{
     // handle special case of variable declaration / reassignment
     // in this case, we don't want to codegen LHS as a separate expression
     if (ast->op == Operator::OP_EQL)
@@ -144,7 +146,8 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast) {
     }
 }
 
-llvm::Value* CodegenVisitor::codegen(ModuleAST* ast) {
+llvm::Value* CodegenVisitor::codegen(ModuleAST* ast) 
+{
     for (auto& child : ast->children)
     {
         child->accept(*this);
@@ -152,11 +155,13 @@ llvm::Value* CodegenVisitor::codegen(ModuleAST* ast) {
     return nullptr;
 }
 
-llvm::Value* CodegenVisitor::codegen(NumberAST* ast) {
+llvm::Value* CodegenVisitor::codegen(NumberAST* ast) 
+{
     return llvm::ConstantInt::get(*ctx, llvm::APInt(32, ast->val));
 }
 
-llvm::Value* CodegenVisitor::codegen(VariableAST* ast) {
+llvm::Value* CodegenVisitor::codegen(VariableAST* ast) 
+{
     llvm::AllocaInst* val = namedValues[ast->id];
     if (!val)
     {
@@ -167,7 +172,8 @@ llvm::Value* CodegenVisitor::codegen(VariableAST* ast) {
     return builder->CreateLoad(val->getAllocatedType(), val, ast->id);
 }
 
-llvm::Function* CodegenVisitor::codegen(FunctionAST* ast) {
+llvm::Function* CodegenVisitor::codegen(FunctionAST* ast) 
+{
     llvm::Function* func = mainModule->getFunction(ast->proto->name);
     if (!func)
     {
@@ -205,7 +211,8 @@ llvm::Function* CodegenVisitor::codegen(FunctionAST* ast) {
     return nullptr;
 }
 
-llvm::Value* CodegenVisitor::codegen(CompoundAST* ast) {
+llvm::Value* CodegenVisitor::codegen(CompoundAST* ast) 
+{
     // children.size() - 1 to skip return statement (only temporary)
     for (int i = 0; i < ast->children.size() - 1; i++)
     {
@@ -215,7 +222,8 @@ llvm::Value* CodegenVisitor::codegen(CompoundAST* ast) {
     return ast->children[size-1]->accept(*this);
 }
 
-llvm::Function* CodegenVisitor::codegen(PrototypeAST* ast) {
+llvm::Function* CodegenVisitor::codegen(PrototypeAST* ast) 
+{
     std::vector<llvm::Type*> paramTypes;
     for (auto& param : ast->params)
     {
@@ -232,11 +240,13 @@ llvm::Function* CodegenVisitor::codegen(PrototypeAST* ast) {
     return func;
 }
 
-llvm::Value* CodegenVisitor::codegen(ReturnAST* ast) {
+llvm::Value* CodegenVisitor::codegen(ReturnAST* ast) 
+{
     return ast->expr->accept(*this);
 }
 
-llvm::Value* CodegenVisitor::codegen(CallAST* ast) {
+llvm::Value* CodegenVisitor::codegen(CallAST* ast) 
+{
     throw NotImplementedError("CallAST codegen\n", SourceLocation(0,0));
 }
 
