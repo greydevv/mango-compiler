@@ -88,19 +88,29 @@ llvm::Value* CodegenVisitor::codegen() {
 }
 
 llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast) {
+    // handle special case of variable declaration / reassignment
+    // in this case, we don't want to codegen LHS as a separate expression
     if (ast->op == Operator::OP_EQL)
     {
-        std::string name = dynamic_cast<VariableAST*>(ast->LHS->clone())->id;
-        llvm::Value* var = namedValues[name];
-        if (!var)
+        auto varAST = dynamic_cast<VariableAST*>(ast->LHS->clone());
+        if (varAST->ctx == VarCtx::eAlloc)
         {
-            std::ostringstream s;
-            s << "unknown variable name '" << name << '\'';
-            throw ReferenceError(s.str(), SourceLocation(0,0));
+            throw NotImplementedError("variable allocation\n", SourceLocation(0,0));
         }
-        builder->CreateStore(var, ast->RHS->accept(*this));
-        // createEntryBlockAlloca(llvm::Function *func, llvm::Value *param)
-        return ast->RHS->accept(*this);
+        else
+        {
+            llvm::Value* rhs = ast->RHS->accept(*this);
+            llvm::Value* var = namedValues[varAST->id];
+            if (!var)
+            {
+                std::ostringstream s;
+                s << "unknown variable name '" << (varAST->id) << '\'';
+                throw ReferenceError(s.str(), SourceLocation(0,0));
+            }
+            builder->CreateStore(rhs, var);
+            // createEntryBlockAlloca(llvm::Function *func, llvm::Value *param)
+            return rhs;
+        }
     }
     llvm::Value* L = ast->LHS->accept(*this);
     llvm::Value* R = ast->RHS->accept(*this);
@@ -195,6 +205,11 @@ llvm::Function* CodegenVisitor::codegen(FunctionAST* ast) {
 }
 
 llvm::Value* CodegenVisitor::codegen(CompoundAST* ast) {
+    // children.size() - 1 to skip return statement (only temporary)
+    for (int i = 0; i < ast->children.size() - 1; i++)
+    {
+        ast->children[i]->accept(*this);
+    }
     int size = ast->children.size();
     return ast->children[size-1]->accept(*this);
 }
