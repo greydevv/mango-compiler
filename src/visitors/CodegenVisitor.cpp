@@ -13,6 +13,7 @@
 #include "../ast/CompoundAST.h"
 #include "../ast/PrototypeAST.h"
 #include "../ast/ReturnAST.h"
+#include "../ast/CallAST.h"
 #include "llvm/IR/Value.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/ADT/APInt.h"
@@ -233,6 +234,10 @@ llvm::Function* CodegenVisitor::codegen(PrototypeAST* ast) {
 
 llvm::Value* CodegenVisitor::codegen(ReturnAST* ast) {
     return ast->expr->accept(*this);
+}
+
+llvm::Value* CodegenVisitor::codegen(CallAST* ast) {
+    throw NotImplementedError("CallAST codegen\n", SourceLocation(0,0));
 }
 
 llvm::Type* CodegenVisitor::typeToLlvm(Type type)

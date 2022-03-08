@@ -16,6 +16,7 @@ class FunctionAST;
 class CompoundAST;
 class PrototypeAST;
 class ReturnAST;
+class CallAST;
 
 class CodegenVisitor
 {
@@ -32,6 +33,7 @@ class CodegenVisitor
         llvm::Value* codegen(CompoundAST* ast);
         llvm::Function* codegen(PrototypeAST* ast);
         llvm::Value* codegen(ReturnAST* ast);
+        llvm::Value* codegen(CallAST* ast);
 
     private:
         llvm::Type* typeToLlvm(Type type);

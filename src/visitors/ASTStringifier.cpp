@@ -11,6 +11,7 @@
 #include "../ast/FunctionAST.h"
 #include "../ast/PrototypeAST.h"
 #include "../ast/ReturnAST.h"
+#include "../ast/CallAST.h"
 #include "ASTStringifier.h"
 
 ASTStringifier::ASTStringifier(bool simpleExpr)
@@ -158,6 +159,37 @@ std::string ASTStringifier::toString(ReturnAST* ast, int tabs)
     {
         s << "ReturnAST:\n";
         s << indent(ast->expr->accept(*this, tabs+1), tabs+1);
+    }
+    return s.str();
+}
+
+std::string ASTStringifier::toString(CallAST* ast, int tabs)
+{
+    std::ostringstream s;
+    if (simpleExpr)
+    {
+        s << ast->id << '(';
+        int i = 0;
+        for (auto& param : ast->params)
+        {
+            s << param->accept(*this, tabs);
+            if (i < ast->params.size() - 1)
+            {
+                s << ", ";
+            }
+            i++;
+        }
+        s << ')';
+    }
+    else
+    {
+        s << "CallAST(" << ast->id << ")\n";
+        if (ast->params.size() > 0)
+            s << indent("Parameters: ", tabs+1) << '\n';
+        for (auto& param : ast->params)
+        {
+            s << indent(param->accept(*this, tabs+2), tabs+2) << '\n';
+        }
     }
     return s.str();
 }
