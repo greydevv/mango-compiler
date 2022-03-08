@@ -247,7 +247,29 @@ llvm::Value* CodegenVisitor::codegen(ReturnAST* ast)
 
 llvm::Value* CodegenVisitor::codegen(CallAST* ast) 
 {
-    throw NotImplementedError("CallAST codegen\n", SourceLocation(0,0));
+    llvm::Function* callee = mainModule->getFunction(ast->id);
+    if (!callee)
+    {
+        std::ostringstream s;
+        s << "unknown function name '" << ast->id << "'\n";
+        throw ReferenceError(s.str(), SourceLocation(0,0));
+    }
+    if (callee->arg_size() != ast->params.size())
+    {
+        std::ostringstream s;
+        s << "incorrect number of arguments passed to function. got " << ast->params.size();
+        s << " but expected " << callee->arg_size() << ".\n";
+        // TODO: make new error for this (Python uses TypeError)
+        throw SyntaxError(s.str(), SourceLocation(0,0));
+    }
+    std::vector<llvm::Value*> argValues;
+    for (int i = 0; i < ast->params.size(); i++)
+    {
+        argValues.push_back(ast->params[i]->accept(*this));
+        if (!argValues.back())
+            return nullptr;
+    }
+    return builder->CreateCall(callee, argValues, "calltmp");
 }
 
 llvm::Type* CodegenVisitor::typeToLlvm(Type type)
