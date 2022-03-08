@@ -1,7 +1,7 @@
 #include <iostream>
 
 extern "C" {
-    double add(double, double);
+    int add(int, int);
 }
 
 int main(int argc, char *argv[])
