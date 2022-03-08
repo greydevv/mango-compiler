@@ -18,8 +18,8 @@
 #include "ast/CallAST.h"
 #include "Exception.h"
 
-Parser::Parser(const std::string& src)
-    : lexer(Lexer(src)), tok(Token::TOK_EOF, {0,0})
+Parser::Parser(const std::string& fname, const std::string& src)
+    : fname(fname), lexer(Lexer(src)), tok(Token::TOK_EOF, {0,0})
 {
     tok = lexer.nextToken();
 }

@@ -14,11 +14,12 @@
 class Parser
 {
     public:
-        Parser(const std::string& src);
+        Parser(const std::string& fname, const std::string& src);
         std::unique_ptr<ModuleAST> parse();
         int getErrState();
         
     private:
+        std::string fname;
         Lexer lexer;
         Token tok;
         int errState;
