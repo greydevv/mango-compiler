@@ -81,7 +81,9 @@ std::unique_ptr<AST> Parser::parseKwd()
 
 std::unique_ptr<AST> Parser::parseId()
 {
-    return parseExpr();
+    std::unique_ptr<AST> expr = parseExpr();
+    eat(Token::TOK_SCOLON);
+    return expr;
 }
 
 std::unique_ptr<FunctionAST> Parser::parseFuncDef()
