@@ -2,9 +2,11 @@ CXX=clang++
 CXXFLAGS:=-g -Wall -std=c++17 $(shell llvm-config --cxxflags)
 LDFLAGS:=$(shell llvm-config --ldflags --system-libs --libs core)
 
-EXEC=out
+EXEC=com # executable for compiling code
 SRCS:=$(shell find src -type f -name '*.cpp')
 OBJS:=$(patsubst %.cpp,%.o,$(SRCS))
+
+COMP_EXEC=out # executable for running compiled code 
 
 all: $(EXEC)
 
@@ -17,8 +19,11 @@ $(EXEC): $(OBJS)
 .PHONY: clean
 clean:
 	@rm -f $(shell find src -type f -name '*.o')
-	@rm -f $(EXEC)
+	@rm -f $(EXEC) $(COMP_EXEC)
 
-.PHONY: output
-output:
-	$(CXX) output.cpp output.o -o output
+
+# for compiling code
+.PHONY: $(COMP_EXEC)
+$(COMP_EXEC):
+	@./$(EXEC)
+	@$(CXX) output.cpp output.o -o $(COMP_EXEC)
