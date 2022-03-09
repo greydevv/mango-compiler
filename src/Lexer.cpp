@@ -183,7 +183,9 @@ bool Lexer::isKwd(const std::string& s)
 {
     // reserved keywords
     return (s == "return"
-            || s == "func");
+            || s == "func"
+            || s == "if"
+            || s == "else");
 }
 
 bool Lexer::isType(const std::string& s)
