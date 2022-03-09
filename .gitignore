@@ -8,6 +8,9 @@ out
 main
 output
 
+# Assets
+assets/
+
 # Editor
 .vscode/**
 compile_commands.json
