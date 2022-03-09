@@ -9,7 +9,7 @@ CompoundAST::CompoundAST(const CompoundAST& other)
 {
     for (auto& child : other.children)
     {
-        children.push_back(std::unique_ptr<AST>(child->clone()));
+        addChild(std::unique_ptr<AST>(child->clone()));
     }
 }
 
