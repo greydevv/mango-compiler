@@ -286,7 +286,7 @@ bool Parser::eat(Token::token_type expectedType)
     {
         setErrState(1);
         std::ostringstream s;
-        s << "expected '" << tokenValues.at(expectedType) << "' but got '" << tok.value << "' instead"; 
+        s << "expected '" << tokenValues.at(expectedType) << "' but got '" << tok.value << "' instead\n"; 
         s << underlineError(lexer.getLine(tok.loc.y), tok.loc.x, tok.value.size());
         throw SyntaxError(fname, s.str(), tok.loc);
     }
