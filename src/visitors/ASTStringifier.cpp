@@ -92,7 +92,9 @@ std::string ASTStringifier::toString(CompoundAST* ast, int tabs) {
         s << "CompoundAST:\n";
         for (int i = 0; i < ast->children.size(); i++)
         {
-            s << indent(ast->children[i]->accept(*this, tabs+1), tabs+1) << '\n';
+            s << indent(ast->children[i]->accept(*this, tabs+1), tabs+1);
+            if (i < ast->children.size()-1)
+                s << '\n';
         }
     }
     return s.str();
@@ -210,10 +212,19 @@ std::string ASTStringifier::toString(IfAST* ast, int tabs)
     {
         s << "IfAST:\n";
         if (ast->expr)
-            s << "Expression: " << indent(ast->expr->accept(*this, tabs+1), tabs+1);
-        s << "Body: " << indent(ast->body->accept(*this, tabs+1), tabs+1);
+            s << indent("Expression:\n", tabs+1) << indent(ast->expr->accept(*this, tabs+2), tabs+2);
+        if (ast->body->children.size() > 0)
+        {
+            if (ast->expr)
+                s << '\n';
+            s << indent("Body:\n", tabs+1) << indent(ast->body->accept(*this, tabs+2), tabs+2);
+        }
         if (ast->other)
-            s << "Other: " << indent(ast->other->accept(*this, tabs+1), tabs+1);
+        {
+            if (ast->body)
+                s << '\n';
+            s << indent("Other:\n", tabs+1) << indent(ast->other->accept(*this, tabs+2), tabs+2);
+        }
     }
     return s.str();
 }
