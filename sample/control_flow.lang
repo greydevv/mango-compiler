@@ -1,0 +1,10 @@
+func myfunc() -> int
+{
+    int a = 3;
+    int b = 10;
+    if (a + b == 13)
+    {
+        return 0;
+    }
+    return 1;
+}
