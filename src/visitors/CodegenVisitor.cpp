@@ -281,6 +281,11 @@ llvm::Value* CodegenVisitor::codegen(CallAST* ast)
     return builder->CreateCall(callee, argValues, "calltmp");
 }
 
+llvm::Value* CodegenVisitor::codegen(IfAST* ast)
+{
+    return nullptr;
+}
+
 llvm::Type* CodegenVisitor::typeToLlvm(Type type)
 {
     switch (type)
