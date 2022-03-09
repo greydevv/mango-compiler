@@ -5,8 +5,7 @@ main.cpp
 *.dSYM
 *.o
 out
-main
-output
+com
 
 # Assets
 assets/
