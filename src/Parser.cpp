@@ -17,6 +17,7 @@
 #include "ast/PrototypeAST.h"
 #include "ast/ReturnAST.h"
 #include "ast/CallAST.h"
+#include "ast/IfAST.h"
 #include "Exception.h"
 
 Parser::Parser(const std::string& fname, const std::string& src)
@@ -74,6 +75,10 @@ std::unique_ptr<AST> Parser::parseKwd()
     {
         return parseFuncDef();
     }
+    else if (tok.value == "if")
+    {
+        return parseIfStmt();
+    }
     else
     {
         std::cout << "[Dev Error] Keyword handling for '" << tok.value << "' not yet implemented in parser.\n";
@@ -83,6 +88,15 @@ std::unique_ptr<AST> Parser::parseKwd()
 
 std::unique_ptr<AST> Parser::parseId()
 {
+    if (lexer.peekToken().type == Token::TOK_EQUALS)
+    {
+        auto var = std::make_unique<VariableAST>(tok.value, Type::eUnd, VarCtx::eStore);
+        eat(Token::TOK_ID);
+        eat(Token::TOK_EQUALS);
+        auto expr = std::make_unique<ExpressionAST>(std::move(var), parseExpr(), Operator::OP_EQL); 
+        eat(Token::TOK_SCOLON);
+        return expr;
+    }
     std::unique_ptr<AST> expr = parseExpr();
     eat(Token::TOK_SCOLON);
     return expr;
@@ -180,6 +194,34 @@ std::unique_ptr<ReturnAST> Parser::parseReturnStmt()
     std::unique_ptr<AST> expr = parseExpr();
     eat(Token::TOK_SCOLON);
     return std::make_unique<ReturnAST>(std::move(expr));
+}
+
+std::unique_ptr<IfAST> Parser::parseIfStmt()
+{
+    eat(Token::TOK_KWD);
+    eat(Token::TOK_OPAREN);
+    if (tok.type == Token::TOK_CPAREN)
+    {
+        std::ostringstream s;
+        s << "expected expression\n";
+        s << underlineError(lexer.getLine(tok.loc.y), tok.loc.x, tok.value.size());
+        throw SyntaxError(fname, s.str(), tok.loc);
+    }
+    std::unique_ptr<AST> expr = parseExpr();
+    eat(Token::TOK_CPAREN);
+    std::unique_ptr<CompoundAST> body = parseCompound();
+    std::unique_ptr<IfAST> other = nullptr;
+    if (tok.type == Token::TOK_KWD && tok.value == "else")
+    {
+        eat();
+        if (tok.type == Token::TOK_KWD && tok.value == "if")
+            // parse 'else if'
+            other = parseIfStmt();
+        else
+            // parse 'else' (neither expr nor other should be present)
+            other = std::make_unique<IfAST>(nullptr, parseCompound(), nullptr);
+    }
+    return std::make_unique<IfAST>(std::move(expr), std::move(body), std::move(other));
 }
 
 std::unique_ptr<NumberAST> Parser::parseNum() 

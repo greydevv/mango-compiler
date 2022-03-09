@@ -34,6 +34,7 @@ class Parser
         std::vector<std::unique_ptr<AST>> parseCallParams();
         std::unique_ptr<CompoundAST> parseCompound();
         std::unique_ptr<ReturnAST> parseReturnStmt();
+        std::unique_ptr<IfAST> parseIfStmt();
         std::unique_ptr<AST> parseIdTerm();
         std::unique_ptr<AST> parseTerm();
         std::unique_ptr<AST> parseExpr();
