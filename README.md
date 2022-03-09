@@ -7,7 +7,7 @@ This compiler is still under development.
 
 ### Language
 
-![viper](https://user-images.githubusercontent.com/58391520/157448364-4f268f9b-f362-4fa0-9df8-e190c5091588.png)
+![viper](https://user-images.githubusercontent.com/58391520/157451541-a4206926-8307-451e-ba8f-6bffd7e9d92a.png)
 
 This language uses the classic lexer-parser-AST structure. Source code is parsed into the [Abstract-Syntax-Tree (AST)](https://en.wikipedia.org/wiki/Abstract_syntax_tree), whose output of the above snippet is as follows:
 ```
