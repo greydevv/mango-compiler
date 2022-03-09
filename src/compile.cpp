@@ -8,7 +8,7 @@
 #include "ast/ModuleAST.h"
 #include "Exception.h"
 
-int compile(const std::string& fname)
+int compile(const std::string& fname, bool debug)
 {
     std::ifstream fs(fname);
     if (!fs.is_open())
@@ -20,11 +20,13 @@ int compile(const std::string& fname)
     Parser parser(fname, src);
     try {
         std::unique_ptr<ModuleAST> ast = parser.parse();
-        std::cout << stringify(ast.get());
-        // CodegenVisitor cg(fname, std::move(ast));
-        // cg.codegen();
-        // cg.emitObjectCode();
-        // cg.print();
+        if (debug)
+            std::cout << stringify(ast.get());
+        CodegenVisitor cg(fname, std::move(ast));
+        cg.codegen();
+        cg.emitObjectCode();
+        if (debug)
+            cg.print();
     } catch (const BaseException& e) {
         std::cout << e.what() << '\n';
     }
