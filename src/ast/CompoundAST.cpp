@@ -5,6 +5,9 @@
 #include "../visitors/CodegenVisitor.h"
 #include "../visitors/ASTStringifier.h"
 
+CompoundAST::CompoundAST(std::vector<std::unique_ptr<AST>> children)
+    : children(std::move(children)) {}
+
 CompoundAST::CompoundAST(const CompoundAST& other)
 {
     for (auto& child : other.children)
@@ -12,9 +15,6 @@ CompoundAST::CompoundAST(const CompoundAST& other)
         addChild(std::unique_ptr<AST>(child->clone()));
     }
 }
-
-CompoundAST::CompoundAST(std::vector<std::unique_ptr<AST>> children)
-    : children(std::move(children)) {}
 
 void CompoundAST::addChild(std::unique_ptr<AST> child)
 {
