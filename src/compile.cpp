@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include "checks.h"
 #include "io.h"
 #include "compile.h"
 #include "Lexer.h"
@@ -10,6 +11,10 @@
 
 int compile(const std::string& fname, bool debug)
 {
+    if (debug)
+        // validate enums
+        runChecks();
+
     std::ifstream fs(fname);
     if (!fs.is_open())
     {
@@ -22,11 +27,11 @@ int compile(const std::string& fname, bool debug)
         std::unique_ptr<ModuleAST> ast = parser.parse();
         if (debug)
             std::cout << stringify(ast.get());
-        CodegenVisitor cg(fname, std::move(ast));
-        cg.codegen();
-        cg.emitObjectCode();
-        if (debug)
-            cg.print();
+        // CodegenVisitor cg(fname, std::move(ast));
+        // cg.codegen();
+        // cg.emitObjectCode();
+        // if (debug)
+        //     cg.print();
     } catch (const BaseException& e) {
         std::cout << e.what() << '\n';
     }
