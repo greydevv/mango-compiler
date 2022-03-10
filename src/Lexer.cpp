@@ -126,7 +126,10 @@ Token Lexer::lexNum()
 
 Token Lexer::lexOther()
 {
-    Token tok = Token(lexTokenType(), loc);
+    Token::token_type type = lexTokenType();
+    // have to subtract length to get correct start position
+    SourceLocation tokLoc(loc.x-(tokenValues.at(type).size()-1), loc.y);
+    Token tok = Token(type, tokLoc);
     next();
     return tok;
 }
@@ -168,13 +171,19 @@ Token::token_type Lexer::lexTokenType()
             return Token::TOK_FSLASH;
         }
         case '=':
+        {
+            if (peek() == '=')
+            {
+                next();
+                return Token::TOK_DEQUALS;
+            }
             return Token::TOK_EQUALS;
+        }
         case '\0':
             return Token::TOK_EOF;
         default:
             std::cout << "[Dev Warning] Lexer returning TOK_UND with value of <" << c << "> and (ASCII: " << int(c) << ") (Line " << loc.y << " at position " << loc.x << ")\n";
             next();
-
             return lexTokenType();
     }
 }

@@ -27,6 +27,8 @@ Operator Token::toOperator()
             return Operator::opMultiply();
         case Token::TOK_FSLASH:
             return Operator::opDivide();
+        case Token::TOK_DEQUALS:
+            return Operator::opEqualTo();
         default:
             return Operator::opUnknown();
     } 

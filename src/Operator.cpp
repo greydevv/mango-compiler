@@ -24,31 +24,71 @@ Operator Operator::opEqual()
     return Operator(Operator::OP_EQL, 1, Operator::A_RIGHT);
 }
 
+Operator Operator::opLogicalOr()
+{
+    return Operator(Operator::OP_BOOL_OR, 2, Operator::A_LEFT);
+}
+
+Operator Operator::opLogicalAnd()
+{
+    return Operator(Operator::OP_BOOL_AND, 3, Operator::A_LEFT);
+}
+
+Operator Operator::opEqualTo()
+{
+    return Operator(Operator::OP_BOOL_EQL, 4, Operator::A_LEFT);
+}
+
+Operator Operator::opNotEqualTo()
+{
+    return Operator(Operator::OP_BOOL_NEQL, 4, Operator::A_LEFT);
+}
+
+Operator Operator::opGT()
+{
+    return Operator(Operator::OP_BOOL_GT, 5, Operator::A_LEFT);
+}
+
+Operator Operator::opGTE()
+{
+    return Operator(Operator::OP_BOOL_GTE, 5, Operator::A_LEFT);
+}
+
+Operator Operator::opLT()
+{
+    return Operator(Operator::OP_BOOL_LT, 5, Operator::A_LEFT);
+}
+
+Operator Operator::opLTE()
+{
+    return Operator(Operator::OP_BOOL_LTE, 5, Operator::A_LEFT);
+}
+
 Operator Operator::opAdd()
 {
-    return Operator(Operator::OP_ADD, 2, Operator::A_LEFT);
+    return Operator(Operator::OP_ADD, 6, Operator::A_LEFT);
 }
 
 Operator Operator::opSubtract()
 {
-    return Operator(Operator::OP_SUB, 2, Operator::A_LEFT);
+    return Operator(Operator::OP_SUB, 6, Operator::A_LEFT);
 }
 
 Operator Operator::opMultiply()
 {
-    return Operator(Operator::OP_MUL, 3, Operator::A_LEFT);
+    return Operator(Operator::OP_MUL, 7, Operator::A_LEFT);
 }
 
 Operator Operator::opDivide()
 {
-    return Operator(Operator::OP_DIV, 3, Operator::A_LEFT);
+    return Operator(Operator::OP_DIV, 7, Operator::A_LEFT);
 }
 
-Operator Operator::opPower()
-{
-    // TODO: should I support this?
-    return Operator(Operator::OP_EXP, 4, Operator::A_RIGHT);
-}
+// Operator Operator::opPower()
+// {
+//     // TODO: should I support this?
+//     return Operator(Operator::OP_EXP, 4, Operator::A_RIGHT);
+// }
 
 Operator Operator::opUnknown()
 {

@@ -2,6 +2,7 @@
 #define TOKEN_H
 
 #include <sstream>
+#include <vector>
 #include <map>
 #include "Operator.h"
 #include "Types.h"
@@ -29,6 +30,7 @@ class Token final
             TOK_CBRACK,
             TOK_RARROW,
             TOK_EQUALS,
+            TOK_DEQUALS,
             TOK_COMMA,
             TOK_SCOLON,
             TOK_COLON,
@@ -38,6 +40,7 @@ class Token final
             TOK_FSLASH,
             TOK_EOF,
             TOK_UND,
+            NUM_TOKS,
         };
 
         token_type type;
@@ -55,7 +58,7 @@ class Token final
         friend std::ostream& operator<<(std::ostream& os, const Token& tok);
 };
 
-static const std::string tokenStrings[] = {
+static const std::vector<std::string> tokenStrings = {
     "TOK_NUM",
     "TOK_ID",
     "TOK_KWD",
@@ -66,6 +69,7 @@ static const std::string tokenStrings[] = {
     "TOK_CBRACK",
     "TOK_RARROW",
     "TOK_EQUALS",
+    "TOK_DEQUALS",
     "TOK_COMMA",
     "TOK_SCOLON",
     "TOK_COLON",
@@ -88,6 +92,7 @@ static const std::map<Token::token_type, std::string> tokenValues = {
     {Token::TOK_CBRACK, "}"},
     {Token::TOK_RARROW, "->"},
     {Token::TOK_EQUALS, "="},
+    {Token::TOK_DEQUALS, "=="},
     {Token::TOK_COMMA, ","},
     {Token::TOK_SCOLON, ";"},
     {Token::TOK_COLON, ":"},

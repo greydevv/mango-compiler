@@ -2,6 +2,7 @@
 #define OPERATOR_H
 
 #include <ostream>
+#include <vector>
 #include <map>
 #include <string>
 
@@ -11,12 +12,21 @@ class Operator final
         enum op_type
         {
             OP_EQL,
+            OP_BOOL_GT,
+            OP_BOOL_LT,
+            OP_BOOL_GTE,
+            OP_BOOL_LTE,
+            OP_BOOL_EQL,
+            OP_BOOL_NEQL,
+            OP_BOOL_OR,
+            OP_BOOL_AND,
             OP_ADD,
             OP_SUB,
             OP_MUL,
             OP_DIV,
-            OP_EXP,
+            // OP_EXP,
             OP_NOP,
+            NUM_OPS
         };
         enum op_assoc
         {
@@ -32,7 +42,15 @@ class Operator final
         static Operator opSubtract();
         static Operator opMultiply();
         static Operator opDivide();
-        static Operator opPower();
+        // static Operator opPower();
+        static Operator opGT();
+        static Operator opLT();
+        static Operator opGTE();
+        static Operator opLTE();
+        static Operator opEqualTo();
+        static Operator opNotEqualTo();
+        static Operator opLogicalOr();
+        static Operator opLogicalAnd();
         static Operator opUnknown();
         bool operator==(const Operator& other);
         bool operator!=(const Operator& other);
@@ -62,8 +80,16 @@ class Operator final
         Operator(op_type type, int prec, op_assoc assoc);
 };
 
-static const std::string operatorStrings[] = {
+static const std::vector<std::string> operatorStrings = {
     "OP_EQL",
+    "OP_BOOL_GT",
+    "OP_BOOL_LT",
+    "OP_BOOL_GTE",
+    "OP_BOOL_LTE",
+    "OP_BOOL_EQL",
+    "OP_BOOL_NEQL",
+    "OP_BOOL_OR",
+    "OP_BOOL_AND",
     "OP_ADD",
     "OP_SUB",
     "OP_MUL",
@@ -78,19 +104,15 @@ static const std::map<Operator::op_type, std::string> operatorValues = {
     {Operator::OP_SUB, "-"},
     {Operator::OP_MUL, "*"},
     {Operator::OP_DIV, "/"},
-    {Operator::OP_EXP, "**"}
-};
-
-// 1: Right-associative
-// 0: Left-associative
-static const std::map<Operator::op_type, int> operatorAssociativity = {
-    {Operator::OP_EQL, 1},
-    {Operator::OP_ADD, 0},
-    {Operator::OP_SUB, 0},
-    {Operator::OP_MUL, 0},
-    {Operator::OP_MUL, 0},
-    {Operator::OP_DIV, 0},
-    {Operator::OP_EXP, 1}
+    {Operator::OP_BOOL_GT, ">"},
+    {Operator::OP_BOOL_LT, "<"},
+    {Operator::OP_BOOL_GTE, ">="},
+    {Operator::OP_BOOL_LTE, "<="},
+    {Operator::OP_BOOL_EQL, "=="},
+    {Operator::OP_BOOL_NEQL, "!="},
+    {Operator::OP_BOOL_OR, "||"},
+    {Operator::OP_BOOL_AND, "&&"}
+    // {Operator::OP_EXP, "**"}
 };
 
 #endif
