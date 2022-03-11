@@ -1,3 +1,4 @@
+#include <iostream>
 #include <cassert>
 #include "checks.h"
 #include "Token.h"
@@ -5,13 +6,18 @@
 
 void runChecks()
 {
-    // check tokens
-    unsigned int numTokens = Token::NUM_TOKS;
+    // tokens
+    unsigned numTokens = Token::NUM_TOKS;
     assert(tokenStrings.size() == numTokens);
     
-    // check operators
-    unsigned int numOps = Operator::NUM_OPS;
+    // operators
+    unsigned numOps = Operator::NUM_OPS;
     assert(operatorStrings.size() == numOps);
     assert(operatorValues.size() == numOps);
-    
+   
+    // types
+    unsigned numTypes = Type::NUM_TYPES;
+    assert(typeStrings.size() == numTypes);
+    assert(typeValues.size() == numTypes);
+    std::cout << "\nAll pre-compilation assertions passed!\n\n";
 }
