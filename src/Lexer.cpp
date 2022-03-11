@@ -116,12 +116,13 @@ Token Lexer::lexNum()
 {
     // TODO: refactor below while loop into separate function
     std::string s;
+    SourceLocation tmpLoc(loc.x, loc.y);
     while (isalnum(c))
     {
         s += c;
         next();
     }
-    return Token(Token::TOK_NUM, s, loc);
+    return Token(Token::TOK_NUM, s, tmpLoc);
 }
 
 Token Lexer::lexOther()
