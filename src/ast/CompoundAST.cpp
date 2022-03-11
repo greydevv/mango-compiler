@@ -2,11 +2,15 @@
 #include <vector>
 #include "AST.h"
 #include "CompoundAST.h"
+#include "ReturnAST.h"
 #include "../visitors/CodegenVisitor.h"
 #include "../visitors/ASTStringifier.h"
 
+CompoundAST::CompoundAST(std::vector<std::unique_ptr<AST>> children, std::unique_ptr<ReturnAST> retStmt)
+    : children(std::move(children)), retStmt(std::move(retStmt)) {}
+
 CompoundAST::CompoundAST(std::vector<std::unique_ptr<AST>> children)
-    : children(std::move(children)) {}
+    : children(std::move(children)), retStmt(nullptr) {}
 
 CompoundAST::CompoundAST(const CompoundAST& other)
 {

@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include "AST.h"
+#include "ReturnAST.h"
 #include "../visitors/CodegenVisitor.h"
 #include "../visitors/ASTStringifier.h"
 
@@ -11,7 +12,9 @@ class CompoundAST : public AST
 {
     public:
         std::vector<std::unique_ptr<AST>> children;
+        std::unique_ptr<ReturnAST> retStmt;
 
+        CompoundAST(std::vector<std::unique_ptr<AST>> children, std::unique_ptr<ReturnAST> retStmt);
         CompoundAST(std::vector<std::unique_ptr<AST>> children);
         CompoundAST(const CompoundAST& other);
         void addChild(std::unique_ptr<AST> child);
