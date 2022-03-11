@@ -12,6 +12,11 @@ class Operator final
         enum op_type
         {
             OP_EQL,
+            OP_ADD,
+            OP_SUB,
+            OP_MUL,
+            OP_DIV,
+            // OP_EXP,
             OP_BOOL_GT,
             OP_BOOL_LT,
             OP_BOOL_GTE,
@@ -20,13 +25,8 @@ class Operator final
             OP_BOOL_NEQL,
             OP_BOOL_OR,
             OP_BOOL_AND,
-            OP_ADD,
-            OP_SUB,
-            OP_MUL,
-            OP_DIV,
-            // OP_EXP,
             OP_NOP,
-            NUM_OPS
+            NUM_OPS,
         };
         enum op_assoc
         {
@@ -82,6 +82,12 @@ class Operator final
 
 static const std::vector<std::string> operatorStrings = {
     "OP_EQL",
+    "OP_ADD",
+    "OP_SUB",
+    "OP_MUL",
+    "OP_DIV",
+    // "OP_EXP",
+    "OP_NOP",
     "OP_BOOL_GT",
     "OP_BOOL_LT",
     "OP_BOOL_GTE",
@@ -90,12 +96,6 @@ static const std::vector<std::string> operatorStrings = {
     "OP_BOOL_NEQL",
     "OP_BOOL_OR",
     "OP_BOOL_AND",
-    "OP_ADD",
-    "OP_SUB",
-    "OP_MUL",
-    "OP_DIV",
-    "OP_EXP",
-    "OP_NOP",
 };
 
 static const std::map<Operator::op_type, std::string> operatorValues = {
@@ -111,7 +111,8 @@ static const std::map<Operator::op_type, std::string> operatorValues = {
     {Operator::OP_BOOL_EQL, "=="},
     {Operator::OP_BOOL_NEQL, "!="},
     {Operator::OP_BOOL_OR, "||"},
-    {Operator::OP_BOOL_AND, "&&"}
+    {Operator::OP_BOOL_AND, "&&"},
+    {Operator::OP_NOP, ""},
     // {Operator::OP_EXP, "**"}
 };
 
