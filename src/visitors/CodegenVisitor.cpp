@@ -289,45 +289,80 @@ llvm::Value* CodegenVisitor::codegen(CallAST* ast)
 llvm::Value* CodegenVisitor::codegen(IfAST* ast)
 {
     llvm::Function* func = builder->GetInsertBlock()->getParent();
-    llvm::BasicBlock* thenBB = llvm::BasicBlock::Create(*ctx, "then", func);
-    llvm::BasicBlock* elseBB = llvm::BasicBlock::Create(*ctx, "else");
-    llvm::BasicBlock* mergeBB = llvm::BasicBlock::Create(*ctx, "merge");
-
-    llvm::Value* cond = ast->expr->accept(*this);
-    builder->CreateCondBr(cond, thenBB, elseBB);
-    builder->SetInsertPoint(thenBB);
-
-    llvm::Value* thenV = ast->body->accept(*this);
-    createRetOrBr(thenV, mergeBB);
-    thenBB = builder->GetInsertBlock();
-    insertFuncBlock(func, elseBB);
     
-    llvm::Value* elseV = nullptr;
-    if (ast->other != nullptr)
+    // create initial blocks
+    llvm::BasicBlock* ifBlock = llvm::BasicBlock::Create(*ctx, "if");
+    llvm::BasicBlock* elseBlock = llvm::BasicBlock::Create(*ctx, "else");
+    llvm::BasicBlock* mergeBlock = llvm::BasicBlock::Create(*ctx, "merge");
+
+    // create branch instruction based on condition
+    llvm::Value* cond = ast->expr->accept(*this);
+    builder->CreateCondBr(cond, ifBlock, elseBlock);
+
+    // insert if block
+    insertFuncBlock(func, ifBlock);
+    llvm::Value* thenV = ast->body->accept(*this);
+    createRetOrBr(thenV, mergeBlock);
+    ifBlock = builder->GetInsertBlock();
+
+    // insert else block
+    insertFuncBlock(func, elseBlock);
+    if (!ast->other)
     {
-        elseV = ast->other->body->accept(*this);
+        // conditional w/o explicit else block
+        // insert block with just one instruction which is a br
+        builder->CreateBr(mergeBlock);
+        insertFuncBlock(func, mergeBlock);
+        return nullptr;
+    }
+    
+    llvm::Value* elseV = ast->other->body->accept(*this);
+    createRetOrBr(elseV, mergeBlock);
+    elseBlock = builder->GetInsertBlock();
+    insertFuncBlock(func, mergeBlock);
+
+    // TODO: implement PHI node functionality. Currently just inserting ret or
+    // br without PHI
+
+    // if (!thenV || !elseV)
+    //     return nullptr;
+
+    // builder->SetInsertPoint(ifBlock);
+    // builder->SetInsertPoint(elseBlock);
+
+    // // if both have a return statement, use a PHI node
+    // llvm::PHINode* pn = builder->CreatePHI(typeToLlvm(Type::eInt), 2, "iftmp");
+    // pn->addIncoming(thenV, ifBlock);
+    // pn->addIncoming(elseV, ifBlock);
+    // return pn;
+
+    return nullptr;
+}
+
+void CodegenVisitor::debugPrint(IfAST* ast)
+{
+    std::cout << "br ";
+    if (ast->other)
+    {
+        // if statement with another branch after it
+        if (ast->other->other)
+        {
+            // if statement with an else if after it
+            std::cout << "true block, cond block\n";
+            debugPrint(ast->other.get());
+        }
+        else
+        {
+            std::cout << "true block, false block\n";
+            // if statement with an else after it
+        }
     }
     else
     {
-        builder->CreateBr(mergeBB);
-        insertFuncBlock(func, mergeBB);
-        return nullptr;
+        // if statement without else
+        std::cout << "true block, br block\n";
     }
-
-    createRetOrBr(elseV, mergeBB);
-
-    elseBB = builder->GetInsertBlock();
-    insertFuncBlock(func, mergeBB);
-
-    // either 'thenBB' or 'elseBB' does not have a return value, so there is no
-    // use for a PHI node
-    if (!thenV || !elseV)
-        return nullptr;
-
-    llvm::PHINode* pn = builder->CreatePHI(typeToLlvm(Type::eInt), 2, "iftmp");
-    pn->addIncoming(thenV, thenBB);
-    pn->addIncoming(elseV, elseBB);
-    return pn;
+    std::cout << "merge\n";
 }
 
 void CodegenVisitor::insertFuncBlock(llvm::Function* func, llvm::BasicBlock* block)
