@@ -179,13 +179,42 @@ std::vector<std::unique_ptr<AST>> Parser::parseCallParams()
 std::unique_ptr<CompoundAST> Parser::parseCompound()
 {
     eat(Token::TOK_OBRACK);
-    std::vector<std::unique_ptr<AST>> children;
+    auto compound = std::make_unique<CompoundAST>();
+
+    // bool to catch early returns
+    bool didReturn = false;
+    int prevWarnLine = -1;
     while (tok != Token::TOK_CBRACK)
     {
-        children.push_back(parsePrimary());
+        if (tok.type == Token::TOK_KWD && tok.value == "return")
+        {
+            didReturn = true;
+            compound->setRetStmt(parseReturnStmt());
+        }
+        else
+        {
+            // check if early return was hit
+            if (didReturn)
+            {
+                // if parsing multiple statements on same line separated by
+                // semicolon, need to only output warning once
+                if (prevWarnLine != tok.loc.y)
+                {
+                    std::cout << "Warning! Parsing line past early return.\n";
+                    std::cout << "  " << lexer.getLine(tok.loc.y) << '\n';
+                }
+                prevWarnLine = tok.loc.y;
+                parsePrimary();
+            }
+            else
+            {
+                compound->addChild(parsePrimary());
+            }
+        }
+
     }
     eat(Token::TOK_CBRACK);
-    return std::make_unique<CompoundAST>(std::move(children));
+    return compound;
 }
 
 std::unique_ptr<ReturnAST> Parser::parseReturnStmt()
@@ -218,7 +247,7 @@ std::unique_ptr<IfAST> Parser::parseIfStmt()
             // parse 'else if'
             other = parseIfStmt();
         else
-            // parse 'else' (neither expr nor other should be present)
+            // parse 'else' (neither 'expr' nor 'other' should be present)
             other = std::make_unique<IfAST>(nullptr, parseCompound(), nullptr);
     }
     return std::make_unique<IfAST>(std::move(expr), std::move(body), std::move(other));
