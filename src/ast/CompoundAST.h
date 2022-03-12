@@ -16,8 +16,10 @@ class CompoundAST : public AST
 
         CompoundAST(std::vector<std::unique_ptr<AST>> children, std::unique_ptr<ReturnAST> retStmt);
         CompoundAST(std::vector<std::unique_ptr<AST>> children);
+        CompoundAST();
         CompoundAST(const CompoundAST& other);
         void addChild(std::unique_ptr<AST> child);
+        void setRetStmt(std::unique_ptr<ReturnAST> retStmt);
         virtual llvm::Value* accept(CodegenVisitor& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:

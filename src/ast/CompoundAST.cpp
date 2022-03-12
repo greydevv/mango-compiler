@@ -12,6 +12,9 @@ CompoundAST::CompoundAST(std::vector<std::unique_ptr<AST>> children, std::unique
 CompoundAST::CompoundAST(std::vector<std::unique_ptr<AST>> children)
     : children(std::move(children)), retStmt(nullptr) {}
 
+CompoundAST::CompoundAST()
+    : children(std::vector<std::unique_ptr<AST>>()), retStmt(nullptr) {}
+
 CompoundAST::CompoundAST(const CompoundAST& other)
 {
     for (auto& child : other.children)
@@ -23,6 +26,11 @@ CompoundAST::CompoundAST(const CompoundAST& other)
 void CompoundAST::addChild(std::unique_ptr<AST> child)
 {
     children.push_back(std::move(child));
+}
+
+void CompoundAST::setRetStmt(std::unique_ptr<ReturnAST> newRetStmt)
+{
+    retStmt = std::move(newRetStmt);
 }
 
 llvm::Value* CompoundAST::accept(CodegenVisitor& cg)
