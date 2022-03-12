@@ -15,6 +15,9 @@
 #include "../ast/PrototypeAST.h"
 #include "../ast/ReturnAST.h"
 #include "../ast/CallAST.h"
+#include "../ast/IfAST.h"
+#include "llvm/ADT/APFloat.h"
+#include "llvm/IR/Instructions.h"
 #include "llvm/IR/Value.h"
 #include "llvm/IR/Constants.h"
 #include "llvm/ADT/APInt.h"
@@ -119,7 +122,6 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast)
                 throw ReferenceError(mainModule->getModuleIdentifier(), s.str(), SourceLocation(0,0));
             }
             builder->CreateStore(rhs, var);
-            // createEntryBlockAlloca(llvm::Function *func, llvm::Value *param)
         }
         return rhs;
     }
@@ -149,6 +151,8 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast)
             return builder->CreateNSWSub(L, R, "subtmp");
         case Operator::OP_MUL:
             return builder->CreateNSWMul(L, R, "multmp");
+        case Operator::OP_BOOL_EQL:
+            return builder->CreateICmpEQ(L, R, "eqtmp");
         default:
             throw SyntaxError(mainModule->getModuleIdentifier(), "invalid binary operator", SourceLocation(0,0));
     }
@@ -223,12 +227,13 @@ llvm::Function* CodegenVisitor::codegen(FunctionAST* ast)
 llvm::Value* CodegenVisitor::codegen(CompoundAST* ast) 
 {
     // children.size() - 1 to skip return statement (only temporary)
-    for (int i = 0; i < ast->children.size() - 1; i++)
+    for (int i = 0; i < ast->children.size(); i++)
     {
         ast->children[i]->accept(*this);
     }
-    int size = ast->children.size();
-    return ast->children[size-1]->accept(*this);
+    if (!ast->retStmt)
+        return nullptr;
+    return ast->retStmt->accept(*this);
 }
 
 llvm::Function* CodegenVisitor::codegen(PrototypeAST* ast) 
@@ -283,7 +288,66 @@ llvm::Value* CodegenVisitor::codegen(CallAST* ast)
 
 llvm::Value* CodegenVisitor::codegen(IfAST* ast)
 {
-    return nullptr;
+    llvm::Function* func = builder->GetInsertBlock()->getParent();
+    llvm::BasicBlock* thenBB = llvm::BasicBlock::Create(*ctx, "then", func);
+    llvm::BasicBlock* elseBB = llvm::BasicBlock::Create(*ctx, "else");
+    llvm::BasicBlock* mergeBB = llvm::BasicBlock::Create(*ctx, "merge");
+
+    llvm::Value* cond = ast->expr->accept(*this);
+    builder->CreateCondBr(cond, thenBB, elseBB);
+    builder->SetInsertPoint(thenBB);
+
+    llvm::Value* thenV = ast->body->accept(*this);
+    createRetOrBr(thenV, mergeBB);
+    thenBB = builder->GetInsertBlock();
+    insertFuncBlock(func, elseBB);
+    
+    llvm::Value* elseV = nullptr;
+    if (ast->other != nullptr)
+    {
+        elseV = ast->other->body->accept(*this);
+    }
+    else
+    {
+        builder->CreateBr(mergeBB);
+        insertFuncBlock(func, mergeBB);
+        return nullptr;
+    }
+
+    createRetOrBr(elseV, mergeBB);
+
+    elseBB = builder->GetInsertBlock();
+    insertFuncBlock(func, mergeBB);
+
+    // either 'thenBB' or 'elseBB' does not have a return value, so there is no
+    // use for a PHI node
+    if (!thenV || !elseV)
+        return nullptr;
+
+    llvm::PHINode* pn = builder->CreatePHI(typeToLlvm(Type::eInt), 2, "iftmp");
+    pn->addIncoming(thenV, thenBB);
+    pn->addIncoming(elseV, elseBB);
+    return pn;
+}
+
+void CodegenVisitor::insertFuncBlock(llvm::Function* func, llvm::BasicBlock* block)
+{
+    // Used in control flow
+    // Appends a block to the function's list of blocks and sets the
+    // IRBuilder's insert point to the newly appended block
+    func->getBasicBlockList().push_back(block);
+    builder->SetInsertPoint(block);
+}
+
+void CodegenVisitor::createRetOrBr(llvm::Value* retV, llvm::BasicBlock* block)
+{
+    // Used in control flow (primarily if-else if-else-statements)
+    // Inserts a branch ('br') or return ('ret') instruction based on if the
+    // return value is not null
+    if (retV)
+        builder->CreateRet(retV);
+    else
+        builder->CreateBr(block);
 }
 
 llvm::Type* CodegenVisitor::typeToLlvm(Type type)

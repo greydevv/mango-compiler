@@ -38,6 +38,8 @@ class CodegenVisitor
         llvm::Value* codegen(IfAST* ast);
 
     private:
+        void insertFuncBlock(llvm::Function* func, llvm::BasicBlock* block);
+        void createRetOrBr(llvm::Value* retV, llvm::BasicBlock* block);
         llvm::Type* typeToLlvm(Type type);
         std::unique_ptr<ModuleAST> ast;
         std::unique_ptr<llvm::LLVMContext> ctx;
