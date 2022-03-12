@@ -5,7 +5,8 @@ EXEC=com # executable for compiling code
 SRCS:=$(shell find src -type f -name '*.cpp')
 OBJS:=$(patsubst %.cpp,%.o,$(SRCS))
 
-COMP_EXEC=out # executable for running compiled code 
+# executable for running compiled code 
+COMP_EXEC=out
 
 all: $(EXEC)
 
@@ -24,5 +25,5 @@ clean:
 # for compiling code
 .PHONY: out
 $(COMP_EXEC):
-	@./$(EXEC)
+	./$(EXEC) -emit
 	$(CXX) output.cpp output.o -o $(COMP_EXEC)
