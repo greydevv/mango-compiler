@@ -1,11 +1,13 @@
 " Syntax Highlighting
-" Language: '.lang'
+" Language: .lang
 "
 " Usage: 
 "   - Vim:
-"       '~/.vim/syntax/lang.vim'
+"       ~/.vim/syntax/lang.vim
 "   - Neovim
-"       '$VIMRUNTIME/syntax/lang.vim'
+"       $VIMRUNTIME/syntax/lang.vim
+"   - Add to .vimrc
+"       autocmd BufRead,BufNewFile *.lang set filetype=lang
 
 if exists("b:current_sytnax")
     finish
