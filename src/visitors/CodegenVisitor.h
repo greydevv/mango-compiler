@@ -36,6 +36,7 @@ class CodegenVisitor
         llvm::Value* codegen(ReturnAST* ast);
         llvm::Value* codegen(CallAST* ast);
         llvm::Value* codegen(IfAST* ast);
+        llvm::Value* codegen(IfAST* ast, llvm::BasicBlock* parentMergeBlock);
 
     private:
         void debugPrint(IfAST* ast);

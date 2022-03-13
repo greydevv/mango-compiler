@@ -288,38 +288,55 @@ llvm::Value* CodegenVisitor::codegen(CallAST* ast)
 
 llvm::Value* CodegenVisitor::codegen(IfAST* ast)
 {
+    return codegen(ast, nullptr);
+}
+
+llvm::Value* CodegenVisitor::codegen(IfAST* ast, llvm::BasicBlock* parentMergeBlock)
+{
     llvm::Function* func = builder->GetInsertBlock()->getParent();
+    llvm::BasicBlock* trueBlock = llvm::BasicBlock::Create(*ctx, "if");
+    llvm::BasicBlock* falseBlock = llvm::BasicBlock::Create(*ctx, "else");
+    llvm::BasicBlock* localMergeBlock = llvm::BasicBlock::Create(*ctx, "merge");
     
-    // create initial blocks
-    llvm::BasicBlock* ifBlock = llvm::BasicBlock::Create(*ctx, "if");
-    llvm::BasicBlock* elseBlock = llvm::BasicBlock::Create(*ctx, "else");
-    llvm::BasicBlock* mergeBlock = llvm::BasicBlock::Create(*ctx, "merge");
-
-    // create branch instruction based on condition
     llvm::Value* cond = ast->expr->accept(*this);
-    builder->CreateCondBr(cond, ifBlock, elseBlock);
+    builder->CreateCondBr(cond, trueBlock, falseBlock);
 
-    // insert if block
-    insertFuncBlock(func, ifBlock);
-    llvm::Value* thenV = ast->body->accept(*this);
-    createRetOrBr(thenV, mergeBlock);
-    ifBlock = builder->GetInsertBlock();
+    // trueBlock will always be filled out
+    insertFuncBlock(func, trueBlock);
+    createRetOrBr(ast->body->accept(*this), localMergeBlock);
+    trueBlock = builder->GetInsertBlock();
 
-    // insert else block
-    insertFuncBlock(func, elseBlock);
-    if (!ast->other)
+    // falseBlock might be an 'else if' or just plain 'else'
+    if (ast->other)
     {
-        // conditional w/o explicit else block
-        // insert block with just one instruction which is a br
-        builder->CreateBr(mergeBlock);
-        insertFuncBlock(func, mergeBlock);
-        return nullptr;
+        if (ast->other->expr)
+        {
+            // 'else if' block encountered
+            // prepare recursion by setting insertion point
+            insertFuncBlock(func, falseBlock);
+            // recur
+            codegen(ast->other.get(), localMergeBlock);
+        }
+        else
+        {
+            // 'else' block encountered
+            insertFuncBlock(func, falseBlock);
+            createRetOrBr(ast->other->body->accept(*this), localMergeBlock);
+            falseBlock = builder->GetInsertBlock();
+        }
     }
-    
-    llvm::Value* elseV = ast->other->body->accept(*this);
-    createRetOrBr(elseV, mergeBlock);
-    elseBlock = builder->GetInsertBlock();
-    insertFuncBlock(func, mergeBlock);
+    else
+    {
+        // implicit 'else' block, need to generate one
+        insertFuncBlock(func, falseBlock);
+        builder->CreateBr(localMergeBlock);
+        falseBlock = builder->GetInsertBlock();
+    }
+
+    insertFuncBlock(func, localMergeBlock);
+    if (parentMergeBlock)
+        // merge the merge, lol
+        builder->CreateBr(parentMergeBlock);
 
     // TODO: implement PHI node functionality. Currently just inserting ret or
     // br without PHI
