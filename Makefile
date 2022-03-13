@@ -1,5 +1,5 @@
 CXX=clang++
-CXXFLAGS:=-g -Wall -std=c++17 $(shell llvm-config --cxxflags)
+CXXFLAGS:=-g -Wall -std=c++17 $(shell llvm-config --cxxflags) -I/Users/greysonmurray/Developer/fmt/include
 LDFLAGS:=$(shell llvm-config --ldflags --system-libs --libs core)
 EXEC=com # executable for compiling code
 SRCS:=$(shell find src -type f -name '*.cpp')
