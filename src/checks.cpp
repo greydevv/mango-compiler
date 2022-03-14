@@ -9,6 +9,7 @@ void runChecks()
     // tokens
     unsigned numTokens = Token::NUM_TOKS;
     assert(tokenStrings.size() == numTokens);
+    assert(tokenValues.size() == numTokens);
     
     // operators
     unsigned numOps = Operator::NUM_OPS;
