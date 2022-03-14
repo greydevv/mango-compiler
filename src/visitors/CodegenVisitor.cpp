@@ -164,6 +164,10 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast)
             return builder->CreateICmpSGT(L, R, "lttmp");
         case Operator::OP_BOOL_GTE:
             return builder->CreateICmpSGE(L, R, "gtetmp");
+        case Operator::OP_BOOL_OR:
+            return builder->CreateOr(L, R, "ortmp");
+        case Operator::OP_BOOL_AND:
+            return builder->CreateAnd(L, R, "andtmp");
         default:
             {
                 // TODO: need to capture the operator's value

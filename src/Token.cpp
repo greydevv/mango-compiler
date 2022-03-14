@@ -36,6 +36,10 @@ Operator Token::toOperator()
             return Operator::opGT();
         case Token::TOK_GTE:
             return Operator::opGTE();
+        case Token::TOK_DAMPSND:
+            return Operator::opLogicalAnd();
+        case Token::TOK_DBAR:
+            return Operator::opLogicalOr();
         default:
             return Operator::opUnknown();
     } 
