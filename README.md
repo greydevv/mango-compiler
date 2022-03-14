@@ -8,6 +8,7 @@ The compiler is still under development. Not everything listed in the [Language 
 - [Introduction](#introduction)
 - [Language Reference](#language-reference)
 - [About the Compiler](#about-the-compiler)
+- [Development Progress](#development-progress)
 
 ### Introduction
 This repository hosts the compiler for my custom programming language,
@@ -115,3 +116,12 @@ Then, the AST is constructed from the source code in the front end:
 After the AST is constructed, it is fed to the code-generation module, which
 emits the IR:
 ![LLVM-IR](https://user-images.githubusercontent.com/58391520/157454073-f8acd217-76a9-4789-99d2-eb002e03a6bf.png)
+
+### Development Progress
+
+- [x] Construct AST
+- [x] IR: expressions (arithmetic, boolean, etc.)
+- [x] IR: functions
+- [x] IR: if/else if/else
+- [] IR: loops (for, while)
+- [] Static typing (weakly typed)
