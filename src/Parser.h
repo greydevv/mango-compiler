@@ -44,6 +44,7 @@ class Parser
         bool eat();
         void getToken();
         void setErrState(int errState);
+        std::string underlineTok(Token tok);
 };
 
 #endif

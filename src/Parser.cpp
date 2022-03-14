@@ -230,10 +230,7 @@ std::unique_ptr<IfAST> Parser::parseIfStmt()
     eat(Token::TOK_OPAREN);
     if (tok.type == Token::TOK_CPAREN)
     {
-        std::ostringstream s;
-        s << "expected expression\n";
-        s << underlineError(lexer.getLine(tok.loc.y), tok.loc.x, tok.value.size());
-        throw SyntaxError(fname, s.str(), tok.loc);
+        throw SyntaxError(fname, "expected expression", underlineTok(tok), tok.loc);
     }
     std::unique_ptr<AST> expr = parseExpr();
     eat(Token::TOK_CPAREN);
@@ -291,17 +288,12 @@ std::unique_ptr<AST> Parser::parseTerm()
         case Token::TOK_SCOLON:
             {
                 // specific error message
-                std::ostringstream s;
-                s << "expected expression\n";
-                s << underlineError(lexer.getLine(tok.loc.y), tok.loc.x, tok.value.size());
-                throw SyntaxError(fname, s.str(), tok.loc);
+                throw SyntaxError(fname, "expected expression", underlineTok(tok), tok.loc);
             }
         default:
             {
-                std::ostringstream s;
-                s << '\'' << tok.value << "' is not a valid operand\n";
-                s << underlineError(lexer.getLine(tok.loc.y), tok.loc.x, tok.value.size());
-                throw SyntaxError(fname, s.str(), tok.loc);
+                std::string msg = fmt::format("'{}' is not a valid operand", tok.value);
+                throw SyntaxError(fname, msg, underlineTok(tok), tok.loc);
             }
     }
 }
@@ -318,10 +310,7 @@ std::unique_ptr<AST> Parser::parseSubExpr(std::unique_ptr<AST> L, int prec)
     {
         if (nextOp.getType() == Operator::OP_EQL)
         {
-            std::ostringstream s;
-            s << "expression is not assignable\n";
-            s << underlineError(lexer.getLine(tok.loc.y), tok.loc.x, tok.value.size());
-            throw SyntaxError(fname, s.str(), tok.loc);
+            throw SyntaxError(fname, "expression is not assignable", underlineTok(tok), tok.loc);
         }
         Operator currOp = nextOp;
         eat();
@@ -331,10 +320,7 @@ std::unique_ptr<AST> Parser::parseSubExpr(std::unique_ptr<AST> L, int prec)
         {
             if (nextOp.getType() == Operator::OP_EQL)
             {
-                std::ostringstream s;
-                s << "expression is not assignable\n";
-                s << underlineError(lexer.getLine(tok.loc.y), tok.loc.x, tok.value.size());
-                throw SyntaxError(fname, s.str(), tok.loc);
+                throw SyntaxError(fname, "expression is not assignable", underlineTok(tok), tok.loc);
             }
             auto RHS = std::unique_ptr<AST>(R->clone());
             if (currOp.getAssoc() == Operator::A_RIGHT)
@@ -355,10 +341,8 @@ bool Parser::eat(Token::token_type expectedType)
     if (badToken)
     {
         setErrState(1);
-        std::ostringstream s;
-        s << "expected '" << tokenValues.at(expectedType) << "' but got '" << tok.value << "' instead\n"; 
-        s << underlineError(lexer.getLine(tok.loc.y), tok.loc.x, tok.value.size());
-        throw SyntaxError(fname, s.str(), tok.loc);
+        std::string msg = fmt::format("expected '{}' but got '{}' instead", tokenValues.at(expectedType), tok.value);
+        throw SyntaxError(fname, msg, underlineTok(tok), tok.loc);
     }
     getToken();
     return badToken;
@@ -383,4 +367,10 @@ int Parser::getErrState()
 void Parser::setErrState(int errState) 
 {
     this->errState = errState;
+}
+
+std::string Parser::underlineTok(Token tok)
+{
+    // helper method for io/underlineError
+    return underlineError(lexer.getLine(tok.loc.y), tok.loc.x, tok.value.size());
 }

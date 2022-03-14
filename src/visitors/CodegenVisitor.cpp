@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include "CodegenVisitor.h"
+#include "../io.h"
 #include "../Token.h"
 #include "../Exception.h"
 #include "../ast/ExpressionAST.h"
@@ -105,7 +106,10 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast)
         if (varAst->ctx == VarCtx::eAlloc)
         {
             if (namedValues[varAst->id])
-                throw ReferenceError(mainModule->getModuleIdentifier(), "cannot redefine variable", SourceLocation(0,0));
+            {
+                std::string msg = fmt::format("variable '{}' already defined", varAst->id);
+                throw ReferenceError(mainModule->getModuleIdentifier(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
+            }
             // make all allocations in entry block of function
             llvm::AllocaInst* varAlloca = createEntryBlockAlloca(currFunc, rhs);
             namedValues[varAst->id] = varAlloca;
@@ -117,9 +121,8 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast)
             llvm::Value* var = namedValues[varAst->id];
             if (!var)
             {
-                std::ostringstream s;
-                s << "unknown variable name '" << (varAst->id) << '\'';
-                throw ReferenceError(mainModule->getModuleIdentifier(), s.str(), SourceLocation(0,0));
+                std::string msg = fmt::format("unknown variable '{}'", varAst->id);
+                throw ReferenceError(mainModule->getModuleIdentifier(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
             }
             builder->CreateStore(rhs, var);
         }
@@ -154,7 +157,10 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast)
         case Operator::OP_BOOL_EQL:
             return builder->CreateICmpEQ(L, R, "eqtmp");
         default:
-            throw SyntaxError(mainModule->getModuleIdentifier(), "invalid binary operator", SourceLocation(0,0));
+            {
+                // TODO: need to capture the operator's value
+                throw SyntaxError(mainModule->getModuleIdentifier(), "invalid binary operator", "LINE NOT IMPLEMENTED", SourceLocation(0,0));
+            }
     }
 }
 
@@ -177,9 +183,8 @@ llvm::Value* CodegenVisitor::codegen(VariableAST* ast)
     llvm::AllocaInst* val = namedValues[ast->id];
     if (!val)
     {
-        std::ostringstream s;
-        s << "unknown variable name '" << ast->id << '\'';
-        throw ReferenceError(mainModule->getModuleIdentifier(), s.str(), SourceLocation(0,0));
+        std::string msg = fmt::format("unknown variable '{}'", ast->id);
+        throw ReferenceError(mainModule->getModuleIdentifier(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
     }
     return builder->CreateLoad(val->getAllocatedType(), val, ast->id);
 }
@@ -198,7 +203,8 @@ llvm::Function* CodegenVisitor::codegen(FunctionAST* ast)
     }
     if (!func->empty())
     {
-        throw ReferenceError(mainModule->getModuleIdentifier(), "cannot redefine function", SourceLocation(0,0));
+        std::string msg = fmt::format("function '{}' already defined", ast->proto->name);
+        throw ReferenceError(mainModule->getModuleIdentifier(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
     }
     llvm::BasicBlock* BB = llvm::BasicBlock::Create(*ctx, "entry", func);
     builder->SetInsertPoint(BB);
@@ -264,17 +270,14 @@ llvm::Value* CodegenVisitor::codegen(CallAST* ast)
     llvm::Function* callee = mainModule->getFunction(ast->id);
     if (!callee)
     {
-        std::ostringstream s;
-        s << "unknown function name '" << ast->id << "'\n";
-        throw ReferenceError(mainModule->getModuleIdentifier(), s.str(), SourceLocation(0,0));
+        std::string msg = fmt::format("unknown function '{}'", ast->id);
+        throw ReferenceError(mainModule->getModuleIdentifier(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
     }
     if (callee->arg_size() != ast->params.size())
     {
-        std::ostringstream s;
-        s << "incorrect number of arguments passed to function. got " << ast->params.size();
-        s << " but expected " << callee->arg_size() << ".\n";
         // TODO: make new error for this (Python uses TypeError)
-        throw SyntaxError(mainModule->getModuleIdentifier(), s.str(), SourceLocation(0,0));
+        std::string msg = fmt::format("function received {} arguments but expected {} arguments", callee->arg_size(), ast->params.size());
+        throw SyntaxError(mainModule->getModuleIdentifier(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
     }
     std::vector<llvm::Value*> argValues;
     for (int i = 0; i < ast->params.size(); i++)

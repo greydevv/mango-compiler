@@ -1,8 +1,8 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include "ast/ModuleAST.h"
 #include "io.h"
+#include "ast/ModuleAST.h"
 
 std::string readFile(std::ifstream& in)
 {
@@ -24,6 +24,6 @@ std::string underlineError(const std::string& line, int xPos, int len)
     s << "  " << line << '\n';
     // fill beginning of string with spaces until (xPos-1) as xPos is the
     // position token begins
-    s << "  " << std::string(xPos-1, ' ') << std::string(len, '^');
+    s << "  " << std::string(xPos-1, ' ') << '^' << std::string(len-1, '~');
     return s.str();
 }
