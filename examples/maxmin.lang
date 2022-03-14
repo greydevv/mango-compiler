@@ -1,0 +1,17 @@
+func max(int a, int b) -> int
+{
+    if (a > b)
+    {
+        return a;
+    }
+    return b;
+}
+
+func min(int a, int b) -> int
+{
+    if (a < b)
+    {
+        return a;
+    }
+    return b;
+}
