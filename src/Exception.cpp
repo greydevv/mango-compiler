@@ -2,52 +2,56 @@
 #include <filesystem>
 #include "Exception.h"
 #include "Token.h"
+#include "io.h"
 
-BaseException::BaseException(const std::string& fname, const std::string& msg, SourceLocation loc)
-    : fname(fname), msg(msg), loc(loc) {}
+BaseException::BaseException(const std::string& excName, const std::string& fname, const std::string& msg, SourceLocation loc)
+    : excName(excName), fname(fname), msg(msg), loc(loc) {}
 
 std::ostringstream BaseException::getErrMetaStream() const
 {
-    std::ostringstream s;
-    s << getFileNameFromPath(fname) << ':' << loc.y << ':' << loc.x;
-    return s;
+    // builds the metadata that includes the location of the error
+    // '[fname]:x:y: [excName]: [msg]'
+    std::ostringstream tmp;
+    tmp << fmt::format(fmt::emphasis::bold, "{}:{}:{}: ", getFileNameFromPath(fname), loc.x, loc.y);
+    tmp << fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::orange_red), excName);
+    tmp << fmt::format(fmt::emphasis::bold, ": {}\n", msg);
+
+    return tmp;
 }
 
 const char* BaseException::what() const throw()
 {
-    std::string what = buildMsg();
+    std::string what = getMsg();
     const char* what_cstr = what.c_str();
     return what_cstr;
 }
 
-SyntaxError::SyntaxError(const std::string& fname, const std::string& msg, SourceLocation loc)
-    : BaseException(fname, msg, loc) {}
+SyntaxError::SyntaxError(const std::string& fname, const std::string& msg, const std::string& line, SourceLocation loc)
+    : BaseException("SyntaxError", fname, msg, loc), line(line) {}
 
-std::string SyntaxError::buildMsg() const
+std::string SyntaxError::getMsg() const
 {
     std::ostringstream s = getErrMetaStream();
-    s << " SyntaxError: " << msg;
+    s << line;
     return s.str();
 }
 
-ReferenceError::ReferenceError(const std::string& fname, const std::string& msg, SourceLocation loc)
-    : BaseException(fname, msg, loc) {}
+ReferenceError::ReferenceError(const std::string& fname, const std::string& msg, const std::string& line, SourceLocation loc)
+    : BaseException("ReferenceError", fname, msg, loc), line(line) {}
 
-std::string ReferenceError::buildMsg() const
+std::string ReferenceError::getMsg() const
 {
     std::ostringstream s = getErrMetaStream();
-    s << " SyntaxError: " << msg;
+    s << line;
     return s.str();
 }
 
 NotImplementedError::NotImplementedError(const std::string& fname, const std::string& msg, SourceLocation loc)
-    : BaseException(fname, msg, loc) {}
+    : BaseException("NotImplementedError", fname, msg, loc) {}
 
-std::string NotImplementedError::buildMsg() const
+std::string NotImplementedError::getMsg() const
 {
-    std::ostringstream s = getErrMetaStream();
-    s << " NotImplementedError: " << msg;
-    return s.str();
+    return getErrMetaStream().str();
 }
 
 std::string getFileNameFromPath(const std::string& fullPath)
