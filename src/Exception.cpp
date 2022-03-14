@@ -11,12 +11,11 @@ std::ostringstream BaseException::getErrMetaStream() const
 {
     // builds the metadata that includes the location of the error
     // '[fname]:x:y: [excName]: [msg]'
-    std::ostringstream tmp;
-    tmp << fmt::format(fmt::emphasis::bold, "{}:{}:{}: ", getFileNameFromPath(fname), loc.x, loc.y);
-    tmp << fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::orange_red), excName);
-    tmp << fmt::format(fmt::emphasis::bold, ": {}\n", msg);
-
-    return tmp;
+    std::ostringstream s;
+    s << fmt::format(fmt::emphasis::bold, "{}:{}:{}: ", getFileNameFromPath(fname), loc.x, loc.y);
+    s << fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::orange_red), excName);
+    s << fmt::format(fmt::emphasis::bold, ": {}\n", msg);
+    return s;
 }
 
 const char* BaseException::what() const throw()
