@@ -3,7 +3,7 @@
 Compiler for a custom programming language.
 
 ### Warning
-This compiler is still under development.
+This compiler is still under development. Not everything listed in the [Language Reference](https://github.com/greysonDEV/pseudo-rng#introduction) section is completely implemented.
 
 ### Language
 
@@ -17,27 +17,58 @@ After the source code is structured into the AST, the AST is fed to the code-gen
 
 ### Language Reference
 
+#### Basic Syntax
+
+Compound statements are composed within curly braces, `{` and `}`. Like many languages, standalone statements and expressions must end in a semicolon, `;`.
+
 #### Types
 
 | Type   | Size (bits) | Description                                                               |
-| ---    | ---         | ---                                                                       |
-| `void` | 0           | `void` should be used to denote that a function does not return anything. | 
+| :--    | :--:        | :--                                                                       |
+| `void` | 0           | Used to denote that a function does not return anything.                  | 
 | `int`  | 32          | 32-bit signed integer.                                                    |
 | `bool` | 1           | Can be either 1 (true) or 0 (false).                                      |
+
+#### Expressions
+
+This language handles expressions no different than C++ and other similar languages. Parenthesis can be used for correct evaluation order, like so:
+```
+int a = 3 + 4 * 10; // 4 * 10 evaluated first (* has higher precedence than +)
+int a = (3 + 4) * 10; // 3 + 4 evaluated first
+```
+This is all trivial and should be very familiar.
+
+The operator precedence was stolen straight from the [C++ precedence table](https://en.cppreference.com/w/cpp/language/operator_precedence). In descending order, the operator precedence is as follows:
+
+| Operator             | Description                    | Associativity
+| :--                  | :--                            | :--
+| `!`                  | Logical not (boolean)          | Left-to-right
+| `*`, `/`             | Multiplication, division       | Left-to-right
+| `+`, `-`             | Addition, subtraction          | Left-to-right
+| `<`, `>`, `>=`, `<=` | Relational operators (boolean) | Left-to-right
+| `==`, `!=`           | Equality operators (boolean)   | Left-to-right
+| `&&`                 | Logical and (boolean)          | Left-to-right
+| `||`                 | Logical or (boolean)           | Left-to-right
+| `=`                  | Assignment                     | Right-to-left
+
 
 #### Functions
 
 Functions can be defined in the following ways. Parameters are optional, as always.
 ```
-func [id]( [params...] ) -> [return type]
+func [id]([params...]) -> [return type]
 {
     [body...]
 }
 ```
 ```
-func [id]( [params...] )
+func [id]([params...])
 {
     [body...]
 }
 ```
 If the return type is omitted, the compiler will assume the function returns `void`.
+
+#### Miscellaneous
+
+Comments begin with a double forward slash, `//`.
