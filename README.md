@@ -123,5 +123,5 @@ emits the IR:
 - [x] IR: expressions (arithmetic, boolean, etc.)
 - [x] IR: functions
 - [x] IR: if/else if/else
-- [] IR: loops (for, while)
-- [] Static typing (weakly typed)
+- [ ] IR: loops (for, while)
+- [ ] Static typing (weakly typed)
