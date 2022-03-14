@@ -182,7 +182,21 @@ Token::token_type Lexer::lexTokenType()
         }
         case '<':
         {
+            if (peek() == '=')
+            {
+                next();
+                return Token::TOK_LTE;
+            }
             return Token::TOK_LT;
+        }
+        case '>':
+        {
+            if (peek() == '=')
+            {
+                next();
+                return Token::TOK_GTE;
+            }
+            return Token::TOK_GT;
         }
         case '\0':
             return Token::TOK_EOF;

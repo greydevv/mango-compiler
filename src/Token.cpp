@@ -30,6 +30,12 @@ Operator Token::toOperator()
             return Operator::opEqualTo();
         case Token::TOK_LT:
             return Operator::opLT();
+        case Token::TOK_LTE:
+            return Operator::opLTE();
+        case Token::TOK_GT:
+            return Operator::opGT();
+        case Token::TOK_GTE:
+            return Operator::opGTE();
         default:
             return Operator::opUnknown();
     } 
