@@ -3,7 +3,7 @@
 Compiler for a custom programming language.
 
 ### Warning
-This compiler is still under development. Not everything listed in the [Language Reference](https://github.com/greysonDEV/pseudo-rng#introduction) section is completely implemented.
+This compiler is still under development. Not everything listed in the [Language Reference](https://github.com/greydevv/cpp-compiler#language-reference) is completely implemented.
 
 ### Language
 
