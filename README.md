@@ -1,13 +1,13 @@
 # Katana Language
 
 ### Warning
-The compiler is still under development. Not everything listed in the [Language Reference](https://github.com/greydevv/cpp-compiler#language-reference) is completely implemented.
+The compiler is still under development. Not everything listed in the [Language Reference](#language-reference) is completely implemented.
 
 ### Contents
 
-- [Introduction](https://github.com/greydevv/cpp-compiler#introduction)
-- [Language Reference](https://github.com/greydevv/cpp-compiler#language-reference)
-- [About the Compiler](https://github.com/greydevv/cpp-compiler#about-the-compiler)
+- [Introduction](#introduction)
+- [Language Reference](#language-reference)
+- [About the Compiler](#about-the-compiler)
 
 ### Introduction
 This repository hosts the compiler for my custom programming language,
@@ -16,7 +16,7 @@ the future. Oops.
 
 Katana is a programming language inspired by the likes of
 [Python](https://www.python.org/), [Swift](https://developer.apple.com/swift/),
-[C](https://en.wikipedia.org/wiki/C_(programming_language\)), and
+[C](https://en.wikipedia.org/wiki/C_%28programming_language%29), and
 [C++](https://en.wikipedia.org/wiki/C%2B%2B). The goal of this project is to
 create a compiler with Katana as the proof-of-concept.    
 
