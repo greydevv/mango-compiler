@@ -13,8 +13,8 @@ if exists("b:current_sytnax")
     finish
 endif
 
-" Function identifiers
-syntax region langFuncIds start='[_a-zA-Z]\+[_a-zA-Z0-9]*' end='[_a-zA-Z0-9]\?' contained
+" Functions (calls and definitions)
+syntax match langFuncIds '\w\+\s*\ze(' 
 
 " Keywords
 syntax keyword langFuncKwd func nextgroup=langFuncIds skipwhite
@@ -35,6 +35,7 @@ syntax match langComments '//.*$' contains=langTodos
 " Highlight groups
 highlight default link langFuncKwd Keyword
 highlight default link langFuncIds Function 
+highlight default link langFuncCalls Function
 highlight default link langKwds Keyword
 highlight default link langTypes Type
 highlight default link langNums Number
