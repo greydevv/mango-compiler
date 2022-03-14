@@ -14,7 +14,6 @@ Token::Token(token_type type, const std::string& value, SourceLocation loc)
 
 Operator Token::toOperator() 
 {
-    // either binary OR unary operator
     switch (type)
     {
         case Token::TOK_EQUALS:
@@ -29,6 +28,8 @@ Operator Token::toOperator()
             return Operator::opDivide();
         case Token::TOK_DEQUALS:
             return Operator::opEqualTo();
+        case Token::TOK_LT:
+            return Operator::opLT();
         default:
             return Operator::opUnknown();
     } 

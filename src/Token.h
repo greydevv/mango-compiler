@@ -31,6 +31,7 @@ class Token final
             TOK_RARROW,
             TOK_EQUALS,
             TOK_DEQUALS,
+            TOK_LT,
             TOK_COMMA,
             TOK_SCOLON,
             TOK_COLON,
@@ -59,7 +60,7 @@ class Token final
 };
 
 static const std::vector<std::string> tokenStrings = {
-    "TOK_NUM",
+    "TOK_NUM",             
     "TOK_ID",
     "TOK_KWD",
     "TOK_TYPE",
@@ -70,6 +71,7 @@ static const std::vector<std::string> tokenStrings = {
     "TOK_RARROW",
     "TOK_EQUALS",
     "TOK_DEQUALS",
+    "TOK_LT",
     "TOK_COMMA",
     "TOK_SCOLON",
     "TOK_COLON",
@@ -93,6 +95,7 @@ static const std::map<Token::token_type, std::string> tokenValues = {
     {Token::TOK_RARROW, "->"},
     {Token::TOK_EQUALS, "="},
     {Token::TOK_DEQUALS, "=="},
+    {Token::TOK_LT, "<"},
     {Token::TOK_COMMA, ","},
     {Token::TOK_SCOLON, ";"},
     {Token::TOK_COLON, ":"},

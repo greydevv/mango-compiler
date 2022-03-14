@@ -156,6 +156,8 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast)
             return builder->CreateNSWMul(L, R, "multmp");
         case Operator::OP_BOOL_EQL:
             return builder->CreateICmpEQ(L, R, "eqtmp");
+        case Operator::OP_BOOL_LT:
+            return builder->CreateICmpSLT(L, R, "lttmp");
         default:
             {
                 // TODO: need to capture the operator's value

@@ -180,6 +180,10 @@ Token::token_type Lexer::lexTokenType()
             }
             return Token::TOK_EQUALS;
         }
+        case '<':
+        {
+            return Token::TOK_LT;
+        }
         case '\0':
             return Token::TOK_EOF;
         default:
