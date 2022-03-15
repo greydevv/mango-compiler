@@ -36,8 +36,7 @@ CodegenVisitor::CodegenVisitor(const std::string& fname, std::unique_ptr<ModuleA
     : ast(std::move(ast)),
       ctx(std::make_unique<llvm::LLVMContext>()),
       builder(std::make_unique<llvm::IRBuilder<>>(*ctx)),
-      mainModule(std::make_unique<llvm::Module>(fname, *ctx)),
-      currFunc(nullptr) {}
+      mainModule(std::make_unique<llvm::Module>(fname, *ctx)) {}
 
 void CodegenVisitor::print()
 {
@@ -111,7 +110,7 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast)
                 throw ReferenceError(mainModule->getModuleIdentifier(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
             }
             // make all allocations in entry block of function
-            llvm::AllocaInst* varAlloca = createEntryBlockAlloca(currFunc, rhs);
+            llvm::AllocaInst* varAlloca = createEntryBlockAlloca(rhs);
             namedValues[varAst->id] = varAlloca;
             // store value at current insert point
             builder->CreateStore(rhs, varAlloca);
@@ -229,7 +228,6 @@ llvm::Function* CodegenVisitor::codegen(FunctionAST* ast)
         namedValues[param.getName().str()] = argAlloca;
     }
     
-    currFunc = func;
     llvm::Value* retVal = ast->body->accept(*this);
     if (retVal)
     {
@@ -436,4 +434,10 @@ llvm::AllocaInst* CodegenVisitor::createEntryBlockAlloca(llvm::Function* func, l
     llvm::BasicBlock& bb = func->getEntryBlock();
     llvm::IRBuilder<> tmpBuilder(&bb, bb.begin());
     return tmpBuilder.CreateAlloca(val->getType(), 0, val->getName());
+}
+
+llvm::AllocaInst* CodegenVisitor::createEntryBlockAlloca(llvm::Value* val)
+{
+    llvm::Function* func = builder->GetInsertBlock()->getParent();
+    return createEntryBlockAlloca(func, val);
 }
