@@ -45,16 +45,6 @@ class NotImplementedError : public BaseException
         virtual std::string getMsg() const override;
 };
 
-class BasicException : public std::exception
-{
-    public:
-        BasicException(const std::string& msg);
-        virtual const char* what() const throw();
-    private:
-        const std::string excName;
-        const std::string msg;
-};
-
 std::string getFileNameFromPath(const std::string& fullPath);
 
 #endif
