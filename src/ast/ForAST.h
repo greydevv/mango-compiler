@@ -10,12 +10,12 @@
 class ForAST : public AST
 {
     public:
-        std::unique_ptr<VariableAST> var;
+        std::unique_ptr<ExpressionAST> var;
         std::unique_ptr<ExpressionAST> expr;
         std::unique_ptr<ExpressionAST> stepExpr;
         std::unique_ptr<CompoundAST> body;
 
-        ForAST(std::unique_ptr<VariableAST> var, std::unique_ptr<ExpressionAST> expr, std::unique_ptr<ExpressionAST> stepExpr, std::unique_ptr<CompoundAST> body);
+        ForAST(std::unique_ptr<ExpressionAST> var, std::unique_ptr<ExpressionAST> expr, std::unique_ptr<ExpressionAST> stepExpr, std::unique_ptr<CompoundAST> body);
         ForAST(const ForAST& other);
         virtual llvm::Value* accept(CodegenVisitor& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
