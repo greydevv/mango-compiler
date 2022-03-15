@@ -2,6 +2,7 @@
 #include <filesystem>
 #include "Exception.h"
 #include "Token.h"
+#include "fmt/color.h"
 #include "io.h"
 
 BaseException::BaseException(const std::string& excName, const std::string& fname, const std::string& msg, SourceLocation loc)
@@ -56,4 +57,17 @@ std::string NotImplementedError::getMsg() const
 std::string getFileNameFromPath(const std::string& fullPath)
 {
     return fullPath.substr(fullPath.find_last_of('/')+1);
+}
+
+CommandError::CommandError(const std::string& msg)
+    : excName("CommandError"), msg(msg) {}
+
+const char* CommandError::what() const throw()
+{
+    std::ostringstream s;
+    s << fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::orange_red), excName);
+    s << fmt::format(fmt::emphasis::bold, ": {}\r", msg);
+    std::string what = s.str();
+    const char* what_cstr = what.c_str();
+    return what_cstr;
 }

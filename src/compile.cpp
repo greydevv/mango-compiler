@@ -11,6 +11,12 @@
 
 int compile(const std::string& fname, bool debug, bool emit)
 {
+    if (fname.size() == 0)
+    {
+        std::cout << CommandError("no file name supplied").what() << '\n';
+        return 1;
+    }
+
     if (debug)
         // validate enums
         runChecks();
@@ -35,8 +41,8 @@ int compile(const std::string& fname, bool debug, bool emit)
             cg.print();
     } catch (const BaseException& e) {
         std::cout << e.what() << '\n';
+        return 1;
     }
 
-
-    return parser.getErrState();
+    return 0;
 }
