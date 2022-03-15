@@ -13,7 +13,8 @@ int compile(CompileArgs args)
 {
     if (args.fnames.size() == 0)
     {
-        std::cout << BasicException("no file name(s) specified").what() << '\n';
+        fmt::print(fmt::emphasis::bold | fmt::fg(fmt::color::orange_red), "Error");
+        fmt::print(fmt::emphasis::bold, ": no file name(s) specified\n");
         return 1;
     }
 
@@ -23,10 +24,17 @@ int compile(CompileArgs args)
 
     for (auto fname : args.fnames)
     {
+        if (fname.find_first_of('-') == 0)
+        {
+            fmt::print(fmt::emphasis::bold | fmt::fg(fmt::color::orange_red), "Error");
+            fmt::print(fmt::emphasis::bold, ": unknown argument: '{}'\n", fname);
+            return 1;
+        }
         std::ifstream fs(fname);
         if (!fs.is_open())
         {
-            std::cout << BasicException(fmt::format("file '{}' was not found", fname)).what() << '\n';
+            fmt::print(fmt::emphasis::bold | fmt::fg(fmt::color::orange_red), "Error");
+            fmt::print(fmt::emphasis::bold, ": file not found: '{}'\n", fname);
             return 1;
         }
         std::string src = readFile(fs);
