@@ -52,7 +52,7 @@ descending order, the operator precedence is as follows:
 
 | Operator             | Description                    | Associativity  |
 | :--                  | :--                            | :--            |
-| `!`                  | Logical not (boolean)          | Left-to-right  |
+| `!`                  | Logical not (boolean)          | Right-to-left  |
 | `*`, `/`             | Multiplication, division       | Left-to-right  |
 | `+`, `-`             | Addition, subtraction          | Left-to-right  |
 | `<`, `>`, `>=`, `<=` | Relational operators (boolean) | Left-to-right  |
