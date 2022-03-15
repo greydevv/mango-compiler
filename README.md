@@ -46,7 +46,7 @@ int b = (3 + 4) * 10; // 3 + 4 evaluated first
 ```
 This is all trivial and should be very familiar.
 
-The operator precedence was stolen straight from the [C++ precedence
+The operator precedence was stolen straight from the [C++ Operator Precedence
 table](https://en.cppreference.com/w/cpp/language/operator_precedence). In
 descending order, the operator precedence is as follows:
 
@@ -119,7 +119,7 @@ emits the IR:
 
 ### Development Progress
 
-- [x] Construct AST
+- [x] Front end: Lexer->Parser->AST
 - [x] IR: expressions (arithmetic, boolean, etc.)
 - [x] IR: functions
 - [x] IR: if/else if/else
