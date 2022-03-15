@@ -22,7 +22,8 @@ class VariableAST : public AST
         Type type;
         VarCtx ctx;
 
-        VariableAST(const std::string& id, Type type = Type::eUnd, VarCtx ctx = VarCtx::eReference);
+        VariableAST(const std::string& id, Type type, VarCtx ctx);
+        VariableAST(const std::string& id);
         VariableAST(const VariableAST& other);
         virtual llvm::Value* accept(CodegenVisitor& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
