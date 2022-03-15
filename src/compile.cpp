@@ -1,47 +1,50 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include "compile.h"
 #include "checks.h"
 #include "io.h"
-#include "compile.h"
 #include "Lexer.h"
 #include "Parser.h"
 #include "ast/ModuleAST.h"
 #include "Exception.h"
 
-int compile(const std::string& fname, bool debug, bool emit)
+int compile(CompileArgs args)
 {
-    if (fname.size() == 0)
+    if (args.fnames.size() == 0)
     {
-        std::cout << CommandError("no file name supplied").what() << '\n';
+        std::cout << BasicException("no file name(s) specified").what() << '\n';
         return 1;
     }
 
-    if (debug)
+    if (args.debug)
         // validate enums
         runChecks();
 
-    std::ifstream fs(fname);
-    if (!fs.is_open())
+    for (auto fname : args.fnames)
     {
-        std::cout << "File not found: " << fname << '\n';
-        return 1;
-    }
-    std::string src = readFile(fs);
-    Parser parser(fname, src);
-    try {
-        std::unique_ptr<ModuleAST> ast = parser.parse();
-        if (debug)
-            std::cout << stringify(ast.get());
-        CodegenVisitor cg(fname, std::move(ast));
-        cg.codegen();
-        if (emit)
-            cg.emitObjectCode();
-        if (debug)
-            cg.print();
-    } catch (const BaseException& e) {
-        std::cout << e.what() << '\n';
-        return 1;
+        std::ifstream fs(fname);
+        if (!fs.is_open())
+        {
+            std::cout << BasicException(fmt::format("file '{}' was not found", fname)).what() << '\n';
+            return 1;
+        }
+        std::string src = readFile(fs);
+        Parser parser(fname, src);
+        try {
+            std::unique_ptr<ModuleAST> ast = parser.parse();
+            if (args.debug)
+                std::cout << stringify(ast.get());
+            CodegenVisitor cg(fname, std::move(ast));
+            cg.codegen();
+            if (args.emit)
+                cg.emitObjectCode();
+            if (args.debug)
+                cg.print();
+        } catch (const BaseException& e) {
+            std::cout << e.what() << '\n';
+            return 1;
+        }
     }
 
     return 0;

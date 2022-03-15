@@ -27,3 +27,18 @@ std::string underlineError(const std::string& line, int xPos, int len)
     s << "  " << std::string(xPos-1, ' ') << '^' << std::string(len-1, '~');
     return s.str();
 }
+
+CompileArgs parseArgs(std::vector<std::string> argv)
+{
+    CompileArgs args;
+    for (auto arg : argv)
+    {
+        if (arg == "-debug")
+            args.debug = true;
+        else if (arg == "-emit")
+            args.emit = true;
+        else
+            args.fnames.push_back(arg);
+    }
+    return args;
+}

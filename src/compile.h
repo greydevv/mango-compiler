@@ -2,7 +2,8 @@
 #define COMPILE_H
 
 #include <string>
+#include "io.h"
 
-int compile(const std::string& fname, bool debug=false, bool emit=false);
+int compile(CompileArgs args);
 
 #endif

@@ -45,10 +45,10 @@ class NotImplementedError : public BaseException
         virtual std::string getMsg() const override;
 };
 
-class CommandError : public std::exception
+class BasicException : public std::exception
 {
     public:
-        CommandError(const std::string& msg);
+        BasicException(const std::string& msg);
         virtual const char* what() const throw();
     private:
         const std::string excName;

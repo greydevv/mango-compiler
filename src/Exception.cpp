@@ -59,10 +59,10 @@ std::string getFileNameFromPath(const std::string& fullPath)
     return fullPath.substr(fullPath.find_last_of('/')+1);
 }
 
-CommandError::CommandError(const std::string& msg)
-    : excName("CommandError"), msg(msg) {}
+BasicException::BasicException(const std::string& msg)
+    : excName("Error"), msg(msg) {}
 
-const char* CommandError::what() const throw()
+const char* BasicException::what() const throw()
 {
     std::ostringstream s;
     s << fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::orange_red), excName);
