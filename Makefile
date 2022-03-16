@@ -25,5 +25,5 @@ clean:
 # for compiling code
 .PHONY: out
 $(COMP_EXEC):
-	./$(EXEC) -emit
+	./$(EXEC) $(OUTFILE) -emit
 	$(CXX) output.cpp output.o -o $(COMP_EXEC)
