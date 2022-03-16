@@ -18,6 +18,7 @@
 #include "../ast/CallAST.h"
 #include "../ast/IfAST.h"
 #include "../ast/ForAST.h"
+#include "../ast/WhileAST.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Value.h"
@@ -371,6 +372,11 @@ llvm::Value* CodegenVisitor::codegen(IfAST* ast, llvm::BasicBlock* parentMergeBl
 }
 
 llvm::Value* CodegenVisitor::codegen(ForAST* ast)
+{
+    return nullptr;
+}
+
+llvm::Value* CodegenVisitor::codegen(WhileAST* ast)
 {
     return nullptr;
 }

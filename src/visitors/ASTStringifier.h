@@ -16,6 +16,7 @@ class ReturnAST;
 class CallAST;
 class IfAST;
 class ForAST;
+class WhileAST;
 
 class ASTStringifier
 {
@@ -32,6 +33,7 @@ class ASTStringifier
         std::string toString(CallAST* ast, int tabs = 0);
         std::string toString(IfAST* ast, int tabs = 0);
         std::string toString(ForAST* ast, int tabs = 0);
+        std::string toString(WhileAST* ast, int tabs = 0);
     
     private:
         bool simpleExpr;

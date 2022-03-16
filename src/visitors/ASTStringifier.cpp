@@ -14,6 +14,7 @@
 #include "../ast/CallAST.h"
 #include "../ast/IfAST.h"
 #include "../ast/ForAST.h"
+#include "../ast/WhileAST.h"
 #include "ASTStringifier.h"
 
 ASTStringifier::ASTStringifier(bool simpleExpr)
@@ -248,6 +249,28 @@ std::string ASTStringifier::toString(ForAST* ast, int tabs)
     else
     {
         s << "ForAST:\n";
+        if (ast->expr)
+            s << indent("Expression:\n", tabs+1) << indent(ast->expr->accept(*this, tabs+2), tabs+2);
+        if (ast->body->children.size() > 0 || ast->body->retStmt)
+        {
+            if (ast->expr)
+                s << '\n';
+            s << indent("Body:\n", tabs+1) << indent(ast->body->accept(*this, tabs+2), tabs+2);
+        }
+    }
+    return s.str();
+}
+
+std::string ASTStringifier::toString(WhileAST* ast, int tabs)
+{
+    std::ostringstream s;
+    if (simpleExpr)
+    {
+        s << "while (" << ast->expr->accept(*this) << ") {\n" << ast->body->accept(*this) << "\n}\n";
+    }
+    else
+    {
+        s << "WhileAST:\n";
         if (ast->expr)
             s << indent("Expression:\n", tabs+1) << indent(ast->expr->accept(*this, tabs+2), tabs+2);
         if (ast->body->children.size() > 0 || ast->body->retStmt)
