@@ -379,26 +379,26 @@ llvm::Value* CodegenVisitor::codegen(ForAST* ast)
 llvm::Value* CodegenVisitor::codegen(WhileAST* ast)
 {
     llvm::Function* func = builder->GetInsertBlock()->getParent();
+    llvm::BasicBlock* condBlock = llvm::BasicBlock::Create(*ctx, "cond");
     llvm::BasicBlock* whileBlock = llvm::BasicBlock::Create(*ctx, "while");
     llvm::BasicBlock* mergeBlock = llvm::BasicBlock::Create(*ctx, "merge");
 
+    builder->CreateBr(condBlock);
+
+    insertFuncBlock(func, condBlock);
+    condBlock = builder->GetInsertBlock();
+
     llvm::Value* whileCond = ast->expr->accept(*this);
     builder->CreateCondBr(whileCond, whileBlock, mergeBlock);
-
 
     insertFuncBlock(func, whileBlock);
     whileBlock = builder->GetInsertBlock();
 
     llvm::Value* bodyRet = ast->body->accept(*this);
     if (bodyRet)
-    {
         builder->CreateRet(bodyRet);
-    }
     else
-    {
-        whileCond = ast->expr->accept(*this);
-        builder->CreateCondBr(whileCond, whileBlock, mergeBlock);
-    }
+        builder->CreateBr(condBlock);
 
     insertFuncBlock(func, mergeBlock);
     mergeBlock = builder->GetInsertBlock();
