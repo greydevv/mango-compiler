@@ -18,6 +18,7 @@ class PrototypeAST;
 class ReturnAST;
 class CallAST;
 class IfAST;
+class ForAST;
 
 class CodegenVisitor
 {
@@ -37,6 +38,7 @@ class CodegenVisitor
         llvm::Value* codegen(CallAST* ast);
         llvm::Value* codegen(IfAST* ast);
         llvm::Value* codegen(IfAST* ast, llvm::BasicBlock* parentMergeBlock);
+        llvm::Value* codegen(ForAST* ast);
 
     private:
         void debugPrint(IfAST* ast);
