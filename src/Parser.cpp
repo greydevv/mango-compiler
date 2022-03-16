@@ -18,6 +18,8 @@
 #include "ast/ReturnAST.h"
 #include "ast/CallAST.h"
 #include "ast/IfAST.h"
+#include "ast/ForAST.h"
+#include "ast/WhileAST.h"
 #include "Exception.h"
 
 Parser::Parser(const std::string& fname, const std::string& src)
@@ -95,6 +97,10 @@ std::unique_ptr<AST> Parser::parseKwd()
     else if (tok.value == "for")
     {
         return parseForStmt();
+    }
+    else if (tok.value == "while")
+    {
+        return parseWhileStmt();
     }
     else
     {
@@ -277,7 +283,17 @@ std::unique_ptr<ForAST> Parser::parseForStmt()
 
     throw NotImplementedError(fname, "For loop parsing.", SourceLocation(0,0));
 
-    return std::make_unique<ForAST>(std::move(var), nullptr, nullptr, parseCompound());
+    // return std::make_unique<ForAST>(std::move(var), nullptr, nullptr, parseCompound());
+}
+
+std::unique_ptr<WhileAST> Parser::parseWhileStmt()
+{
+    eat(Token::TOK_KWD);
+    eat(Token::TOK_OPAREN);
+    std::unique_ptr<AST> expr = parseExpr();
+    eat(Token::TOK_CPAREN);
+    std::unique_ptr<CompoundAST> body = parseCompound();
+    return std::make_unique<WhileAST>(std::move(expr), std::move(body));
 }
 
 std::unique_ptr<AST> Parser::parseIdTerm() 
