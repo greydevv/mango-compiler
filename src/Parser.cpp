@@ -45,23 +45,37 @@ std::unique_ptr<AST> Parser::parsePrimary()
             // either variable redefinition, reference
             return parseId();
         case Token::TOK_TYPE:
-        {
             // assuming variable declaration
-            // get type of variable declaration
-            Type allocType = typeFromString(tok.value);
-            eat(Token::TOK_TYPE);
-            auto allocVar = std::make_unique<VariableAST>(tok.value, allocType, VarCtx::eAlloc);
-            eat(Token::TOK_ID);
-            eat(Token::TOK_EQUALS);
-            auto allocExpr = std::make_unique<ExpressionAST>(std::move(allocVar), parseExpr(), Operator::OP_EQL);
-            eat(Token::TOK_SCOLON);
-            return allocExpr;
-        }
+            return parseVarDef();
         default:
             std::unique_ptr<AST> exprAST = parseExpr();
             eat(Token::TOK_SCOLON);
             return exprAST;
     }
+}
+
+std::unique_ptr<ExpressionAST> Parser::parseVarDef()
+{
+    Type allocType = typeFromString(tok.value);
+    eat(Token::TOK_TYPE);
+    auto allocVar = std::make_unique<VariableAST>(tok.value, allocType, VarCtx::eAlloc);
+    eat(Token::TOK_ID);
+    return createVarAssignExpr(std::move(allocVar));
+}
+
+std::unique_ptr<ExpressionAST> Parser::parseVarStore()
+{
+    auto storeVar = std::make_unique<VariableAST>(tok.value, Type::eUnd, VarCtx::eStore);
+    eat(Token::TOK_ID);
+    return createVarAssignExpr(std::move(storeVar));
+}
+
+std::unique_ptr<ExpressionAST> Parser::createVarAssignExpr(std::unique_ptr<VariableAST> var)
+{
+    eat(Token::TOK_EQUALS);
+    auto expr = std::make_unique<ExpressionAST>(std::move(var), parseExpr(), Operator::OP_EQL);
+    eat(Token::TOK_SCOLON);
+    return expr;
 }
 
 std::unique_ptr<AST> Parser::parseKwd()
@@ -78,6 +92,10 @@ std::unique_ptr<AST> Parser::parseKwd()
     {
         return parseIfStmt();
     }
+    else if (tok.value == "for")
+    {
+        return parseForStmt();
+    }
     else
     {
         std::cout << "[Dev Error] Keyword handling for '" << tok.value << "' not yet implemented in parser.\n";
@@ -89,16 +107,18 @@ std::unique_ptr<AST> Parser::parseId()
 {
     if (lexer.peekToken().type == Token::TOK_EQUALS)
     {
-        auto var = std::make_unique<VariableAST>(tok.value, Type::eUnd, VarCtx::eStore);
-        eat(Token::TOK_ID);
-        eat(Token::TOK_EQUALS);
-        auto expr = std::make_unique<ExpressionAST>(std::move(var), parseExpr(), Operator::OP_EQL); 
-        eat(Token::TOK_SCOLON);
-        return expr;
+        return parseVarStore();
     }
     std::unique_ptr<AST> expr = parseExpr();
     eat(Token::TOK_SCOLON);
     return expr;
+}
+
+std::unique_ptr<NumberAST> Parser::parseNum() 
+{
+    std::unique_ptr<NumberAST> numAST = std::make_unique<NumberAST>(std::stod(tok.value));
+    eat(Token::TOK_NUM);
+    return numAST;
 }
 
 std::unique_ptr<FunctionAST> Parser::parseFuncDef()
@@ -185,7 +205,7 @@ std::unique_ptr<CompoundAST> Parser::parseCompound()
     int prevWarnLine = -1;
     while (tok != Token::TOK_CBRACK)
     {
-        if (tok.type == Token::TOK_KWD && tok.value == "return")
+        if (!didReturn && tok.type == Token::TOK_KWD && tok.value == "return")
         {
             didReturn = true;
             compound->setRetStmt(parseReturnStmt());
@@ -249,11 +269,15 @@ std::unique_ptr<IfAST> Parser::parseIfStmt()
     return std::make_unique<IfAST>(std::move(expr), std::move(body), std::move(other));
 }
 
-std::unique_ptr<NumberAST> Parser::parseNum() 
+std::unique_ptr<ForAST> Parser::parseForStmt()
 {
-    std::unique_ptr<NumberAST> numAST = std::make_unique<NumberAST>(std::stod(tok.value));
-    eat(Token::TOK_NUM);
-    return numAST;
+    eat(Token::TOK_KWD);
+    eat(Token::TOK_OPAREN);
+    std::unique_ptr<ExpressionAST> var = tok.type == Token::TOK_TYPE ? parseVarDef() : parseVarStore();
+
+    throw NotImplementedError(fname, "For loop parsing.", SourceLocation(0,0));
+
+    return std::make_unique<ForAST>(std::move(var), nullptr, nullptr, parseCompound());
 }
 
 std::unique_ptr<AST> Parser::parseIdTerm() 

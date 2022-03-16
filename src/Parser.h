@@ -8,8 +8,12 @@
 #include "ast/AST.h"
 #include "ast/FunctionAST.h"
 #include "ast/ModuleAST.h"
+#include "ast/VariableAST.h"
 #include "ast/NumberAST.h"
+#include "ast/ReturnAST.h"
+#include "ast/CompoundAST.h"
 #include "ast/PrototypeAST.h"
+#include "ast/ForAST.h"
 
 class Parser
 {
@@ -25,6 +29,9 @@ class Parser
         int errState;
 
         std::unique_ptr<AST> parsePrimary();
+        std::unique_ptr<ExpressionAST> parseVarDef();
+        std::unique_ptr<ExpressionAST> parseVarStore();
+        std::unique_ptr<ExpressionAST> createVarAssignExpr(std::unique_ptr<VariableAST> var);
         std::unique_ptr<AST> parseKwd();
         std::unique_ptr<AST> parseId();
         std::unique_ptr<NumberAST> parseNum();
@@ -35,6 +42,7 @@ class Parser
         std::unique_ptr<CompoundAST> parseCompound();
         std::unique_ptr<ReturnAST> parseReturnStmt();
         std::unique_ptr<IfAST> parseIfStmt();
+        std::unique_ptr<ForAST> parseForStmt();
         std::unique_ptr<AST> parseIdTerm();
         std::unique_ptr<AST> parseTerm();
         std::unique_ptr<AST> parseExpr();
