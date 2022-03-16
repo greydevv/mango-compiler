@@ -78,7 +78,7 @@ Token Lexer::nextToken()
         // remove comments
         skipComment();
     }
-    if (isalpha(c))
+    if (isalpha(c) || c == '_')
     {
         return lexAlpha();
     }
@@ -98,7 +98,7 @@ Token Lexer::lexAlpha()
     std::string s;
     // want loc of token to start at beginning of token's value
     SourceLocation tmpLoc(loc.x, loc.y);
-    while (isalnum(c))
+    while (isalnum(c) || c == '_')
     {
         s += c;
         next();
