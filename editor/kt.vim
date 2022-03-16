@@ -18,7 +18,7 @@ syntax match ktFuncIds '\w\+\s*\ze('
 
 " Keywords
 syntax keyword ktFuncKwd func nextgroup=ktFuncIds skipwhite
-syntax keyword ktKwds return else if 
+syntax keyword ktKwds return if else for while
 
 " Types
 syntax keyword ktTypes int void
