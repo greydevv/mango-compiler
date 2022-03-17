@@ -35,6 +35,8 @@ class Parser
         std::unique_ptr<AST> parseKwd();
         std::unique_ptr<AST> parseId();
         std::unique_ptr<NumberAST> parseNum();
+        std::unique_ptr<AST> parseArray(Type eleType);
+        std::unique_ptr<AST> parseArray();
         std::unique_ptr<FunctionAST> parseFuncDef();
         std::unique_ptr<PrototypeAST> parseFuncProto();
         std::vector<std::unique_ptr<VariableAST>> parseFuncParams();

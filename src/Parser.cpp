@@ -13,6 +13,7 @@
 #include "ast/ExpressionAST.h"
 #include "ast/VariableAST.h"
 #include "ast/NumberAST.h"
+#include "ast/ArrayAST.h"
 #include "ast/FunctionAST.h"
 #include "ast/PrototypeAST.h"
 #include "ast/ReturnAST.h"
@@ -60,6 +61,14 @@ std::unique_ptr<ExpressionAST> Parser::parseVarDef()
 {
     Type allocType = typeFromString(tok.value);
     eat(Token::TOK_TYPE);
+    if (allocType == Type::eArray)
+    {
+        // need to eat second type that denotes the type of the elements
+        eat(Token::TOK_LT);
+        // Type eleType = typeFromString(tok.value);
+        eat(Token::TOK_TYPE);
+        eat(Token::TOK_GT);
+    }
     auto allocVar = std::make_unique<VariableAST>(tok.value, allocType, VarCtx::eAlloc);
     eat(Token::TOK_ID);
     return createVarAssignExpr(std::move(allocVar));
@@ -125,6 +134,33 @@ std::unique_ptr<NumberAST> Parser::parseNum()
     std::unique_ptr<NumberAST> numAST = std::make_unique<NumberAST>(std::stod(tok.value));
     eat(Token::TOK_NUM);
     return numAST;
+}
+
+std::unique_ptr<AST> Parser::parseArray(Type eleType)
+{
+    // throw NotImplementedError(fname, "array parsing", tok.loc);
+    // either basic array '[a,b,c,d]' or string '"abcd"'
+    // if (eleType != Type::eString) {}
+
+    auto arr = std::make_unique<ArrayAST>(eleType);
+    eat(Token::TOK_OSQUARE);
+    while (true)
+    {
+        arr->addElement(parseExpr());
+        if (tok.type != Token::TOK_COMMA)
+            // break and expect closing square bracket
+            break;
+        eat(Token::TOK_COMMA);
+    }
+
+    eat(Token::TOK_CSQUARE);
+
+    return arr;
+}
+
+std::unique_ptr<AST> Parser::parseArray()
+{
+    return parseArray(Type::eUnd);
 }
 
 std::unique_ptr<FunctionAST> Parser::parseFuncDef()
@@ -319,6 +355,8 @@ std::unique_ptr<AST> Parser::parseTerm()
                 eat(Token::TOK_CPAREN);
                 return expr;
             }
+        case Token::TOK_OSQUARE:
+            return parseArray();
         case Token::TOK_SCOLON:
             {
                 // specific error message
