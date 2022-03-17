@@ -144,6 +144,10 @@ Token::token_type Lexer::lexTokenType()
             return Token::TOK_OPAREN;
         case ')':
             return Token::TOK_CPAREN;
+        case '[':
+            return Token::TOK_OSQUARE;
+        case ']':
+            return Token::TOK_CSQUARE;
         case '{':
             return Token::TOK_OBRACK;
         case '}':
