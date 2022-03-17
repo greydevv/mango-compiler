@@ -171,6 +171,14 @@ Token::token_type Lexer::lexTokenType()
         {
             return Token::TOK_FSLASH;
         }
+        case '!':
+        {
+            if (peek() == '=')
+            {
+                next();
+                return Token::TOK_NEQUALS;
+            }
+        }
         case '=':
         {
             if (peek() == '=')

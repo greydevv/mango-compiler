@@ -155,6 +155,8 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast)
             return builder->CreateNSWSub(L, R, "subtmp");
         case Operator::OP_MUL:
             return builder->CreateNSWMul(L, R, "multmp");
+        case Operator::OP_BOOL_NEQL:
+            return builder->CreateICmpNE(L, R, "neqtmp");
         case Operator::OP_BOOL_EQL:
             return builder->CreateICmpEQ(L, R, "eqtmp");
         case Operator::OP_BOOL_LT:
