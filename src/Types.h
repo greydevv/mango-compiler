@@ -9,6 +9,7 @@ enum Type
 {
     eVoid,
     eInt,
+    eArray,
     eUnd,
     NUM_TYPES,
 };
@@ -19,12 +20,14 @@ Type typeFromString(const std::string& str);
 static std::vector<std::string> typeStrings = {
     "eVoid",
     "eInt",
+    "eArray",
     "eUnd",
 };
 
 static std::map<Type, std::string> typeValues = {
     {Type::eVoid, "void"},
     {Type::eInt, "int"},
+    {Type::eArray, "array"},
     {Type::eUnd, "undefined"},
 };
 
