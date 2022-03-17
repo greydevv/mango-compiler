@@ -165,4 +165,4 @@ emits the IR:
 - [x] IR: functions
 - [x] IR: if/else if/else
 - [ ] IR: loops (for, while)
-- [ ] Static, weak typing
+- [ ] Static (and weak) type-checking
