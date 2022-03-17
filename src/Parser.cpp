@@ -277,13 +277,7 @@ std::unique_ptr<IfAST> Parser::parseIfStmt()
 
 std::unique_ptr<ForAST> Parser::parseForStmt()
 {
-    eat(Token::TOK_KWD);
-    eat(Token::TOK_OPAREN);
-    std::unique_ptr<ExpressionAST> var = tok.type == Token::TOK_TYPE ? parseVarDef() : parseVarStore();
-
     throw NotImplementedError(fname, "For loop parsing.", SourceLocation(0,0));
-
-    // return std::make_unique<ForAST>(std::move(var), nullptr, nullptr, parseCompound());
 }
 
 std::unique_ptr<WhileAST> Parser::parseWhileStmt()
