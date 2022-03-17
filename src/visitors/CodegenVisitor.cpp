@@ -10,6 +10,7 @@
 #include "../ast/ExpressionAST.h"
 #include "../ast/ModuleAST.h"
 #include "../ast/NumberAST.h"
+#include "../ast/ArrayAST.h"
 #include "../ast/VariableAST.h"
 #include "../ast/FunctionAST.h"
 #include "../ast/CompoundAST.h"
@@ -188,11 +189,6 @@ llvm::Value* CodegenVisitor::codegen(ModuleAST* ast)
     return nullptr;
 }
 
-llvm::Value* CodegenVisitor::codegen(NumberAST* ast) 
-{
-    return llvm::ConstantInt::get(*ctx, llvm::APInt(32, ast->val));
-}
-
 llvm::Value* CodegenVisitor::codegen(VariableAST* ast) 
 {
     llvm::AllocaInst* val = namedValues[ast->id];
@@ -202,6 +198,16 @@ llvm::Value* CodegenVisitor::codegen(VariableAST* ast)
         throw ReferenceError(mainModule->getModuleIdentifier(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
     }
     return builder->CreateLoad(val->getAllocatedType(), val, ast->id);
+}
+
+llvm::Value* CodegenVisitor::codegen(NumberAST* ast) 
+{
+    return llvm::ConstantInt::get(*ctx, llvm::APInt(32, ast->val));
+}
+
+llvm::Value* CodegenVisitor::codegen(ArrayAST* ast)
+{
+    throw NotImplementedError(mainModule->getModuleIdentifier(), "codegen of ArrayAST", SourceLocation(0,0));
 }
 
 llvm::Function* CodegenVisitor::codegen(FunctionAST* ast) 

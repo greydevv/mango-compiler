@@ -7,6 +7,7 @@
 #include "../ast/ExpressionAST.h"
 #include "../ast/VariableAST.h"
 #include "../ast/NumberAST.h"
+#include "../ast/ArrayAST.h"
 #include "../ast/CompoundAST.h"
 #include "../ast/FunctionAST.h"
 #include "../ast/PrototypeAST.h"
@@ -20,7 +21,8 @@
 ASTStringifier::ASTStringifier(bool simpleExpr)
     : simpleExpr(simpleExpr) {}
 
-std::string ASTStringifier::toString(ModuleAST* ast, int tabs) {
+std::string ASTStringifier::toString(ModuleAST* ast, int tabs) 
+{
     std::ostringstream s;
     s << "ModuleAST:\n";
     for (int i = 0; i < ast->children.size(); i++)
@@ -31,7 +33,8 @@ std::string ASTStringifier::toString(ModuleAST* ast, int tabs) {
     return s.str();
 }
 
-std::string ASTStringifier::toString(ExpressionAST* ast, int tabs) {
+std::string ASTStringifier::toString(ExpressionAST* ast, int tabs) 
+{
     std::ostringstream s;
     if (simpleExpr)
     {
@@ -48,20 +51,8 @@ std::string ASTStringifier::toString(ExpressionAST* ast, int tabs) {
     return s.str();
 }
 
-std::string ASTStringifier::toString(NumberAST* ast, int tabs) {
-    std::ostringstream s;
-    if (simpleExpr)
-    {
-        s << ast->val;
-    }
-    else
-    {
-        s << "NumberAST(" << ast->val << ')';
-    }
-    return s.str();
-}
-
-std::string ASTStringifier::toString(VariableAST* ast, int tabs) {
+std::string ASTStringifier::toString(VariableAST* ast, int tabs) 
+{
     std::ostringstream s;
     if (simpleExpr)
     {
@@ -78,7 +69,48 @@ std::string ASTStringifier::toString(VariableAST* ast, int tabs) {
     return s.str();
 }
 
-std::string ASTStringifier::toString(CompoundAST* ast, int tabs) {
+std::string ASTStringifier::toString(NumberAST* ast, int tabs) 
+{
+    std::ostringstream s;
+    if (simpleExpr)
+    {
+        s << ast->val;
+    }
+    else
+    {
+        s << "NumberAST(" << ast->val << ')';
+    }
+    return s.str();
+}
+
+std::string ASTStringifier::toString(ArrayAST* ast, int tabs)
+{
+    std::ostringstream s;
+    if (simpleExpr)
+    {
+        s << '[';
+        for (int i = 0; i < ast->elements.size(); i++)
+        {
+            s << ast->elements[i]->accept(*this);
+            if (i < ast->elements.size() - 1)
+                s << ", ";
+        }
+        s << ']';
+    }
+    else
+    {
+        s << "ArrayAST(" << ast->elements.size() << ", " << typeToString(ast->type) << "):\n";
+        for (int i = 0; i < ast->elements.size(); i++)
+        {
+            s << indent(ast->elements[i]->accept(*this, tabs+1), tabs+1) << '\n';
+        }
+    }
+
+    return s.str();
+}
+
+std::string ASTStringifier::toString(CompoundAST* ast, int tabs) 
+{
     std::ostringstream s;
     if (simpleExpr)
     {
@@ -110,7 +142,8 @@ std::string ASTStringifier::toString(CompoundAST* ast, int tabs) {
     return s.str();
 }
 
-std::string ASTStringifier::toString(FunctionAST* ast, int tabs) {
+std::string ASTStringifier::toString(FunctionAST* ast, int tabs) 
+{
     std::ostringstream s;
     if (simpleExpr)
     {
@@ -125,7 +158,8 @@ std::string ASTStringifier::toString(FunctionAST* ast, int tabs) {
     return s.str();
 }
 
-std::string ASTStringifier::toString(PrototypeAST* ast, int tabs) {
+std::string ASTStringifier::toString(PrototypeAST* ast, int tabs) 
+{
     std::ostringstream s;
     if (simpleExpr)
     {

@@ -9,6 +9,7 @@ class ModuleAST;
 class ExpressionAST;
 class VariableAST;
 class NumberAST;
+class ArrayAST;
 class CompoundAST;
 class FunctionAST;
 class PrototypeAST;
@@ -26,6 +27,7 @@ class ASTStringifier
         std::string toString(ExpressionAST* ast, int tabs = 0);
         std::string toString(VariableAST* ast, int tabs = 0);
         std::string toString(NumberAST* ast, int tabs = 0);
+        std::string toString(ArrayAST* ast, int tabs = 0);
         std::string toString(CompoundAST* ast, int tabs = 0);
         std::string toString(FunctionAST* ast, int tabs = 0);
         std::string toString(PrototypeAST* ast, int tabs = 0);
