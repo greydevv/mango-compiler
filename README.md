@@ -61,6 +61,47 @@ descending order, the operator precedence is as follows:
 | `\|\|`               | Logical or (boolean)           | Left-to-right  |
 | `=`                  | Assignment                     | Right-to-left  |
 
+#### Variables
+
+Similar to most statically-typed languages:
+```
+// define
+int a = 10;
+int b = 3;
+
+// reference
+int c = a + b;
+```
+
+#### Control Flow
+
+Katana implements if statements, for-loops, and while-loops (no do-while). The
+structure of if-statements are exaclty the same to C++ where else-if and else
+blocks are otional:
+```
+if ( [expression] )
+{
+    [body...]
+}
+else if ( [expression] )
+{
+    [body...]
+}
+else
+{
+    [body...]
+}
+```
+
+##### WARNING: FOR-LOOPS ARE NOT IMPLEMENTED. EVERYTHING FROM DESIGN TO FUNCTIONALITY IS VERY EXPERIMENTAL CURRENTLY.
+Inspiration for for-loops is a combination of Python and Swift:
+```
+for (int i in 1..3)
+{
+    [body...]
+}
+```
+
 #### Functions
 
 Functions can be defined in the following ways. Parameters are optional, as always.
