@@ -278,17 +278,15 @@ std::string ASTStringifier::toString(ForAST* ast, int tabs)
     std::ostringstream s;
     if (simpleExpr)
     {
-        s << "for (" << ast->expr->accept(*this) << ") {\n" << ast->body->accept(*this) << "\n}\n";
+        s << "for (" << ast->expr->accept(*this) << " in " << ast->iter->accept(*this) << ") {\n" << ast->body->accept(*this) << "\n}\n";
     }
     else
     {
         s << "ForAST:\n";
-        if (ast->expr)
-            s << indent("Expression:\n", tabs+1) << indent(ast->expr->accept(*this, tabs+2), tabs+2);
+        s << indent("Expression:\n", tabs+1) << indent(ast->expr->accept(*this, tabs+2), tabs+2) << '\n';
+        s << indent("Iterable:\n", tabs+1) << indent(ast->iter->accept(*this, tabs+2), tabs+2) << '\n';
         if (ast->body->children.size() > 0 || ast->body->retStmt)
         {
-            if (ast->expr)
-                s << '\n';
             s << indent("Body:\n", tabs+1) << indent(ast->body->accept(*this, tabs+2), tabs+2);
         }
     }

@@ -16,6 +16,7 @@ enum Type
 
 std::string typeToString(Type t);
 Type typeFromString(const std::string& str);
+bool isArrayType(Type t);
 
 static std::vector<std::string> typeStrings = {
     "eVoid",

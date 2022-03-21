@@ -381,7 +381,35 @@ llvm::Value* CodegenVisitor::codegen(IfAST* ast, llvm::BasicBlock* parentMergeBl
 
 llvm::Value* CodegenVisitor::codegen(ForAST* ast)
 {
-    return nullptr;
+    throw NotImplementedError(mainModule->getModuleIdentifier(), "ForAST codegen", SourceLocation(0,0));
+    // llvm::Function* func = builder->GetInsertBlock()->getParent();
+    // llvm::BasicBlock* condBlock = llvm::BasicBlock::Create(*ctx, "cond");
+    // llvm::BasicBlock* forBlock = llvm::BasicBlock::Create(*ctx, "for");
+    // llvm::BasicBlock* mergeBlock = llvm::BasicBlock::Create(*ctx, "merge");
+    
+    // insertFuncBlock(func, condBlock);
+    // condBlock = builder->GetInsertBlock();
+
+    // // codegen expression
+    // ast->expr->accept(*this);
+
+    // int stop = ast->iter->elements.size();
+    // llvm::Value* forCond = ast->iter->accept(*this);
+    // builder->CreateCondBr(whileCond, forBlock, mergeBlock);
+
+    // insertFuncBlock(func, forBlock);
+    // forBlock = builder->GetInsertBlock();
+
+    // llvm::Value* bodyRet = ast->body->accept(*this);
+    // if (bodyRet)
+    //     builder->CreateRet(bodyRet);
+    // else
+    //     builder->CreateBr(condBlock);
+
+    // insertFuncBlock(func, mergeBlock);
+    // mergeBlock = builder->GetInsertBlock();
+
+    // return nullptr;
 }
 
 llvm::Value* CodegenVisitor::codegen(WhileAST* ast)

@@ -15,6 +15,7 @@
 #include "ast/NumberAST.h"
 #include "ast/ArrayAST.h"
 #include "ast/FunctionAST.h"
+#include "ast/CompoundAST.h"
 #include "ast/PrototypeAST.h"
 #include "ast/ReturnAST.h"
 #include "ast/CallAST.h"
@@ -61,13 +62,14 @@ std::unique_ptr<ExpressionAST> Parser::parseVarDef()
 {
     Type allocType = typeFromString(tok.value);
     eat(Token::TOK_TYPE);
-    if (allocType == Type::eArray)
+    if (isArrayType(allocType))
     {
         // need to eat second type that denotes the type of the elements
         eat(Token::TOK_LT);
         // Type eleType = typeFromString(tok.value);
         eat(Token::TOK_TYPE);
         eat(Token::TOK_GT);
+        throw NotImplementedError(fname, "parsing of ArrayAST", SourceLocation(0,0));
     }
     auto allocVar = std::make_unique<VariableAST>(tok.value, allocType, VarCtx::eAlloc);
     eat(Token::TOK_ID);
@@ -313,7 +315,74 @@ std::unique_ptr<IfAST> Parser::parseIfStmt()
 
 std::unique_ptr<ForAST> Parser::parseForStmt()
 {
-    throw NotImplementedError(fname, "For loop parsing.", SourceLocation(0,0));
+    eat(Token::TOK_KWD);
+    eat(Token::TOK_OPAREN);
+    std::unique_ptr<VariableAST> var;
+    if (tok.isType())
+    {
+        Type varType = tok.toType();
+        eat(Token::TOK_TYPE);
+        var = std::make_unique<VariableAST>(tok.value, varType, VarCtx::eAlloc);
+    }
+    else
+    {
+        var = std::make_unique<VariableAST>(tok.value);
+    }
+    eat(Token::TOK_ID);
+    eat(Token::TOK_KWD);
+    std::unique_ptr<ArrayAST> gen = parseIntArrayGen();
+    auto expr = std::make_unique<ExpressionAST>(std::move(var), std::unique_ptr<AST>(gen->elements[0]->clone()), Operator::OP_EQL);
+    eat(Token::TOK_CPAREN);
+    std::unique_ptr<CompoundAST> body = parseCompound();
+    return std::make_unique<ForAST>(std::move(expr), std::move(gen), std::move(body));
+    // throw NotImplementedError(fname, "For loop parsing.", SourceLocation(0,0));
+}
+
+std::unique_ptr<ArrayAST> Parser::parseIntArrayGen()
+{
+
+    /*
+     * XXX XXX TODO XXX XXX
+     * This is a terrible temporary solution. This should be a generator
+     * instead of an allocated array because the next value can be computed
+     * very easily. For example:
+     *
+     * for (int i in 0..2000) {}
+     *
+     * allocates an array with 2000 elements in it. That's dumb. What can be
+     * done is on each iteration, the control value, in this case 'i', can be
+     * set to the next value of the iteration. If 'i' is 10, just set it to 11
+     * on the next loop because we know that is what it will be if this close
+     * ranged is used (start..stop..step). There's no point in allocating an
+     * entire array for this.
+     *
+     * The purpose of this shit solution is a proof-of-concept for arrays and
+     * iterating through them.
+     *
+     *
+     */
+    int start, stop;
+    int step = 1;
+    start = std::stoi(tok.value);
+    eat(Token::TOK_NUM);
+    eat(Token::TOK_PERIOD);
+    eat(Token::TOK_PERIOD);
+    stop = std::stoi(tok.value);
+    eat(Token::TOK_NUM);
+    if (tok.type == Token::TOK_PERIOD)
+    {
+        eat(Token::TOK_PERIOD);
+        eat(Token::TOK_PERIOD);
+        step = std::stoi(tok.value);
+        eat(Token::TOK_NUM);
+    }
+    std::vector<std::unique_ptr<AST>> values;
+    for (int i = start; i < stop; i += step)
+    {
+        values.push_back(std::make_unique<NumberAST>(i));
+    }
+
+    return std::make_unique<ArrayAST>(Type::eInt, std::move(values));
 }
 
 std::unique_ptr<WhileAST> Parser::parseWhileStmt()

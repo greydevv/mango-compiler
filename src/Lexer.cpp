@@ -158,6 +158,8 @@ Token::token_type Lexer::lexTokenType()
             return Token::TOK_COLON;
         case ',':
             return Token::TOK_COMMA;
+        case '.':
+            return Token::TOK_PERIOD;
         case '+':
             return Token::TOK_PLUS;
         case '-':

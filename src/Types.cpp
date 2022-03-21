@@ -17,3 +17,19 @@ Type typeFromString(const std::string& str)
     else
         return Type::eUnd;
 }
+
+bool isArrayType(Type t)
+{
+    return (t == Type::eArray);
+}
+
+Type getArrayType(Type eleType)
+{
+    switch (eleType)
+    {
+        case Type::eInt:
+            return Type::eArray;
+        default:
+            return Type::eUnd;
+    }
+}

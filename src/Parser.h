@@ -45,6 +45,7 @@ class Parser
         std::unique_ptr<ReturnAST> parseReturnStmt();
         std::unique_ptr<IfAST> parseIfStmt();
         std::unique_ptr<ForAST> parseForStmt();
+        std::unique_ptr<ArrayAST> parseIntArrayGen();
         std::unique_ptr<WhileAST> parseWhileStmt();
         std::unique_ptr<AST> parseIdTerm();
         std::unique_ptr<AST> parseTerm();
