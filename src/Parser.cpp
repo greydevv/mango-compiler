@@ -77,9 +77,7 @@ std::unique_ptr<ExpressionAST> Parser::parseVarDef()
     if (st.contains(id))
         throw ReferenceError(fname, fmt::format("variable '{}' already defined", id), underlineTok(tok), tok.loc);
     else
-    {
         st.insert(id, allocType);
-    }
     auto allocVar = std::make_unique<VariableAST>(tok.value, allocType, VarCtx::eAlloc);
     eat(Token::TOK_ID);
     return createVarAssignExpr(std::move(allocVar));
@@ -183,6 +181,10 @@ std::unique_ptr<FunctionAST> Parser::parseFuncDef()
 std::unique_ptr<PrototypeAST> Parser::parseFuncProto()
 {
     std::string name = tok.value;
+    if (st.contains(name))
+        throw ReferenceError(fname, fmt::format("function '{}' already defined", name), underlineTok(tok), tok.loc);
+    else
+        st.insert(name, Type::eFunc);
     eat(Token::TOK_ID);
     std::vector<std::unique_ptr<VariableAST>> params = parseFuncParams();
     Type retType = Type::eVoid;

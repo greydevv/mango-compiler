@@ -224,11 +224,6 @@ llvm::Function* CodegenVisitor::codegen(FunctionAST* ast)
             return nullptr;
         }
     }
-    if (!func->empty())
-    {
-        std::string msg = fmt::format("function '{}' already defined", ast->proto->name);
-        throw ReferenceError(mainModule->getModuleIdentifier(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
-    }
     llvm::BasicBlock* BB = llvm::BasicBlock::Create(*ctx, "entry", func);
     builder->SetInsertPoint(BB);
 
