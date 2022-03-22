@@ -85,7 +85,10 @@ std::unique_ptr<ExpressionAST> Parser::parseVarDef()
 
 std::unique_ptr<ExpressionAST> Parser::parseVarStore()
 {
-    auto storeVar = std::make_unique<VariableAST>(tok.value, Type::eUnd, VarCtx::eStore);
+    std::string id = tok.value;
+    if (!st.contains(id))
+        throw ReferenceError(fname, fmt::format("unknown variable name '{}'", id), underlineTok(tok), tok.loc);
+    auto storeVar = std::make_unique<VariableAST>(id, st.lookup(id), VarCtx::eStore);
     eat(Token::TOK_ID);
     return createVarAssignExpr(std::move(storeVar));
 }
@@ -409,13 +412,18 @@ std::unique_ptr<WhileAST> Parser::parseWhileStmt()
 std::unique_ptr<AST> Parser::parseIdTerm() 
 {
     std::string id = tok.value;
+    Token tmpIdTok = tok;
     eat(Token::TOK_ID);
     // check if function call
     if (tok.type == Token::TOK_OPAREN)
     {
+        if (!st.contains(id))
+            throw ReferenceError(fname, fmt::format("unknown function name '{}'", id), underlineTok(tmpIdTok), tmpIdTok.loc);
         auto callAST = std::make_unique<CallAST>(id, parseCallParams());
         return callAST;
     }
+        if (!st.contains(id))
+            throw ReferenceError(fname, fmt::format("unknown variable name '{}'", id), underlineTok(tmpIdTok), tmpIdTok.loc);
     auto varAST = std::make_unique<VariableAST>(id);
     return varAST;
 }
