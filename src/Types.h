@@ -8,6 +8,7 @@
 enum Type
 {
     eVoid,
+    eFunc,
     eInt,
     eArray,
     eUnd,
@@ -21,6 +22,7 @@ bool isArrayType(Type t);
 
 static std::vector<std::string> typeStrings = {
     "eVoid",
+    "eFunc",
     "eInt",
     "eArray",
     "eUnd",
@@ -29,6 +31,7 @@ static std::vector<std::string> typeStrings = {
 
 static std::map<Type, std::string> typeValues = {
     {Type::eVoid, "void"},
+    {Type::eFunc, "function"},
     {Type::eInt, "int"},
     {Type::eArray, "array"},
     {Type::eUnd, "undefined"},
