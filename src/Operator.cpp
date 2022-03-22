@@ -95,32 +95,32 @@ Operator Operator::opUnknown()
     return Operator(Operator::OP_NOP, -1, Operator::A_LEFT);
 }
 
-bool Operator::operator==(const Operator& other)
+bool Operator::operator==(const Operator& other) const
 {
     return prec == other.prec;    
 }
 
-bool Operator::operator!=(const Operator& other)
+bool Operator::operator!=(const Operator& other) const
 {
     return prec != other.prec;
 }
 
-bool Operator::operator<=(const Operator& other)
+bool Operator::operator<=(const Operator& other) const
 {
     return prec <= other.prec;
 }
 
-bool Operator::operator>=(const Operator& other)
+bool Operator::operator>=(const Operator& other) const
 {
     return prec >= other.prec;
 }
 
-bool Operator::operator<(const Operator& other)
+bool Operator::operator<(const Operator& other) const
 {
     return prec < other.prec;
 }
 
-bool Operator::operator>(const Operator& other)
+bool Operator::operator>(const Operator& other) const
 {
     return prec > other.prec;
 }

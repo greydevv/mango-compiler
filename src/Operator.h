@@ -52,12 +52,12 @@ class Operator final
         static Operator opLogicalOr();
         static Operator opLogicalAnd();
         static Operator opUnknown();
-        bool operator==(const Operator& other);
-        bool operator!=(const Operator& other);
-        bool operator<=(const Operator& other);
-        bool operator>=(const Operator& other);
-        bool operator< (const Operator& other);
-        bool operator> (const Operator& other);
+        bool operator==(const Operator& other) const;
+        bool operator!=(const Operator& other) const;
+        bool operator<=(const Operator& other) const;
+        bool operator>=(const Operator& other) const;
+        bool operator< (const Operator& other) const;
+        bool operator> (const Operator& other) const;
         friend bool operator==(int i, const Operator& op);
         friend bool operator!=(int i, const Operator& op);
         friend bool operator<=(int i, const Operator& op);
