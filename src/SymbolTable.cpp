@@ -1,6 +1,9 @@
 #include <map>
 #include "SymbolTable.h"
 
+SymbolTable::SymbolTable()
+    : st() {}
+
 bool SymbolTable::contains(const std::string& name)
 {
     return st.contains(name);
@@ -8,7 +11,7 @@ bool SymbolTable::contains(const std::string& name)
 
 bool SymbolTable::insert(const std::string& name, Type type)
 {
-    if (!contains(name))
+    if (contains(name))
         return false;
 
     st.insert(std::pair<std::string, Type>(name, type));

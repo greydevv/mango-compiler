@@ -7,7 +7,7 @@
 class SymbolTable
 {
     public:
-        SymbolTable() {};
+        SymbolTable();
         bool contains(const std::string& name);
         bool insert(const std::string& name, Type type);
         Type lookup(const std::string& name);
