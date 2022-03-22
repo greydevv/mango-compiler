@@ -207,7 +207,14 @@ llvm::Value* CodegenVisitor::codegen(NumberAST* ast)
 
 llvm::Value* CodegenVisitor::codegen(ArrayAST* ast)
 {
-    throw NotImplementedError(mainModule->getModuleIdentifier(), "codegen of ArrayAST", SourceLocation(0,0));
+    llvm::ArrayType* arrType = llvm::ArrayType::get(llvm::Type::getInt32Ty(*ctx), ast->elements.size());
+    mainModule->getOrInsertGlobal("thearray", arrType);
+    llvm::GlobalVariable* gArr = mainModule->getNamedGlobal("thearray");
+    gArr->setLinkage(llvm::GlobalValue::LinkageTypes::CommonLinkage);
+
+
+    // throw NotImplementedError(mainModule->getModuleIdentifier(), "codegen of ArrayAST", SourceLocation(0,0));
+    return nullptr;
 }
 
 llvm::Function* CodegenVisitor::codegen(FunctionAST* ast) 
@@ -381,6 +388,8 @@ llvm::Value* CodegenVisitor::codegen(IfAST* ast, llvm::BasicBlock* parentMergeBl
 
 llvm::Value* CodegenVisitor::codegen(ForAST* ast)
 {
+    // ast->iter->accept(*this);
+    // return nullptr;
     throw NotImplementedError(mainModule->getModuleIdentifier(), "ForAST codegen", SourceLocation(0,0));
     // llvm::Function* func = builder->GetInsertBlock()->getParent();
     // llvm::BasicBlock* condBlock = llvm::BasicBlock::Create(*ctx, "cond");
