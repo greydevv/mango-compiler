@@ -496,7 +496,7 @@ llvm::Type* CodegenVisitor::typeToLlvm(Type type)
         case Type::eVoid:
             return llvm::Type::getVoidTy(*ctx);
         default:
-            std::cout << "ERROR - UNHANDLED CODEGEN TYPE. STOP.\n";
+            std::cout << "ERROR - UNHANDLED CODEGEN TYPE '" << typeStrings[type] << "' STOP.\n";
             exit(1);
     }
 }
