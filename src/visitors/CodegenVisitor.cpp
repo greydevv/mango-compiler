@@ -107,11 +107,6 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast)
         llvm::Value* rhs = ast->RHS->accept(*this);
         if (varAst->ctx == VarCtx::eAlloc)
         {
-            if (namedValues[varAst->id])
-            {
-                std::string msg = fmt::format("variable '{}' already defined", varAst->id);
-                throw ReferenceError(mainModule->getModuleIdentifier(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
-            }
             // make all allocations in entry block of function
             llvm::AllocaInst* varAlloca = createEntryBlockAlloca(rhs);
             namedValues[varAst->id] = varAlloca;

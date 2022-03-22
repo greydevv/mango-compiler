@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include "Operator.h"
+#include "SymbolTable.h"
 #include "Lexer.h"
 #include "ast/AST.h"
 #include "ast/FunctionAST.h"
@@ -24,6 +25,8 @@ class Parser
         
     private:
         std::string fname;
+        SymbolTable st;
+        // std::map<std::string, Type> st;
         Lexer lexer;
         Token tok;
         int errState;

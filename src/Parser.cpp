@@ -26,6 +26,7 @@
 
 Parser::Parser(const std::string& fname, const std::string& src)
     : fname(fname), 
+      st(),
       lexer(Lexer(src)), 
       tok(lexer.nextToken()) {}
 
@@ -70,6 +71,14 @@ std::unique_ptr<ExpressionAST> Parser::parseVarDef()
         eat(Token::TOK_TYPE);
         eat(Token::TOK_GT);
         throw NotImplementedError(fname, "parsing of ArrayAST", SourceLocation(0,0));
+    }
+
+    std::string id = tok.value;
+    if (st.contains(id))
+        throw ReferenceError(fname, fmt::format("variable '{}' already defined", id), underlineTok(tok), tok.loc);
+    else
+    {
+        st.insert(id, allocType);
     }
     auto allocVar = std::make_unique<VariableAST>(tok.value, allocType, VarCtx::eAlloc);
     eat(Token::TOK_ID);
