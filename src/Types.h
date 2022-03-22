@@ -11,6 +11,7 @@ enum Type
     eInt,
     eArray,
     eUnd,
+    eNot,
     NUM_TYPES,
 };
 
@@ -23,6 +24,7 @@ static std::vector<std::string> typeStrings = {
     "eInt",
     "eArray",
     "eUnd",
+    "eNot",
 };
 
 static std::map<Type, std::string> typeValues = {
@@ -30,6 +32,7 @@ static std::map<Type, std::string> typeValues = {
     {Type::eInt, "int"},
     {Type::eArray, "array"},
     {Type::eUnd, "undefined"},
+    {Type::eNot, "no_type"},
 };
 
 #endif
