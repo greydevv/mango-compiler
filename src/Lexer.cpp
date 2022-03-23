@@ -246,7 +246,8 @@ bool Lexer::isKwd(const std::string& s)
             || s == "else"
             || s == "for"
             || s == "while"
-            || s == "in");
+            || s == "in"
+            || s == "extern");
 }
 
 bool Lexer::isType(const std::string& s)
