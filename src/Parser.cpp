@@ -123,6 +123,10 @@ std::unique_ptr<AST> Parser::parseKwd()
     {
         return parseWhileStmt();
     }
+    else if (tok.value == "extern")
+    {
+        return parseExternStmt();
+    }
     else
     {
         std::cout << "[Dev Error] Keyword handling for '" << tok.value << "' not yet implemented in parser.\n";
@@ -173,6 +177,16 @@ std::unique_ptr<AST> Parser::parseArray(Type eleType)
 std::unique_ptr<AST> Parser::parseArray()
 {
     return parseArray(Type::eUnd);
+}
+
+std::unique_ptr<PrototypeAST> Parser::parseExternStmt()
+{
+    eat(Token::TOK_KWD);
+    eat(Token::TOK_KWD);
+    // auto func = std::make_unique<FunctionAST>(parseFuncProto(), nullptr);
+    std::unique_ptr<PrototypeAST> proto = parseFuncProto();
+    eat(Token::TOK_SCOLON);
+    return proto;
 }
 
 std::unique_ptr<FunctionAST> Parser::parseFuncDef()
