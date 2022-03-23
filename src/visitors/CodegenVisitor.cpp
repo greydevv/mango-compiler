@@ -118,8 +118,8 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast)
             llvm::Value* var = namedValues[varAst->id];
             if (!var)
             {
-                std::string msg = fmt::format("unknown variable '{}'", varAst->id);
-                throw ReferenceError(mainModule->getModuleIdentifier(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
+                std::string msg = fmt::format("unknown variable '{}' (it was probably used in a nested function when defined outside. this is a compiler bug)", varAst->id);
+                throw ReferenceError(mainModule->getSourceFileName(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
             }
             builder->CreateStore(rhs, var);
         }
@@ -170,7 +170,7 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast)
         default:
             {
                 // TODO: need to capture the operator's value
-                throw SyntaxError(mainModule->getModuleIdentifier(), "invalid binary operator", "LINE NOT IMPLEMENTED", SourceLocation(0,0));
+                throw SyntaxError(mainModule->getSourceFileName(), "invalid binary operator", "LINE NOT IMPLEMENTED", SourceLocation(0,0));
             }
     }
 }
@@ -189,8 +189,8 @@ llvm::Value* CodegenVisitor::codegen(VariableAST* ast)
     llvm::AllocaInst* val = namedValues[ast->id];
     if (!val)
     {
-        std::string msg = fmt::format("unknown variable '{}'", ast->id);
-        throw ReferenceError(mainModule->getModuleIdentifier(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
+        std::string msg = fmt::format("unknown variable '{}' (it was probably used in a nested function when defined outside. this is a compiler bug)", ast->id);
+        throw ReferenceError(mainModule->getSourceFileName(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
     }
     return builder->CreateLoad(val->getAllocatedType(), val, ast->id);
 }
@@ -208,7 +208,7 @@ llvm::Value* CodegenVisitor::codegen(ArrayAST* ast)
     gArr->setLinkage(llvm::GlobalValue::LinkageTypes::CommonLinkage);
 
 
-    // throw NotImplementedError(mainModule->getModuleIdentifier(), "codegen of ArrayAST", SourceLocation(0,0));
+    // throw NotImplementedError(mainModule->getSourceFileName(), "codegen of ArrayAST", SourceLocation(0,0));
     return nullptr;
 }
 
@@ -288,13 +288,13 @@ llvm::Value* CodegenVisitor::codegen(CallAST* ast)
     if (!callee)
     {
         std::string msg = fmt::format("unknown function '{}'", ast->id);
-        throw ReferenceError(mainModule->getModuleIdentifier(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
+        throw ReferenceError(mainModule->getSourceFileName(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
     }
     if (callee->arg_size() != ast->params.size())
     {
         // TODO: make new error for this (Python uses TypeError)
         std::string msg = fmt::format("function received {} arguments but expected {} arguments", callee->arg_size(), ast->params.size());
-        throw SyntaxError(mainModule->getModuleIdentifier(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
+        throw SyntaxError(mainModule->getSourceFileName(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
     }
     std::vector<llvm::Value*> argValues;
     for (int i = 0; i < ast->params.size(); i++)
@@ -380,7 +380,7 @@ llvm::Value* CodegenVisitor::codegen(ForAST* ast)
 {
     // ast->iter->accept(*this);
     // return nullptr;
-    throw NotImplementedError(mainModule->getModuleIdentifier(), "ForAST codegen", SourceLocation(0,0));
+    throw NotImplementedError(mainModule->getSourceFileName(), "ForAST codegen", SourceLocation(0,0));
     // llvm::Function* func = builder->GetInsertBlock()->getParent();
     // llvm::BasicBlock* condBlock = llvm::BasicBlock::Create(*ctx, "cond");
     // llvm::BasicBlock* forBlock = llvm::BasicBlock::Create(*ctx, "for");
