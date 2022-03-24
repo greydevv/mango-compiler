@@ -86,6 +86,10 @@ Token Lexer::nextToken()
     {
         return lexNum();
     }
+    else if (c == '"')
+    {
+        return lexString();
+    }
     else
     {
         return lexOther();
@@ -123,6 +127,22 @@ Token Lexer::lexNum()
         next();
     }
     return Token(Token::TOK_NUM, s, tmpLoc);
+}
+
+Token Lexer::lexString()
+{
+    std::string s;
+    SourceLocation tmpLoc(loc.x, loc.y);
+    // external 'next' calls are for skipping the quotes. If encountering
+    // "hello world", we only want to store hello world without the quotes
+    next();
+    while (c != '"')
+    {
+        s += c;
+        next();
+    }
+    next();
+    return Token(Token::TOK_STR, s, tmpLoc);
 }
 
 Token Lexer::lexOther()
@@ -250,7 +270,8 @@ bool Lexer::isKwd(const std::string& s)
             || s == "for"
             || s == "while"
             || s == "in"
-            || s == "extern");
+            || s == "extern"
+            || s == "include");
 }
 
 bool Lexer::isType(const std::string& s)

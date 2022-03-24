@@ -53,9 +53,11 @@ std::unique_ptr<AST> Parser::parsePrimary()
             // assuming variable declaration
             return parseVarDef();
         default:
+        {
             std::unique_ptr<AST> exprAST = parseExpr();
             eat(Token::TOK_SCOLON);
             return exprAST;
+        }
     }
 }
 
@@ -127,6 +129,12 @@ std::unique_ptr<AST> Parser::parseKwd()
     {
         return parseExternStmt();
     }
+    else if (tok.value == "include")
+    {
+        // return parseIncludeStmt();
+        parseIncludeStmt();
+        return parsePrimary();
+    }
     else
     {
         std::cout << "[Dev Error] Keyword handling for '" << tok.value << "' not yet implemented in parser.\n";
@@ -179,6 +187,14 @@ std::unique_ptr<AST> Parser::parseArray()
     return parseArray(Type::eUnd);
 }
 
+// std::unique_ptr<AST> Parser::parseIncludeStmt()
+void Parser::parseIncludeStmt() // just temporarily void for testing purposess
+{
+    eat(Token::TOK_KWD);
+    eat(Token::TOK_STR);
+    eat(Token::TOK_SCOLON);
+}
+
 std::unique_ptr<PrototypeAST> Parser::parseExternStmt()
 {
     eat(Token::TOK_KWD);
@@ -225,6 +241,7 @@ std::vector<std::unique_ptr<VariableAST>> Parser::parseFuncParams()
         {
             Type paramType = typeFromString(tok.value);
             eat(Token::TOK_TYPE);
+            st.insert(tok.value, paramType);
             auto param = std::make_unique<VariableAST>(tok.value, paramType, VarCtx::eParam);
             params.push_back(std::move(param));
             eat(Token::TOK_ID);

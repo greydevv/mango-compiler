@@ -21,6 +21,7 @@ class Token final
         enum token_type
         {
             TOK_NUM,
+            TOK_STR,
             TOK_ID,
             TOK_KWD,
             TOK_TYPE,
@@ -70,6 +71,7 @@ class Token final
 
 static const std::vector<std::string> tokenStrings = {
     "TOK_NUM",             
+    "TOK_STR",
     "TOK_ID",
     "TOK_KWD",
     "TOK_TYPE",
@@ -103,6 +105,7 @@ static const std::vector<std::string> tokenStrings = {
 
 static const std::map<Token::token_type, std::string> tokenValues = {
     {Token::TOK_NUM, "number"},
+    {Token::TOK_STR, "string"},
     {Token::TOK_ID, "identifier"},
     {Token::TOK_KWD, "kwd"},
     {Token::TOK_TYPE, "type"},

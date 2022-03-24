@@ -21,6 +21,7 @@ class Lexer
 
         Token lexAlpha();
         Token lexNum();
+        Token lexString();
         Token lexOther();
         Token::token_type lexTokenType();
         bool isKwd(const std::string& s);
