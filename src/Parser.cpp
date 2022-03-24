@@ -515,7 +515,11 @@ bool Parser::eat(Token::token_type expectedType)
     if (badToken)
     {
         setErrState(1);
-        std::string msg = fmt::format("expected '{}' but got '{}' instead", tokenValues.at(expectedType), tok.value);
+        std::string msg;
+        if (tok.type == Token::TOK_ID)
+            msg = "expected identifier";
+        else
+            msg = fmt::format("expected '{}' but got '{}' instead", tokenValues.at(expectedType), tok.value);
         throw SyntaxError(fname, msg, underlineTok(tok), tok.loc);
     }
     getToken();
@@ -531,6 +535,11 @@ bool Parser::eat()
 void Parser::getToken()
 {
     tok = lexer.nextToken();
+    if (tok.type == Token::TOK_UND)
+    {
+        std::string msg = fmt::format("encountered unknown character '{}'", tok.value);
+        throw SyntaxError(fname, msg, underlineTok(tok), tok.loc);
+    }
 }
 
 int Parser::getErrState()
