@@ -18,7 +18,7 @@ syntax match ktFuncIds '\w\+\s*\ze('
 
 " Keywords
 syntax keyword ktFuncKwd func nextgroup=ktFuncIds skipwhite
-syntax keyword ktKwds return if else for while in
+syntax keyword ktKwds return if else for while in extern include
 
 " Types
 syntax keyword ktTypes int void
@@ -30,6 +30,8 @@ syntax match ktNums '\d\+\.\?\d*'
 syntax keyword ktTodos TODO FIXME XXX NOTE
 syntax match ktComments '//.*$' contains=ktTodos
 
+" Strings
+syntax region ktStrings start='"' end='"'
 
 
 " Highlight groups
@@ -40,5 +42,6 @@ highlight default link ktTypes Type
 highlight default link ktNums Number
 highlight default link ktTodos Todo
 highlight default link ktComments Comment
+highlight default link ktStrings String
 
 let b:current_syntax = "kt"
