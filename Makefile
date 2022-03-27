@@ -22,8 +22,15 @@ clean:
 	@rm -f $(EXEC) $(COMP_EXEC)
 
 
-# for compiling code
-.PHONY: out
+# for compiling katana code
+
+.PHONY: libc
+libc:
+	@# compile std/libc
+	clang -c std/libc/std.c -o std/bin/std.o
+
+.PHONY: $(COMP_EXEC)
 $(COMP_EXEC):
-	./$(EXEC) $(OUTFILE) -emit
-	$(CXX) output.cpp output.o -o $(COMP_EXEC)
+	@# compile std
+	./$(EXEC) $(INFILE) -emit
+	clang std/bin/std.o output.o -o $@
