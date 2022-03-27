@@ -1,1 +1,1 @@
-extern func print(int i);
+extern func print(intmi);
