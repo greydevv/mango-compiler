@@ -1,3 +1,4 @@
+#include <filesystem>
 #include <iostream>
 #include <fstream>
 #include <memory>
@@ -131,9 +132,7 @@ std::unique_ptr<AST> Parser::parseKwd()
     }
     else if (tok.value == "include")
     {
-        // return parseIncludeStmt();
-        parseIncludeStmt();
-        return parsePrimary();
+        return parseIncludeStmt();
     }
     else
     {
@@ -187,12 +186,34 @@ std::unique_ptr<AST> Parser::parseArray()
     return parseArray(Type::eUnd);
 }
 
-// std::unique_ptr<AST> Parser::parseIncludeStmt()
-void Parser::parseIncludeStmt() // just temporarily void for testing purposess
+std::string makePath(const std::string& currFname, const std::string& incFname)
+{
+    std::filesystem::path basePath = std::filesystem::current_path();
+    std::filesystem::path currPath = std::filesystem::path(currFname).parent_path() / incFname;
+    return basePath / currPath;
+}
+
+std::unique_ptr<ModuleAST> Parser::parseIncludeStmt()
 {
     eat(Token::TOK_KWD);
+    std::string includeFname = makePath(fname, tok.value);
+    // std::cout << "attempted to open " << includeFname << '\n';
     eat(Token::TOK_STR);
     eat(Token::TOK_SCOLON);
+    std::ifstream fs(includeFname);
+    std::string src = readFile(fs);
+    Parser incParser(includeFname, src);
+    std::unique_ptr<ModuleAST> incAST = incParser.parse();
+    if (st.overwrites(incParser.st).first)
+    {
+        throw NotImplementedError(fname, "BRUH!!!", SourceLocation(69, 69));
+    }
+    else
+    {
+        st.merge(incParser.getSt());
+    }
+
+    return incAST;
 }
 
 std::unique_ptr<PrototypeAST> Parser::parseExternStmt()
@@ -573,4 +594,9 @@ std::string Parser::underlineTok(Token tok)
 {
     // helper method for io/underlineError
     return underlineError(lexer.getLine(tok.loc.y), tok.loc.x, tok.value.size());
+}
+
+SymbolTable Parser::getSt()
+{
+    return st;
 }

@@ -21,6 +21,7 @@ class Parser
     public:
         Parser(const std::string& fname, const std::string& src);
         std::unique_ptr<ModuleAST> parse();
+        SymbolTable getSt();
         int getErrState();
         
     private:
@@ -40,8 +41,7 @@ class Parser
         std::unique_ptr<NumberAST> parseNum();
         std::unique_ptr<AST> parseArray(Type eleType);
         std::unique_ptr<AST> parseArray();
-        // std::unique_ptr<AST> parseIncludeStmt();
-        void parseIncludeStmt(); // just temporarily void for testing purposess
+        std::unique_ptr<ModuleAST> parseIncludeStmt();
         std::unique_ptr<PrototypeAST> parseExternStmt();
         std::unique_ptr<FunctionAST> parseFuncDef();
         std::unique_ptr<PrototypeAST> parseFuncProto();
