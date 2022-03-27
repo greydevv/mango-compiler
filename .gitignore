@@ -7,6 +7,10 @@ main.cpp
 out
 com
 
+# Development Testing
+output.cpp
+sample/
+
 # Assets
 assets/
 
