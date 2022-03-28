@@ -22,15 +22,13 @@ clean:
 	@rm -f $(EXEC) $(COMP_EXEC)
 
 
-# for compiling katana code
-
 .PHONY: libc
+# compiling libc
 libc:
-	@# compile std/libc
 	clang -c std/libc/std.c -o std/bin/std.o
 
 .PHONY: $(COMP_EXEC)
+# copiling katana file with INFILE={fname}
 $(COMP_EXEC):
-	@# compile std
 	./$(EXEC) $(INFILE) -emit
 	clang std/bin/std.o output.o -o $@
