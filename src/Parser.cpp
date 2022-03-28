@@ -206,14 +206,9 @@ std::unique_ptr<ModuleAST> Parser::parseIncludeStmt()
     std::unique_ptr<ModuleAST> incAST = incParser.parse();
     std::pair<bool, std::string> conflict = st.overwrites(incParser.st);
     if (conflict.first)
-    {
         throw NotImplementedError(fname, "Conflicting definitions in included file!", SourceLocation(0,0));
-    }
     else
-    {
         st.merge(incParser.getSt());
-    }
-
     return incAST;
 }
 
@@ -221,7 +216,6 @@ std::unique_ptr<PrototypeAST> Parser::parseExternStmt()
 {
     eat(Token::TOK_KWD);
     eat(Token::TOK_KWD);
-    // auto func = std::make_unique<FunctionAST>(parseFuncProto(), nullptr);
     std::unique_ptr<PrototypeAST> proto = parseFuncProto();
     eat(Token::TOK_SCOLON);
     return proto;
@@ -360,9 +354,7 @@ std::unique_ptr<IfAST> Parser::parseIfStmt()
     eat(Token::TOK_KWD);
     eat(Token::TOK_OPAREN);
     if (tok.type == Token::TOK_CPAREN)
-    {
         throw SyntaxError(fname, "expected expression", underlineTok(tok), tok.loc);
-    }
     std::unique_ptr<AST> expr = parseExpr();
     eat(Token::TOK_CPAREN);
     std::unique_ptr<CompoundAST> body = parseCompound();
@@ -475,8 +467,8 @@ std::unique_ptr<AST> Parser::parseIdTerm()
         auto callAST = std::make_unique<CallAST>(id, parseCallParams());
         return callAST;
     }
-        if (!st.contains(id))
-            throw ReferenceError(fname, fmt::format("unknown variable name '{}'", id), underlineTok(tmpIdTok), tmpIdTok.loc);
+    if (!st.contains(id))
+        throw ReferenceError(fname, fmt::format("unknown variable name '{}'", id), underlineTok(tmpIdTok), tmpIdTok.loc);
     auto varAST = std::make_unique<VariableAST>(id);
     return varAST;
 }
@@ -532,9 +524,7 @@ std::unique_ptr<AST> Parser::parseSubExpr(std::unique_ptr<AST> L, int prec)
         while ((nextOp > currOp) || ((currOp == nextOp) && (nextOp.getAssoc() == Operator::A_RIGHT)))
         {
             if (nextOp.getType() == Operator::OP_EQL)
-            {
                 throw SyntaxError(fname, "expression is not assignable", underlineTok(tok), tok.loc);
-            }
             auto RHS = std::unique_ptr<AST>(R->clone());
             if (currOp.getAssoc() == Operator::A_RIGHT)
                 R = parseSubExpr(std::move(RHS), currOp.getPrec());
