@@ -204,9 +204,10 @@ std::unique_ptr<ModuleAST> Parser::parseIncludeStmt()
     std::string src = readFile(fs);
     Parser incParser(includeFname, src);
     std::unique_ptr<ModuleAST> incAST = incParser.parse();
-    if (st.overwrites(incParser.st).first)
+    std::pair<bool, std::string> conflict = st.overwrites(incParser.st);
+    if (conflict.first)
     {
-        throw NotImplementedError(fname, "BRUH!!!", SourceLocation(69, 69));
+        throw NotImplementedError(fname, "Conflicting definitions in included file!", SourceLocation(0,0));
     }
     else
     {
