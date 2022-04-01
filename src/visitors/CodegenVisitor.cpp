@@ -35,15 +35,19 @@
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/Target/TargetOptions.h"
 
-CodegenVisitor::CodegenVisitor(const std::string& fname, std::unique_ptr<ModuleAST> ast) 
-    : ast(std::move(ast)),
+CodegenVisitor::CodegenVisitor(const std::string& fname, std::shared_ptr<ModuleAST> ast) 
+    : ast(ast),
       ctx(std::make_unique<llvm::LLVMContext>()),
       builder(std::make_unique<llvm::IRBuilder<>>(*ctx)),
       mainModule(std::make_unique<llvm::Module>(fname, *ctx)) {}
 
-void CodegenVisitor::print()
+std::string CodegenVisitor::print()
 {
-    mainModule->print(llvm::errs(), nullptr);
+    std::string ir;
+    llvm::raw_string_ostream output(ir);
+    output << *mainModule;
+    output.flush();
+    return ir;
 }
 
 int CodegenVisitor::emitObjectCode()

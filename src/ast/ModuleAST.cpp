@@ -1,5 +1,7 @@
+#include <iostream>
 #include <memory>
 #include "ModuleAST.h"
+#include "../io.h"
 #include "../visitors/CodegenVisitor.h"
 #include "../visitors/ASTStringifier.h"
 
@@ -14,6 +16,11 @@ ModuleAST::ModuleAST(const ModuleAST& other)
 void ModuleAST::addChild(std::unique_ptr<AST> child) 
 {
     children.push_back(std::move(child));
+}
+
+void ModuleAST::print()
+{
+    std::cout << stringify(this);
 }
 
 llvm::Value* ModuleAST::accept(CodegenVisitor& cg) 

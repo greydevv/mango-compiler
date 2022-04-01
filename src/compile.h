@@ -4,6 +4,6 @@
 #include <string>
 #include "io.h"
 
-int compile(CompileArgs args);
+std::shared_ptr<ModuleAST> compile(const std::string& fname, std::ostringstream& outs);
 
 #endif

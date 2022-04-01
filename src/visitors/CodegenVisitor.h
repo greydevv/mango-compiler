@@ -25,8 +25,8 @@ class WhileAST;
 class CodegenVisitor
 {
     public:
-        CodegenVisitor(const std::string& fname, std::unique_ptr<ModuleAST> ast);
-        void print();
+        CodegenVisitor(const std::string& fname, std::shared_ptr<ModuleAST> ast);
+        std::string print();
         int emitObjectCode();
         llvm::Value* codegen();
         llvm::Value* codegen(ExpressionAST* ast);
@@ -49,7 +49,7 @@ class CodegenVisitor
         void insertFuncBlock(llvm::Function* func, llvm::BasicBlock* block);
         void createRetOrBr(llvm::Value* retV, llvm::BasicBlock* block);
         llvm::Type* typeToLlvm(Type type);
-        std::unique_ptr<ModuleAST> ast;
+        std::shared_ptr<ModuleAST> ast;
         std::unique_ptr<llvm::LLVMContext> ctx;
         std::unique_ptr<llvm::IRBuilder<>> builder;
         std::unique_ptr<llvm::Module> mainModule;
