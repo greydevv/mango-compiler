@@ -29,7 +29,10 @@ BaseSourceException::BaseSourceException(const std::string& fname, const std::st
 std::string BaseSourceException::getFormattedMsg() const
 {
     std::ostringstream s;
-    s << fmt::format(fmt::emphasis::bold, "{}:{}:{}: ", fname, loc.y, loc.x);
+
+    // s << fmt::format(fmt::emphasis::bold, "{}:{}:{}: ", std::filesystem::relative(fname, std::filesystem::current_path()).string(), loc.y, loc.x);
+    std::string relPath = std::filesystem::relative(fname);
+    s << fmt::format(fmt::emphasis::bold, "{}:{}:{}: ", relPath, loc.y, loc.x);
     s << fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::orange_red), getExcName());
     s << fmt::format(fmt::emphasis::bold, ": {}\n", msg);
     s << line << '\n';
