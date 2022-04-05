@@ -2,7 +2,6 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
-#include <system_error>
 #include <vector>
 #include "Token.h"
 #include "Operator.h"
@@ -24,6 +23,7 @@
 #include "ast/ForAST.h"
 #include "ast/WhileAST.h"
 #include "Exception.h"
+#include "compile.h"
 
 Parser::Parser(const std::string& fname, const std::string& src)
     : fname(fname), 
@@ -33,7 +33,7 @@ Parser::Parser(const std::string& fname, const std::string& src)
 
 std::unique_ptr<ModuleAST> Parser::parse()
 {
-    std::unique_ptr<ModuleAST> modAST = std::make_unique<ModuleAST>();
+    auto modAST = std::make_unique<ModuleAST>(fname);
     while (tok.type != Token::TOK_EOF)
     {
         modAST->addChild(parsePrimary());
@@ -73,14 +73,14 @@ std::unique_ptr<ExpressionAST> Parser::parseVarDef()
         // Type eleType = typeFromString(tok.value);
         eat(Token::TOK_TYPE);
         eat(Token::TOK_GT);
-        throw NotImplementedError(fname, "parsing of ArrayAST", SourceLocation(0,0));
+        throw NotImplementedError("parsing of ArrayAST");
     }
 
     std::string id = tok.value;
-    if (st.contains(id))
-        throw ReferenceError(fname, fmt::format("variable '{}' already defined", id), underlineTok(tok), tok.loc);
-    else
-        st.insert(id, allocType);
+    // if (st.contains(id))
+    //     throw ReferenceError(fname, fmt::format("variable '{}' already defined", id), underlineTok(tok), tok.loc);
+    // else
+    //     st.insert(id, allocType);
     auto allocVar = std::make_unique<VariableAST>(tok.value, allocType, VarCtx::eAlloc);
     eat(Token::TOK_ID);
     return createVarAssignExpr(std::move(allocVar));
@@ -89,8 +89,8 @@ std::unique_ptr<ExpressionAST> Parser::parseVarDef()
 std::unique_ptr<ExpressionAST> Parser::parseVarStore()
 {
     std::string id = tok.value;
-    if (!st.contains(id))
-        throw ReferenceError(fname, fmt::format("unknown variable name '{}'", id), underlineTok(tok), tok.loc);
+    // if (!st.contains(id))
+    //     throw ReferenceError(fname, fmt::format("unknown variable name '{}'", id), underlineTok(tok), tok.loc);
     auto storeVar = std::make_unique<VariableAST>(id, st.lookup(id), VarCtx::eStore);
     eat(Token::TOK_ID);
     return createVarAssignExpr(std::move(storeVar));
@@ -188,6 +188,8 @@ std::unique_ptr<AST> Parser::parseArray()
 
 std::string makePath(const std::string& currFname, const std::string& incFname)
 {
+    // resolves imports by taking parent folder of current file and appending
+    // included path on the end
     std::filesystem::path basePath = std::filesystem::current_path();
     std::filesystem::path currPath = std::filesystem::path(currFname).parent_path() / incFname;
     return basePath / currPath;
@@ -196,19 +198,17 @@ std::string makePath(const std::string& currFname, const std::string& incFname)
 std::unique_ptr<ModuleAST> Parser::parseIncludeStmt()
 {
     eat(Token::TOK_KWD);
+    Token includeTok = tok;
     std::string includeFname = makePath(fname, tok.value);
     // std::cout << "attempted to open " << includeFname << '\n';
     eat(Token::TOK_STR);
     eat(Token::TOK_SCOLON);
-    std::ifstream fs(includeFname);
-    std::string src = readFile(fs);
-    Parser incParser(includeFname, src);
-    std::unique_ptr<ModuleAST> incAST = incParser.parse();
-    std::pair<bool, std::string> conflict = st.overwrites(incParser.st);
-    if (conflict.first)
-        throw NotImplementedError(fname, "Conflicting definitions in included file!", SourceLocation(0,0));
-    else
-        st.merge(incParser.getSt());
+    std::unique_ptr<ModuleAST> incAST = getAstFromFile(includeFname);
+    if (!incAST)
+    {
+        // need to add quotes back for correct underlining
+        throw FileNotFoundError(fname, includeFname, underlineTok(includeTok), includeTok.loc);
+    }
     return incAST;
 }
 
@@ -230,10 +230,10 @@ std::unique_ptr<FunctionAST> Parser::parseFuncDef()
 std::unique_ptr<PrototypeAST> Parser::parseFuncProto()
 {
     std::string name = tok.value;
-    if (st.contains(name))
-        throw ReferenceError(fname, fmt::format("function '{}' already defined", name), underlineTok(tok), tok.loc);
-    else
-        st.insert(name, Type::eFunc);
+    // if (st.contains(name))
+    //     throw ReferenceError(fname, fmt::format("function '{}' already defined", name), underlineTok(tok), tok.loc);
+    // else
+    //     st.insert(name, Type::eFunc);
     eat(Token::TOK_ID);
     std::vector<std::unique_ptr<VariableAST>> params = parseFuncParams();
     Type retType = Type::eVoid;
@@ -257,7 +257,7 @@ std::vector<std::unique_ptr<VariableAST>> Parser::parseFuncParams()
         {
             Type paramType = typeFromString(tok.value);
             eat(Token::TOK_TYPE);
-            st.insert(tok.value, paramType);
+            // st.insert(tok.value, paramType);
             auto param = std::make_unique<VariableAST>(tok.value, paramType, VarCtx::eParam);
             params.push_back(std::move(param));
             eat(Token::TOK_ID);
@@ -462,13 +462,13 @@ std::unique_ptr<AST> Parser::parseIdTerm()
     // check if function call
     if (tok.type == Token::TOK_OPAREN)
     {
-        if (!st.contains(id))
-            throw ReferenceError(fname, fmt::format("unknown function name '{}'", id), underlineTok(tmpIdTok), tmpIdTok.loc);
+        // if (!st.contains(id))
+        //     throw ReferenceError(fname, fmt::format("unknown function name '{}'", id), underlineTok(tmpIdTok), tmpIdTok.loc);
         auto callAST = std::make_unique<CallAST>(id, parseCallParams());
         return callAST;
     }
-    if (!st.contains(id))
-        throw ReferenceError(fname, fmt::format("unknown variable name '{}'", id), underlineTok(tmpIdTok), tmpIdTok.loc);
+    // if (!st.contains(id))
+    //     throw ReferenceError(fname, fmt::format("unknown variable name '{}'", id), underlineTok(tmpIdTok), tmpIdTok.loc);
     auto varAST = std::make_unique<VariableAST>(id);
     return varAST;
 }
@@ -545,10 +545,17 @@ bool Parser::eat(Token::token_type expectedType)
     {
         setErrState(1);
         std::string msg;
-        if (tok.type == Token::TOK_ID)
-            msg = "expected identifier";
-        else
-            msg = fmt::format("expected '{}' but got '{}' instead", tokenValues.at(expectedType), tok.value);
+        switch (expectedType)
+        {
+            case Token::TOK_ID:
+                msg = "expected identifier";
+                break;
+            case Token::TOK_TYPE:
+                msg = fmt::format("expected type but got '{}' instead", tok.value);
+                break;
+            default:
+                msg = fmt::format("expected '{}' but got '{}' instead", tokenValues.at(expectedType), tok.value);
+        }
         throw SyntaxError(fname, msg, underlineTok(tok), tok.loc);
     }
     getToken();
@@ -583,6 +590,10 @@ void Parser::setErrState(int errState)
 
 std::string Parser::underlineTok(Token tok)
 {
+    if (tok.type == Token::TOK_STR)
+        // need to add quotes back to underline it properly
+        tok.value = '"' + tok.value + '"';
+
     // helper method for io/underlineError
     return underlineError(lexer.getLine(tok.loc.y), tok.loc.x, tok.value.size());
 }

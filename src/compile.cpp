@@ -11,20 +11,22 @@
 
 std::shared_ptr<ModuleAST> compile(const std::string& fname, std::ostringstream& outs)
 {
-    std::ifstream fs(fname);
-    if (!fs.is_open())
-    {
-        fmt::print(fmt::emphasis::bold | fmt::fg(fmt::color::orange_red), "Error");
-        fmt::print(fmt::emphasis::bold, ": file not found: '{}'\n", fname);
-        return nullptr;
-    }
-    std::string src = readFile(fs);
-    Parser parser(fname, src);
-    std::unique_ptr<ModuleAST> ast = parser.parse();
-    std::shared_ptr<ModuleAST> sharedAst = std::move(ast);
-    CodegenVisitor cg(fname, sharedAst);
+    std::shared_ptr<ModuleAST> ast = getAstFromFile(fname);
+    if (!ast)
+        throw CompilationError(fmt::format("file not found: {}", fname));
+    CodegenVisitor cg(fname, ast);
     cg.codegen();
     cg.emitObjectCode();
     outs << cg.print();
-    return sharedAst;
+    return ast;
+}
+
+std::unique_ptr<ModuleAST> getAstFromFile(const std::string& fname)
+{
+    std::ifstream fs(fname);
+    if (!fs.is_open())
+        return nullptr;
+    std::string src = readFile(fs);
+    Parser parser(fname, src);
+    return parser.parse();
 }

@@ -25,7 +25,7 @@ class Parser
         int getErrState();
         
     private:
-        std::string fname;
+        const std::string fname;
         SymbolTable st;
         // std::map<std::string, Type> st;
         Lexer lexer;
