@@ -5,7 +5,11 @@
 #include "../visitors/CodegenVisitor.h"
 #include "../visitors/ASTStringifier.h"
 
+ModuleAST::ModuleAST(const std::string& modName)
+    : modName(modName) {}
+
 ModuleAST::ModuleAST(const ModuleAST& other)
+    : modName(other.modName)
 {
     for (auto& child : other.children)
     {

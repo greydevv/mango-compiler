@@ -212,7 +212,7 @@ llvm::Value* CodegenVisitor::codegen(ArrayAST* ast)
     gArr->setLinkage(llvm::GlobalValue::LinkageTypes::CommonLinkage);
 
 
-    // throw NotImplementedError(mainModule->getSourceFileName(), "codegen of ArrayAST", SourceLocation(0,0));
+    // throw NotImplementedError("codegen of ArrayAST");
     return nullptr;
 }
 
@@ -384,7 +384,7 @@ llvm::Value* CodegenVisitor::codegen(ForAST* ast)
 {
     // ast->iter->accept(*this);
     // return nullptr;
-    throw NotImplementedError(mainModule->getSourceFileName(), "ForAST codegen", SourceLocation(0,0));
+    throw NotImplementedError("ForAST codegen");
     // llvm::Function* func = builder->GetInsertBlock()->getParent();
     // llvm::BasicBlock* condBlock = llvm::BasicBlock::Create(*ctx, "cond");
     // llvm::BasicBlock* forBlock = llvm::BasicBlock::Create(*ctx, "for");

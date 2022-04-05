@@ -24,11 +24,11 @@ ASTStringifier::ASTStringifier(bool simpleExpr)
 std::string ASTStringifier::toString(ModuleAST* ast, int tabs) 
 {
     std::ostringstream s;
-    s << "ModuleAST:\n";
+    s << "ModuleAST(" << ast->modName << "):\n";
     for (int i = 0; i < ast->children.size(); i++)
     {
         // ModuleAST is always top level, only need to indent once
-        s << indent(ast->children[i]->accept(*this, 1), 1) << '\n';
+        s << indent(ast->children[i]->accept(*this, tabs+1), tabs+1);
     }
     return s.str();
 }
@@ -129,13 +129,9 @@ std::string ASTStringifier::toString(CompoundAST* ast, int tabs)
         for (int i = 0; i < ast->children.size(); i++)
         {
             s << indent(ast->children[i]->accept(*this, tabs+1), tabs+1);
-            if (i < ast->children.size()-1)
-                s << '\n';
         }
         if (ast->retStmt)
         {
-            if (ast->children.size() > 0)
-                s << '\n';
             s << indent(ast->retStmt->accept(*this, tabs+1), tabs+1) << '\n';
         }
     }
