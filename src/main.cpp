@@ -33,14 +33,13 @@ int main(int argc, char const *argv[])
         {
             std::ostringstream outs;
 
-            // the '[weakly_]canonical' methods resolve things like '../' and
-            // './' in the given paths
+            // the 'canonical' methods resolve things like '../' and './' in
+            // the given paths
             // for example, a/b/c/../d is resolved to the literal a/b/d
             //
             // using 'weakly_canonical' does not throw an error if the file is
             // not found
             std::filesystem::path absPath = std::filesystem::weakly_canonical(fname);
-            // std::cout << std::filesystem::relative(std::filesystem::absolute(fname));
             std::shared_ptr<ModuleAST> prog = compile(absPath, outs);
 
             if (args.debug)
@@ -51,7 +50,7 @@ int main(int argc, char const *argv[])
         }
         catch (const BaseException& e)
         {
-            std::cout << e.what();
+            std::cout << e.what() << std::flush;
             return 1;
         }
 
