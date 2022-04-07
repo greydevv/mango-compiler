@@ -5,9 +5,6 @@ EXEC=com # executable for compiling code
 SRCS:=$(shell find src -type f -name '*.cpp')
 OBJS:=$(patsubst %.cpp,%.o,$(SRCS))
 
-# executable for running compiled code 
-COMP_EXEC=out
-
 all: $(EXEC)
 
 $(EXEC): $(OBJS)
@@ -24,11 +21,14 @@ clean:
 
 .PHONY: libc
 # compiling libc
-libc:
+std/bin/std.o: std/libc/std.c
 	clang -c std/libc/std.c -o std/bin/std.o
 
-.PHONY: $(COMP_EXEC)
+libckt.a: std/bin/std.o
+	ar rcs std/libc/$@ $^
+
+.PHONY: out
 # copiling katana file with INFILE={fname}
-$(COMP_EXEC):
+out: libckt.a
 	./$(EXEC) $(INFILE) -emit
-	clang std/bin/std.o output.o -o $@
+	clang output.o -L./std/libc/ -lckt -o $@

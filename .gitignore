@@ -3,6 +3,7 @@
 *.o
 out
 com
+libckt.a
 
 # Development Testing
 output.cpp
