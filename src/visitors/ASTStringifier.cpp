@@ -132,6 +132,8 @@ std::string ASTStringifier::toString(CompoundAST* ast, int tabs)
         }
         if (ast->retStmt)
         {
+            if (ast->children.size() > 0)
+                s << '\n';
             s << indent(ast->retStmt->accept(*this, tabs+1), tabs+1) << '\n';
         }
     }
@@ -229,9 +231,13 @@ std::string ASTStringifier::toString(CallAST* ast, int tabs)
         s << "CallAST(" << ast->id << ")\n";
         if (ast->params.size() > 0)
             s << indent("Parameters: ", tabs+1) << '\n';
+        int i = 0;
         for (auto& param : ast->params)
         {
-            s << indent(param->accept(*this, tabs+2), tabs+2) << '\n';
+            s << indent(param->accept(*this, tabs+2), tabs+2);
+            if (i < ast->params.size() - 1)
+                s << '\n';
+            i++;
         }
     }
     return s.str();
