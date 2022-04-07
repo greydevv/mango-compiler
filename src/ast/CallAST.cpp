@@ -4,6 +4,7 @@ CallAST::CallAST(const std::string& id, std::vector<std::unique_ptr<AST>> params
     : id(id), params(std::move(params)) {}
 
 CallAST::CallAST(const CallAST& other)
+    : id(other.id)
 {
     // TODO: test this method - not sure if below is totally safe
     for (auto& param : other.params)

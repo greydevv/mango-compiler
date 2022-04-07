@@ -10,7 +10,7 @@
 class CallAST : public AST
 {
     public:
-        std::string id;
+        const std::string id;
         std::vector<std::unique_ptr<AST>> params;
 
         CallAST(const std::string& id, std::vector<std::unique_ptr<AST>> param);
