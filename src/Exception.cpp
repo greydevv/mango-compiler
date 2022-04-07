@@ -1,8 +1,9 @@
+#include <sstream>
 #include <string>
-#include <filesystem>
 #include "Exception.h"
 #include "Token.h"
 #include "fmt/color.h"
+#include "path.h"
 #include "io.h"
 
 BaseException::BaseException(const std::string& msg)
@@ -26,11 +27,13 @@ const char* BaseException::what() const throw()
 BaseSourceException::BaseSourceException(const std::string& fname, const std::string& msg, const std::string& line, SourceLocation loc)
     : BaseException(msg), fname(fname), line(line), loc(loc) {}
 
+#include <iostream>
+
 std::string BaseSourceException::getFormattedMsg() const
 {
+    // use relative path for shorter err location
+    std::string relPath = fs::relative(fname);
     std::ostringstream s;
-
-    std::string relPath = std::filesystem::relative(fname);
     s << fmt::format(fmt::emphasis::bold, "{}:{}:{}: ", relPath, loc.y, loc.x);
     s << fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::orange_red), getExcName());
     s << fmt::format(fmt::emphasis::bold, ": {}\n", msg);

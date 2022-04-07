@@ -12,7 +12,7 @@ int main(int argc, char const *argv[])
     if (args.fnames.size() == 0)
     {
         fmt::print(fmt::emphasis::bold | fmt::fg(fmt::color::orange_red), "Error");
-        fmt::print(fmt::emphasis::bold, ": no file name(s) specified\n");
+        fmt::print(fmt::emphasis::bold, ": no file names specified\n");
         return 1;
     }
 

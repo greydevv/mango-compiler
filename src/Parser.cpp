@@ -1,4 +1,3 @@
-#include <filesystem>
 #include <iostream>
 #include <fstream>
 #include <memory>
@@ -447,7 +446,6 @@ std::unique_ptr<WhileAST> Parser::parseWhileStmt()
 
 std::unique_ptr<AST> Parser::parseIdTerm() 
 {
-    std::string id = tok.value;
     Token tmpIdTok = tok;
     eat(Token::TOK_ID);
     // check if function call
@@ -455,12 +453,12 @@ std::unique_ptr<AST> Parser::parseIdTerm()
     {
         // if (!st.contains(id))
         //     throw ReferenceError(fname, fmt::format("unknown function name '{}'", id), underlineTok(tmpIdTok), tmpIdTok.loc);
-        auto callAST = std::make_unique<CallAST>(id, parseCallParams());
+        auto callAST = std::make_unique<CallAST>(tmpIdTok.value, parseCallParams());
         return callAST;
     }
     // if (!st.contains(id))
     //     throw ReferenceError(fname, fmt::format("unknown variable name '{}'", id), underlineTok(tmpIdTok), tmpIdTok.loc);
-    auto varAST = std::make_unique<VariableAST>(id);
+    auto varAST = std::make_unique<VariableAST>(tmpIdTok.value);
     return varAST;
 }
 
