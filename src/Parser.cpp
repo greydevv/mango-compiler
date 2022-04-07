@@ -9,6 +9,7 @@
 #include "Lexer.h"
 #include "Parser.h"
 #include "io.h"
+#include "path.h"
 #include "ast/ModuleAST.h"
 #include "ast/ExpressionAST.h"
 #include "ast/VariableAST.h"
@@ -186,21 +187,11 @@ std::unique_ptr<AST> Parser::parseArray()
     return parseArray(Type::eUnd);
 }
 
-std::string makePath(const std::string& currFname, const std::string& incFname)
-{
-    // resolves imports by taking parent folder of current file and appending
-    // included path on the end
-    std::filesystem::path basePath = std::filesystem::current_path();
-    std::filesystem::path currPath = std::filesystem::path(currFname).parent_path() / incFname;
-    return basePath / currPath;
-}
-
 std::unique_ptr<ModuleAST> Parser::parseIncludeStmt()
 {
     eat(Token::TOK_KWD);
     Token includeTok = tok;
-    std::string includeFname = makePath(fname, tok.value);
-    // std::cout << "attempted to open " << includeFname << '\n';
+    std::string includeFname = getAbsoluteImport(fname, tok.value);
     eat(Token::TOK_STR);
     eat(Token::TOK_SCOLON);
     std::unique_ptr<ModuleAST> incAST = getAstFromFile(includeFname);
