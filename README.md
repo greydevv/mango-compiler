@@ -146,6 +146,14 @@ intermediate form between source code (human readable) and machine code
 this, [LLVM-IR](https://llvm.org/docs/LangRef.html) is used as it is a very
 robust, flexible, and scalable IR generation API.
 
+#### Compilation Steps (directory)
+| Stage                | Module                                              |
+| :--                  | :--                                                 |
+| Lexical analysis     | [src/Lexer.cpp](src/Lexer.cpp)                      |
+| Syntax analysis      | [src/Parser.cpp](src/Parser.cpp)                    |
+| Semantic analysis    | [src/ASTValidator.cpp](src/ASTValidator.cpp)        |
+| IR generation        | [src/CodegenVisitor.cpp](src/CodegenVisitor.cpp)    |
+
 The process of the compiler is illustrated below:
 
 First, the compiler needs some source code:
