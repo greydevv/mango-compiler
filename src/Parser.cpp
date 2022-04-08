@@ -2,11 +2,13 @@
 #include <fstream>
 #include <memory>
 #include <vector>
+#include "Parser.h"
 #include "Token.h"
 #include "Operator.h"
 #include "Types.h"
 #include "Lexer.h"
-#include "Parser.h"
+#include "Exception.h"
+#include "compile.h"
 #include "io.h"
 #include "path.h"
 #include "ast/ModuleAST.h"
@@ -22,8 +24,6 @@
 #include "ast/IfAST.h"
 #include "ast/ForAST.h"
 #include "ast/WhileAST.h"
-#include "Exception.h"
-#include "compile.h"
 
 Parser::Parser(const std::string& fname, const std::string& src)
     : fname(fname), 
@@ -579,15 +579,27 @@ void Parser::setErrState(int errState)
 
 std::string Parser::underlineTok(Token tok)
 {
+    int len = tok.value.size();
     if (tok.type == Token::TOK_STR)
-        // need to add quotes back to underline it properly
-        tok.value = '"' + tok.value + '"';
+        // because value of TOK_STR is stored w/out quotes, we need to add 2 to
+        // include the quotes in the underline
+        len+=2;
 
     // helper method for io/underlineError
-    return underlineError(lexer.getLine(tok.loc.y), tok.loc.x, tok.value.size());
+    return underlineError(lexer.getLine(tok.loc.y), tok.loc.x, len);
 }
 
 SymbolTable Parser::getSt()
 {
     return st;
+}
+
+std::unique_ptr<ModuleAST> getAstFromFile(const std::string& fname)
+{
+    std::ifstream fs(fname);
+    if (!fs.is_open())
+        return nullptr;
+    std::string src = readFile(fs);
+    Parser parser(fname, src);
+    return parser.parse();
 }

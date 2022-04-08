@@ -27,7 +27,6 @@ class Parser
     private:
         const std::string fname;
         SymbolTable st;
-        // std::map<std::string, Type> st;
         Lexer lexer;
         Token tok;
         int errState;
@@ -64,5 +63,7 @@ class Parser
         void setErrState(int errState);
         std::string underlineTok(Token tok);
 };
+
+std::unique_ptr<ModuleAST> getAstFromFile(const std::string& fname);
 
 #endif

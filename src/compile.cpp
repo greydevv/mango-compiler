@@ -20,13 +20,3 @@ std::shared_ptr<ModuleAST> compile(const std::string& fname, std::ostringstream&
     outs << cg.print();
     return ast;
 }
-
-std::unique_ptr<ModuleAST> getAstFromFile(const std::string& fname)
-{
-    std::ifstream fs(fname);
-    if (!fs.is_open())
-        return nullptr;
-    std::string src = readFile(fs);
-    Parser parser(fname, src);
-    return parser.parse();
-}
