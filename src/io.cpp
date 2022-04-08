@@ -20,11 +20,12 @@ std::string stringify(ModuleAST* ast)
 std::string underlineError(const std::string& line, int xPos, int len)
 {
     std::ostringstream s;
+    std::string tab = "  ";
     // indent both line and underline by two spaces
-    s << "  " << line << '\n';
+    s << tab << line << '\n';
     // fill beginning of string with spaces until (xPos-1) as xPos is the
     // position token begins
-    s << "  " << std::string(xPos-1, ' ') << '^' << std::string(len-1, '~');
+    s << tab << std::string(xPos-1, ' ') << '^' << std::string(len-1, '~');
     return s.str();
 }
 
