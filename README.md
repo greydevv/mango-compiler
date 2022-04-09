@@ -6,20 +6,24 @@ The compiler is still under development. Not everything listed in the [Language 
 ### Contents
 
 - [Introduction](#introduction)
+- [Why Another Programming Language](#why-another-programming-language)
 - [Language Reference](#language-reference)
 - [About the Compiler](#about-the-compiler)
 - [Development Progress](#development-progress)
 
 ### Introduction
-This repository hosts the compiler for my custom programming language,
-Mango. I'm pretty indecisive when naming things, so Mango might change in
-the future. Oops.
+This repository houses the compiler for Mango, a staticall-typed general purpose programming language.
 
 Mango is a programming language inspired by the likes of
 [Python](https://www.python.org/), [Swift](https://developer.apple.com/swift/),
 [C](https://en.wikipedia.org/wiki/C_%28programming_language%29), and
 [C++](https://en.wikipedia.org/wiki/C%2B%2B). The goal of this project is to
 create a compiler with Mango as the proof-of-concept.    
+
+### Why Another Programming Language
+
+Let's adress the elephant in the room: why *yet another programming language*?
+Well, I don't really know, I just wanted to make a compiler. The language itself is just a byproduct of it.
 
 ### Language Reference
 
@@ -147,12 +151,12 @@ this, [LLVM-IR](https://llvm.org/docs/LangRef.html) is used as it is a very
 robust, flexible, and scalable IR generation API.
 
 #### Compilation Steps (directory)
-| Stage                | Module                                              |
-| :--                  | :--                                                 |
-| Lexical analysis     | [src/Lexer.cpp](src/Lexer.cpp)                      |
-| Syntax analysis      | [src/Parser.cpp](src/Parser.cpp)                    |
-| Semantic analysis    | [src/ASTValidator.cpp](src/ASTValidator.cpp)        |
-| IR generation        | [src/CodegenVisitor.cpp](src/CodegenVisitor.cpp)    |
+| Stage                | Module                                                                |
+| :--                  | :--                                                                   |
+| Lexical analysis     | [src/Lexer.cpp](src/Lexer.cpp)                                        |
+| Syntax analysis      | [src/Parser.cpp](src/Parser.cpp)                                      |
+| Semantic analysis    | [src/visitors/ASTValidator.cpp](src/visitors/ASTValidator.cpp)        |
+| IR generation        | [src/visitors/ASTCodegenner.cpp](src/visitors/ASTCodegenner.cpp)      |
 
 The process of the compiler is illustrated below:
 
