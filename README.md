@@ -1,4 +1,4 @@
-# Katana Language
+# Mango Language
 
 ### Warning
 The compiler is still under development. Not everything listed in the [Language Reference](#language-reference) is completely implemented.
@@ -12,14 +12,14 @@ The compiler is still under development. Not everything listed in the [Language 
 
 ### Introduction
 This repository hosts the compiler for my custom programming language,
-Katana. I'm pretty indecisive when naming things, so Katana might change in
+Mango. I'm pretty indecisive when naming things, so Mango might change in
 the future. Oops.
 
-Katana is a programming language inspired by the likes of
+Mango is a programming language inspired by the likes of
 [Python](https://www.python.org/), [Swift](https://developer.apple.com/swift/),
 [C](https://en.wikipedia.org/wiki/C_%28programming_language%29), and
 [C++](https://en.wikipedia.org/wiki/C%2B%2B). The goal of this project is to
-create a compiler with Katana as the proof-of-concept.    
+create a compiler with Mango as the proof-of-concept.    
 
 ### Language Reference
 
@@ -75,7 +75,7 @@ int c = a + b;
 
 #### Control Flow
 
-Katana implements if statements, for-loops, and while-loops (no do-while). The
+Mango implements if statements, for-loops, and while-loops (no do-while). The
 structure of if-statements are exaclty the same to C++ where else-if and else
 blocks are otional:
 ```
@@ -133,7 +133,7 @@ what the current/previous token(s) were.
 
 For example, when the compiler encounters a `TOK_KWD` (keyword token), it needs
 to check what that keyword is. If the value of the keyword is `func`, then the
-parser knows that the user is attempting to define a function. In the Katana
+parser knows that the user is attempting to define a function. In the Mango
 programming language, the function name comes after the `func` keyword. So, the
 parser will then ask the lexer for the next token. If the token is `TOK_ID`,
 then all is well; continue. If it is not `TOK_ID`, then the program exits with
