@@ -5,6 +5,7 @@
 #include <vector>
 #include "AST.h"
 #include "ReturnAST.h"
+#include "../visitors/ASTValidator.h"
 #include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
@@ -20,6 +21,7 @@ class CompoundAST : public AST
         CompoundAST(const CompoundAST& other);
         void addChild(std::unique_ptr<AST> child);
         void setRetStmt(std::unique_ptr<ReturnAST> retStmt);
+        virtual bool accept(ASTValidator& vd) override;
         virtual llvm::Value* accept(ASTCodegenner& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:

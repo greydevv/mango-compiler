@@ -1,4 +1,9 @@
+#include <string>
+#include <memory>
 #include "CallAST.h"
+#include "../visitors/ASTValidator.h"
+#include "../visitors/ASTCodegenner.h"
+#include "../visitors/ASTStringifier.h"
 
 CallAST::CallAST(const std::string& id, std::vector<std::unique_ptr<AST>> params)
     : id(id), params(std::move(params)) {}
@@ -17,6 +22,11 @@ CallAST::CallAST(const CallAST& other)
 void CallAST::addParam(std::unique_ptr<AST> param)
 {
     params.push_back(std::move(param));
+}
+
+bool CallAST::accept(ASTValidator& vd)
+{
+    return vd.validate(this);
 }
 
 llvm::Value* CallAST::accept(ASTCodegenner& cg)

@@ -22,6 +22,7 @@ class ASTValidator
 {
     public:
         ASTValidator(std::shared_ptr<ModuleAST> ast);
+        bool validate();
         bool validate(ModuleAST* ast);
         bool validate(ExpressionAST* ast);
         bool validate(VariableAST* ast);

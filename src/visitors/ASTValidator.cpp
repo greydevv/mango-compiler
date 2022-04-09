@@ -19,6 +19,11 @@
 ASTValidator::ASTValidator(std::shared_ptr<ModuleAST> ast)
     : ast(ast) {}
 
+bool ASTValidator::validate()
+{
+    return ast->accept(*this);
+}
+
 bool ASTValidator::validate(ModuleAST* ast)
 {
     throw NotImplementedError("Validation of ModuleAST");

@@ -1,5 +1,6 @@
 #include <string>
 #include "VariableAST.h"
+#include "../visitors/ASTValidator.h"
 #include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
@@ -11,6 +12,11 @@ VariableAST::VariableAST(const std::string& id)
 
 VariableAST::VariableAST(const VariableAST& other)
     : id(other.id), type(other.type), ctx(other.ctx) {}
+
+bool VariableAST::accept(ASTValidator& vd)
+{
+    return vd.validate(this);
+}
 
 llvm::Value* VariableAST::accept(ASTCodegenner& cg) 
 {

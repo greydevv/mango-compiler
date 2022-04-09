@@ -12,6 +12,7 @@ class NumberAST : public AST
 
         NumberAST(double val);
         NumberAST(const NumberAST& other);
+        virtual bool accept(ASTValidator& vd) override;
         virtual llvm::Value* accept(ASTCodegenner& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:

@@ -1,4 +1,5 @@
 #include "NumberAST.h"
+#include "../visitors/ASTValidator.h"
 #include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
@@ -7,6 +8,11 @@ NumberAST::NumberAST(double val)
 
 NumberAST::NumberAST(const NumberAST& other)
     : val(other.val) {}
+
+bool NumberAST::accept(ASTValidator& vd)
+{
+    return vd.validate(this);
+}
 
 llvm::Value* NumberAST::accept(ASTCodegenner& cg) 
 {

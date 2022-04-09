@@ -1,6 +1,7 @@
 #include "AST.h"
 #include "ExpressionAST.h"
 #include "../Operator.h"
+#include "../visitors/ASTValidator.h"
 #include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 #include "llvm/IR/Value.h"
@@ -16,6 +17,11 @@ ExpressionAST::ExpressionAST(const ExpressionAST& other)
 llvm::Value* ExpressionAST::accept(ASTCodegenner& cg) 
 {
     return cg.codegen(this);
+}
+
+bool ExpressionAST::accept(ASTValidator& vd)
+{
+    return vd.validate(this);
 }
 
 std::string ExpressionAST::accept(ASTStringifier& sf, int tabs) 

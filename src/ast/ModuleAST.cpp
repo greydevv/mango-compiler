@@ -2,6 +2,7 @@
 #include <memory>
 #include "ModuleAST.h"
 #include "../io.h"
+#include "../visitors/ASTValidator.h"
 #include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
@@ -25,6 +26,11 @@ void ModuleAST::addChild(std::unique_ptr<AST> child)
 void ModuleAST::print()
 {
     std::cout << stringify(this);
+}
+
+bool ModuleAST::accept(ASTValidator& vd)
+{
+    return vd.validate(this);
 }
 
 llvm::Value* ModuleAST::accept(ASTCodegenner& cg) 

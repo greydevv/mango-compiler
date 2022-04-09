@@ -1,5 +1,8 @@
 #include <vector>
 #include "ArrayAST.h"
+#include "../visitors/ASTValidator.h"
+#include "../visitors/ASTCodegenner.h"
+#include "../visitors/ASTStringifier.h"
 #include "llvm/IR/Value.h"
 
 ArrayAST::ArrayAST(Type type, std::vector<std::unique_ptr<AST>> elements)
@@ -20,6 +23,11 @@ ArrayAST::ArrayAST(const ArrayAST& other)
 void ArrayAST::addElement(std::unique_ptr<AST> ele)
 {
     elements.push_back(std::move(ele));
+}
+
+bool ArrayAST::accept(ASTValidator& vd)
+{
+    return vd.validate(this);
 }
 
 llvm::Value* ArrayAST::accept(ASTCodegenner& cg) 

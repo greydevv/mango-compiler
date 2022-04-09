@@ -1,6 +1,7 @@
 #include "PrototypeAST.h"
 #include "VariableAST.h"
 #include "../Types.h"
+#include "../visitors/ASTValidator.h"
 #include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 #include "llvm/IR/Value.h"
@@ -21,6 +22,11 @@ PrototypeAST::PrototypeAST(const PrototypeAST& other)
 void PrototypeAST::addParam(std::unique_ptr<VariableAST> param)
 {
     params.push_back(std::move(param));
+}
+
+bool PrototypeAST::accept(ASTValidator& vd)
+{
+    return vd.validate(this);
 }
 
 llvm::Value* PrototypeAST::accept(ASTCodegenner& cg)

@@ -1,6 +1,7 @@
 #include "FunctionAST.h"
 #include "CompoundAST.h"
 #include "PrototypeAST.h"
+#include "../visitors/ASTValidator.h"
 #include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 #include "llvm/IR/Value.h"
@@ -11,7 +12,11 @@ FunctionAST::FunctionAST(std::unique_ptr<PrototypeAST> proto, std::unique_ptr<Co
 FunctionAST::FunctionAST(const FunctionAST& other)
     // : proto(std::unique_ptr<PrototypeAST>(other.proto->clone())),
     //   body(std::unique_ptr<CompoundAST>(other.body->clone()))
+{}
+
+bool FunctionAST::accept(ASTValidator& vd)
 {
+    return vd.validate(this);
 }
 
 llvm::Value* FunctionAST::accept(ASTCodegenner& cg) 

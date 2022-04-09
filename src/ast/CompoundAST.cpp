@@ -3,6 +3,7 @@
 #include "AST.h"
 #include "CompoundAST.h"
 #include "ReturnAST.h"
+#include "../visitors/ASTValidator.h"
 #include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
@@ -31,6 +32,11 @@ void CompoundAST::addChild(std::unique_ptr<AST> child)
 void CompoundAST::setRetStmt(std::unique_ptr<ReturnAST> newRetStmt)
 {
     retStmt = std::move(newRetStmt);
+}
+
+bool CompoundAST::accept(ASTValidator& vd)
+{
+    return vd.validate(this);
 }
 
 llvm::Value* CompoundAST::accept(ASTCodegenner& cg)
