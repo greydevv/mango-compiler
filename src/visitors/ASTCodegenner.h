@@ -22,10 +22,10 @@ class IfAST;
 class ForAST;
 class WhileAST;
 
-class CodegenVisitor
+class ASTCodegenner
 {
     public:
-        CodegenVisitor(const std::string& fname, std::shared_ptr<ModuleAST> ast);
+        ASTCodegenner(const std::string& fname, std::shared_ptr<ModuleAST> ast);
         std::string print();
         int emitObjectCode();
         llvm::Value* codegen();

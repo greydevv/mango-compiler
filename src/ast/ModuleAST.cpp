@@ -2,7 +2,7 @@
 #include <memory>
 #include "ModuleAST.h"
 #include "../io.h"
-#include "../visitors/CodegenVisitor.h"
+#include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
 ModuleAST::ModuleAST(const std::string& modName)
@@ -27,7 +27,7 @@ void ModuleAST::print()
     std::cout << stringify(this);
 }
 
-llvm::Value* ModuleAST::accept(CodegenVisitor& cg) 
+llvm::Value* ModuleAST::accept(ASTCodegenner& cg) 
 {
     return cg.codegen(this);
 }

@@ -3,7 +3,7 @@
 
 #include "AST.h"
 #include "CompoundAST.h"
-#include "../visitors/CodegenVisitor.h"
+#include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
 class WhileAST : public AST
@@ -14,7 +14,7 @@ class WhileAST : public AST
 
         WhileAST(std::unique_ptr<AST> expr, std::unique_ptr<CompoundAST> body);
         WhileAST(const WhileAST& other);
-        virtual llvm::Value* accept(CodegenVisitor& cg) override;
+        virtual llvm::Value* accept(ASTCodegenner& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
 
     protected:

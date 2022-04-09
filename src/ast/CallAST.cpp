@@ -19,7 +19,7 @@ void CallAST::addParam(std::unique_ptr<AST> param)
     params.push_back(std::move(param));
 }
 
-llvm::Value* CallAST::accept(CodegenVisitor& cg)
+llvm::Value* CallAST::accept(ASTCodegenner& cg)
 {
     return cg.codegen(this);
 }

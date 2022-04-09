@@ -3,7 +3,7 @@
 #include <memory>
 #include <sstream>
 #include <string>
-#include "CodegenVisitor.h"
+#include "ASTCodegenner.h"
 #include "../io.h"
 #include "../Token.h"
 #include "../Exception.h"
@@ -35,13 +35,13 @@
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/Target/TargetOptions.h"
 
-CodegenVisitor::CodegenVisitor(const std::string& fname, std::shared_ptr<ModuleAST> ast) 
+ASTCodegenner::ASTCodegenner(const std::string& fname, std::shared_ptr<ModuleAST> ast) 
     : ast(ast),
       ctx(std::make_unique<llvm::LLVMContext>()),
       builder(std::make_unique<llvm::IRBuilder<>>(*ctx)),
       mainModule(std::make_unique<llvm::Module>(fname, *ctx)) {}
 
-std::string CodegenVisitor::print()
+std::string ASTCodegenner::print()
 {
     std::string ir;
     llvm::raw_string_ostream output(ir);
@@ -50,7 +50,7 @@ std::string CodegenVisitor::print()
     return ir;
 }
 
-int CodegenVisitor::emitObjectCode()
+int ASTCodegenner::emitObjectCode()
 {
     auto targetTriple = llvm::sys::getDefaultTargetTriple();
     llvm::InitializeAllTargetInfos();
@@ -95,12 +95,12 @@ int CodegenVisitor::emitObjectCode()
     return 0;
 }
 
-llvm::Value* CodegenVisitor::codegen() 
+llvm::Value* ASTCodegenner::codegen() 
 {
     return ast->accept(*this);
 }
 
-llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast) 
+llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast) 
 {
     // handle special case of variable declaration / reassignment
     // in this case, we don't want to codegen LHS as a separate expression
@@ -179,7 +179,7 @@ llvm::Value* CodegenVisitor::codegen(ExpressionAST* ast)
     }
 }
 
-llvm::Value* CodegenVisitor::codegen(ModuleAST* ast) 
+llvm::Value* ASTCodegenner::codegen(ModuleAST* ast) 
 {
     for (auto& child : ast->children)
     {
@@ -188,7 +188,7 @@ llvm::Value* CodegenVisitor::codegen(ModuleAST* ast)
     return nullptr;
 }
 
-llvm::Value* CodegenVisitor::codegen(VariableAST* ast) 
+llvm::Value* ASTCodegenner::codegen(VariableAST* ast) 
 {
     llvm::AllocaInst* val = namedValues[ast->id];
     if (!val)
@@ -199,12 +199,12 @@ llvm::Value* CodegenVisitor::codegen(VariableAST* ast)
     return builder->CreateLoad(val->getAllocatedType(), val, ast->id);
 }
 
-llvm::Value* CodegenVisitor::codegen(NumberAST* ast) 
+llvm::Value* ASTCodegenner::codegen(NumberAST* ast) 
 {
     return llvm::ConstantInt::get(*ctx, llvm::APInt(32, ast->val));
 }
 
-llvm::Value* CodegenVisitor::codegen(ArrayAST* ast)
+llvm::Value* ASTCodegenner::codegen(ArrayAST* ast)
 {
     llvm::ArrayType* arrType = llvm::ArrayType::get(llvm::Type::getInt32Ty(*ctx), ast->elements.size());
     mainModule->getOrInsertGlobal("thearray", arrType);
@@ -216,7 +216,7 @@ llvm::Value* CodegenVisitor::codegen(ArrayAST* ast)
     return nullptr;
 }
 
-llvm::Function* CodegenVisitor::codegen(FunctionAST* ast) 
+llvm::Function* ASTCodegenner::codegen(FunctionAST* ast) 
 {
     llvm::Function* func = mainModule->getFunction(ast->proto->name);
     if (!func)
@@ -251,7 +251,7 @@ llvm::Function* CodegenVisitor::codegen(FunctionAST* ast)
     return nullptr;
 }
 
-llvm::Value* CodegenVisitor::codegen(CompoundAST* ast) 
+llvm::Value* ASTCodegenner::codegen(CompoundAST* ast) 
 {
     // children.size() - 1 to skip return statement (only temporary)
     for (int i = 0; i < ast->children.size(); i++)
@@ -263,7 +263,7 @@ llvm::Value* CodegenVisitor::codegen(CompoundAST* ast)
     return ast->retStmt->accept(*this);
 }
 
-llvm::Function* CodegenVisitor::codegen(PrototypeAST* ast) 
+llvm::Function* ASTCodegenner::codegen(PrototypeAST* ast) 
 {
     std::vector<llvm::Type*> paramTypes;
     for (auto& param : ast->params)
@@ -281,12 +281,12 @@ llvm::Function* CodegenVisitor::codegen(PrototypeAST* ast)
     return func;
 }
 
-llvm::Value* CodegenVisitor::codegen(ReturnAST* ast) 
+llvm::Value* ASTCodegenner::codegen(ReturnAST* ast) 
 {
     return ast->expr->accept(*this);
 }
 
-llvm::Value* CodegenVisitor::codegen(CallAST* ast) 
+llvm::Value* ASTCodegenner::codegen(CallAST* ast) 
 {
     llvm::Function* callee = mainModule->getFunction(ast->id);
     if (!callee)
@@ -310,12 +310,12 @@ llvm::Value* CodegenVisitor::codegen(CallAST* ast)
     return builder->CreateCall(callee, argValues, "calltmp");
 }
 
-llvm::Value* CodegenVisitor::codegen(IfAST* ast)
+llvm::Value* ASTCodegenner::codegen(IfAST* ast)
 {
     return codegen(ast, nullptr);
 }
 
-llvm::Value* CodegenVisitor::codegen(IfAST* ast, llvm::BasicBlock* parentMergeBlock)
+llvm::Value* ASTCodegenner::codegen(IfAST* ast, llvm::BasicBlock* parentMergeBlock)
 {
     llvm::Function* func = builder->GetInsertBlock()->getParent();
     llvm::BasicBlock* trueBlock = llvm::BasicBlock::Create(*ctx, "if");
@@ -380,7 +380,7 @@ llvm::Value* CodegenVisitor::codegen(IfAST* ast, llvm::BasicBlock* parentMergeBl
     return nullptr;
 }
 
-llvm::Value* CodegenVisitor::codegen(ForAST* ast)
+llvm::Value* ASTCodegenner::codegen(ForAST* ast)
 {
     // ast->iter->accept(*this);
     // return nullptr;
@@ -415,7 +415,7 @@ llvm::Value* CodegenVisitor::codegen(ForAST* ast)
     // return nullptr;
 }
 
-llvm::Value* CodegenVisitor::codegen(WhileAST* ast)
+llvm::Value* ASTCodegenner::codegen(WhileAST* ast)
 {
     llvm::Function* func = builder->GetInsertBlock()->getParent();
     llvm::BasicBlock* condBlock = llvm::BasicBlock::Create(*ctx, "cond");
@@ -445,7 +445,7 @@ llvm::Value* CodegenVisitor::codegen(WhileAST* ast)
     return nullptr;
 }
 
-void CodegenVisitor::debugPrint(IfAST* ast)
+void ASTCodegenner::debugPrint(IfAST* ast)
 {
     std::cout << "br ";
     if (ast->other)
@@ -471,7 +471,7 @@ void CodegenVisitor::debugPrint(IfAST* ast)
     std::cout << "merge\n";
 }
 
-void CodegenVisitor::insertFuncBlock(llvm::Function* func, llvm::BasicBlock* block)
+void ASTCodegenner::insertFuncBlock(llvm::Function* func, llvm::BasicBlock* block)
 {
     // Used in control flow
     // Appends a block to the function's list of blocks and sets the
@@ -480,7 +480,7 @@ void CodegenVisitor::insertFuncBlock(llvm::Function* func, llvm::BasicBlock* blo
     builder->SetInsertPoint(block);
 }
 
-void CodegenVisitor::createRetOrBr(llvm::Value* retV, llvm::BasicBlock* block)
+void ASTCodegenner::createRetOrBr(llvm::Value* retV, llvm::BasicBlock* block)
 {
     // Used in control flow (primarily if-else if-else-statements)
     // Inserts a branch ('br') or return ('ret') instruction based on if the
@@ -491,7 +491,7 @@ void CodegenVisitor::createRetOrBr(llvm::Value* retV, llvm::BasicBlock* block)
         builder->CreateBr(block);
 }
 
-llvm::Type* CodegenVisitor::typeToLlvm(Type type)
+llvm::Type* ASTCodegenner::typeToLlvm(Type type)
 {
     switch (type)
     {
@@ -505,14 +505,14 @@ llvm::Type* CodegenVisitor::typeToLlvm(Type type)
     }
 }
 
-llvm::AllocaInst* CodegenVisitor::createEntryBlockAlloca(llvm::Function* func, llvm::Value* val)
+llvm::AllocaInst* ASTCodegenner::createEntryBlockAlloca(llvm::Function* func, llvm::Value* val)
 {
     llvm::BasicBlock& bb = func->getEntryBlock();
     llvm::IRBuilder<> tmpBuilder(&bb, bb.begin());
     return tmpBuilder.CreateAlloca(val->getType(), 0, val->getName());
 }
 
-llvm::AllocaInst* CodegenVisitor::createEntryBlockAlloca(llvm::Value* val)
+llvm::AllocaInst* ASTCodegenner::createEntryBlockAlloca(llvm::Value* val)
 {
     llvm::Function* func = builder->GetInsertBlock()->getParent();
     return createEntryBlockAlloca(func, val);

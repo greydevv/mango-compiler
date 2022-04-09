@@ -3,7 +3,7 @@
 #include "AST.h"
 #include "CompoundAST.h"
 #include "ReturnAST.h"
-#include "../visitors/CodegenVisitor.h"
+#include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
 CompoundAST::CompoundAST(std::vector<std::unique_ptr<AST>> children, std::unique_ptr<ReturnAST> retStmt)
@@ -33,7 +33,7 @@ void CompoundAST::setRetStmt(std::unique_ptr<ReturnAST> newRetStmt)
     retStmt = std::move(newRetStmt);
 }
 
-llvm::Value* CompoundAST::accept(CodegenVisitor& cg)
+llvm::Value* CompoundAST::accept(ASTCodegenner& cg)
 {
     return cg.codegen(this);
 }

@@ -1,6 +1,6 @@
 #include "IfAST.h"
 #include "CompoundAST.h"
-#include "../visitors/CodegenVisitor.h"
+#include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 #include "llvm/IR/Value.h"
 
@@ -14,7 +14,7 @@ IfAST::IfAST(const IfAST& other)
       body(std::unique_ptr<CompoundAST>(dynamic_cast<CompoundAST*>(other.body->clone()))),
       other(std::unique_ptr<IfAST>(dynamic_cast<IfAST*>(other.other->clone()))) {}
 
-llvm::Value* IfAST::accept(CodegenVisitor& cg) 
+llvm::Value* IfAST::accept(ASTCodegenner& cg) 
 {
     return cg.codegen(this);
 }

@@ -1,7 +1,7 @@
 #include "PrototypeAST.h"
 #include "VariableAST.h"
 #include "../Types.h"
-#include "../visitors/CodegenVisitor.h"
+#include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 #include "llvm/IR/Value.h"
 
@@ -23,7 +23,7 @@ void PrototypeAST::addParam(std::unique_ptr<VariableAST> param)
     params.push_back(std::move(param));
 }
 
-llvm::Value* PrototypeAST::accept(CodegenVisitor& cg)
+llvm::Value* PrototypeAST::accept(ASTCodegenner& cg)
 {
     return cg.codegen(this);
 }

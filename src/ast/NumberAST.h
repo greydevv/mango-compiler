@@ -2,7 +2,7 @@
 #define NUMBER_AST_H
 
 #include "AST.h"
-#include "../visitors/CodegenVisitor.h"
+#include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
 class NumberAST : public AST 
@@ -12,7 +12,7 @@ class NumberAST : public AST
 
         NumberAST(double val);
         NumberAST(const NumberAST& other);
-        virtual llvm::Value* accept(CodegenVisitor& cg) override;
+        virtual llvm::Value* accept(ASTCodegenner& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:
         virtual NumberAST* cloneImpl() override;

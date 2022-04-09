@@ -1,5 +1,5 @@
 #include "NumberAST.h"
-#include "../visitors/CodegenVisitor.h"
+#include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
 NumberAST::NumberAST(double val)
@@ -8,7 +8,7 @@ NumberAST::NumberAST(double val)
 NumberAST::NumberAST(const NumberAST& other)
     : val(other.val) {}
 
-llvm::Value* NumberAST::accept(CodegenVisitor& cg) 
+llvm::Value* NumberAST::accept(ASTCodegenner& cg) 
 {
     return cg.codegen(this);
 }

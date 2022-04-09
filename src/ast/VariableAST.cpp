@@ -1,6 +1,6 @@
 #include <string>
 #include "VariableAST.h"
-#include "../visitors/CodegenVisitor.h"
+#include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
 VariableAST::VariableAST(const std::string& id, Type type, VarCtx ctx)
@@ -12,7 +12,7 @@ VariableAST::VariableAST(const std::string& id)
 VariableAST::VariableAST(const VariableAST& other)
     : id(other.id), type(other.type), ctx(other.ctx) {}
 
-llvm::Value* VariableAST::accept(CodegenVisitor& cg) 
+llvm::Value* VariableAST::accept(ASTCodegenner& cg) 
 {
     return cg.codegen(this);
 }

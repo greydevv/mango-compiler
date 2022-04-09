@@ -1,7 +1,7 @@
 #include "AST.h"
 #include "ExpressionAST.h"
 #include "../Operator.h"
-#include "../visitors/CodegenVisitor.h"
+#include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 #include "llvm/IR/Value.h"
 
@@ -13,7 +13,7 @@ ExpressionAST::ExpressionAST(const ExpressionAST& other)
       RHS(std::unique_ptr<AST>(other.RHS->clone())), 
       op(other.op) {}
 
-llvm::Value* ExpressionAST::accept(CodegenVisitor& cg) 
+llvm::Value* ExpressionAST::accept(ASTCodegenner& cg) 
 {
     return cg.codegen(this);
 }

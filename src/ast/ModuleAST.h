@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 #include "AST.h"
-#include "../visitors/CodegenVisitor.h"
+#include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
 class ModuleAST : public AST
@@ -17,7 +17,7 @@ class ModuleAST : public AST
         ModuleAST(const ModuleAST& other);
         void addChild(std::unique_ptr<AST> child);
         void print();
-        virtual llvm::Value* accept(CodegenVisitor& cg) override;
+        virtual llvm::Value* accept(ASTCodegenner& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:
         virtual ModuleAST* cloneImpl() override;

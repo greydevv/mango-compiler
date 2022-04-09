@@ -14,7 +14,7 @@ std::shared_ptr<ModuleAST> compile(const std::string& fname, std::ostringstream&
     std::shared_ptr<ModuleAST> ast = getAstFromFile(fname);
     if (!ast)
         throw CompilationError(fmt::format("file not found: {}", fname));
-    CodegenVisitor cg(fname, ast);
+    ASTCodegenner cg(fname, ast);
     cg.codegen();
     cg.emitObjectCode();
     outs << cg.print();

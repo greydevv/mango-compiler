@@ -1,7 +1,7 @@
 #include "FunctionAST.h"
 #include "CompoundAST.h"
 #include "PrototypeAST.h"
-#include "../visitors/CodegenVisitor.h"
+#include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 #include "llvm/IR/Value.h"
 
@@ -14,7 +14,7 @@ FunctionAST::FunctionAST(const FunctionAST& other)
 {
 }
 
-llvm::Value* FunctionAST::accept(CodegenVisitor& cg) 
+llvm::Value* FunctionAST::accept(ASTCodegenner& cg) 
 {
     return cg.codegen(this);
 }

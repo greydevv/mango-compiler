@@ -4,7 +4,7 @@
 #include <string>
 #include "AST.h"
 #include "../Types.h"
-#include "../visitors/CodegenVisitor.h"
+#include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
 enum class VarCtx
@@ -25,7 +25,7 @@ class VariableAST : public AST
         VariableAST(const std::string& id, Type type, VarCtx ctx);
         VariableAST(const std::string& id);
         VariableAST(const VariableAST& other);
-        virtual llvm::Value* accept(CodegenVisitor& cg) override;
+        virtual llvm::Value* accept(ASTCodegenner& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:
         virtual VariableAST* cloneImpl() override;

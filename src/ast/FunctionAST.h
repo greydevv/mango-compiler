@@ -6,7 +6,7 @@
 #include "ExpressionAST.h"
 #include "PrototypeAST.h"
 #include "CompoundAST.h"
-#include "../visitors/CodegenVisitor.h"
+#include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 #include "llvm/IR/Value.h"
 
@@ -18,7 +18,7 @@ class FunctionAST : public AST
 
         FunctionAST(std::unique_ptr<PrototypeAST> proto, std::unique_ptr<CompoundAST> body);
         FunctionAST(const FunctionAST& other);
-        virtual llvm::Value* accept(CodegenVisitor& cg) override;
+        virtual llvm::Value* accept(ASTCodegenner& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:
         virtual FunctionAST* cloneImpl() override;

@@ -3,7 +3,7 @@
 #include "ExpressionAST.h"
 #include "ArrayAST.h"
 #include "CompoundAST.h"
-#include "../visitors/CodegenVisitor.h"
+#include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 #include "llvm/IR/Value.h"
 
@@ -15,7 +15,7 @@ ForAST::ForAST(const ForAST& other)
       iter(std::unique_ptr<ArrayAST>(dynamic_cast<ArrayAST*>(other.iter->clone()))), 
       body(std::unique_ptr<CompoundAST>(dynamic_cast<CompoundAST*>(other.body->clone()))) {}
 
-llvm::Value* ForAST::accept(CodegenVisitor& cg) 
+llvm::Value* ForAST::accept(ASTCodegenner& cg) 
 {
     return cg.codegen(this);
 }

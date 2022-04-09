@@ -22,7 +22,7 @@ void ArrayAST::addElement(std::unique_ptr<AST> ele)
     elements.push_back(std::move(ele));
 }
 
-llvm::Value* ArrayAST::accept(CodegenVisitor& cg) 
+llvm::Value* ArrayAST::accept(ASTCodegenner& cg) 
 {
     return cg.codegen(this);
 }

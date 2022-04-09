@@ -5,7 +5,7 @@
 #include <vector>
 #include "AST.h"
 #include "ReturnAST.h"
-#include "../visitors/CodegenVisitor.h"
+#include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
 class CompoundAST : public AST
@@ -20,7 +20,7 @@ class CompoundAST : public AST
         CompoundAST(const CompoundAST& other);
         void addChild(std::unique_ptr<AST> child);
         void setRetStmt(std::unique_ptr<ReturnAST> retStmt);
-        virtual llvm::Value* accept(CodegenVisitor& cg) override;
+        virtual llvm::Value* accept(ASTCodegenner& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:
         virtual CompoundAST* cloneImpl() override;
