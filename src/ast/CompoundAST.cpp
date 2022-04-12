@@ -58,5 +58,3 @@ CompoundAST* CompoundAST::cloneImpl()
 {
     return new CompoundAST(*this);
 }
-
-
