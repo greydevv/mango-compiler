@@ -47,7 +47,8 @@ class ASTCodegenner
     private:
         void debugPrint(IfAST* ast);
         void insertFuncBlock(llvm::Function* func, llvm::BasicBlock* block);
-        void createRetOrBr(llvm::Value* retV, llvm::BasicBlock* block);
+        void createRetOrBr(std::shared_ptr<CompoundAST> body, llvm::BasicBlock* block);
+        // void createRetOrBr(llvm::Value* retV, llvm::BasicBlock* block);
         llvm::Type* typeToLlvm(Type type);
         std::shared_ptr<ModuleAST> ast;
         std::unique_ptr<llvm::LLVMContext> ctx;

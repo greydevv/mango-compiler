@@ -198,12 +198,18 @@ std::string ASTStringifier::toString(ReturnAST* ast, int tabs)
     std::ostringstream s;
     if (simpleExpr)
     {
-        s << "return " << ast->expr->accept(*this) << '\n';
+        if (ast->hasExpr())
+            s << "return " << ast->expr->accept(*this) << '\n';
+        else
+            s << "return void\n";
     }
     else
     {
         s << "ReturnAST:\n";
-        s << indent(ast->expr->accept(*this, tabs+1), tabs+1);
+        if (ast->hasExpr())
+            s << indent(ast->expr->accept(*this, tabs+1), tabs+1);
+        else
+            s << indent("void", tabs+1);
     }
     return s.str();
 }

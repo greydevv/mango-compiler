@@ -240,7 +240,7 @@ llvm::Function* ASTCodegenner::codegen(FunctionAST* ast)
     }
     
     llvm::Value* retVal = ast->body->accept(*this);
-    if (retVal)
+    if (ast->body->retStmt)
     {
         builder->CreateRet(retVal);
         llvm::verifyFunction(*func);
@@ -258,9 +258,9 @@ llvm::Value* ASTCodegenner::codegen(CompoundAST* ast)
     {
         ast->children[i]->accept(*this);
     }
-    if (!ast->retStmt)
-        return nullptr;
-    return ast->retStmt->accept(*this);
+    if (ast->retStmt)
+        return ast->retStmt->accept(*this);
+    return nullptr;
 }
 
 llvm::Function* ASTCodegenner::codegen(PrototypeAST* ast) 
@@ -283,7 +283,10 @@ llvm::Function* ASTCodegenner::codegen(PrototypeAST* ast)
 
 llvm::Value* ASTCodegenner::codegen(ReturnAST* ast) 
 {
-    return ast->expr->accept(*this);
+    if (ast->hasExpr())
+        return ast->expr->accept(*this);
+    // return llvm::UndefValue::get(llvm::Type::getVoidTy(*ctx));
+    return nullptr;
 }
 
 llvm::Value* ASTCodegenner::codegen(CallAST* ast) 
@@ -327,7 +330,8 @@ llvm::Value* ASTCodegenner::codegen(IfAST* ast, llvm::BasicBlock* parentMergeBlo
 
     // trueBlock will always be filled out
     insertFuncBlock(func, trueBlock);
-    createRetOrBr(ast->body->accept(*this), localMergeBlock);
+    // createRetOrBr(ast->body->accept(*this), localMergeBlock);
+    createRetOrBr(std::move(ast->body), localMergeBlock);
     trueBlock = builder->GetInsertBlock();
 
     // falseBlock might be an 'else if' or just plain 'else'
@@ -345,7 +349,8 @@ llvm::Value* ASTCodegenner::codegen(IfAST* ast, llvm::BasicBlock* parentMergeBlo
         {
             // 'else' block encountered
             insertFuncBlock(func, falseBlock);
-            createRetOrBr(ast->other->body->accept(*this), localMergeBlock);
+            // createRetOrBr(ast->other->body->accept(*this), localMergeBlock);
+            createRetOrBr(std::move(ast->other->body), localMergeBlock);
             falseBlock = builder->GetInsertBlock();
         }
     }
@@ -434,7 +439,7 @@ llvm::Value* ASTCodegenner::codegen(WhileAST* ast)
     whileBlock = builder->GetInsertBlock();
 
     llvm::Value* bodyRet = ast->body->accept(*this);
-    if (bodyRet)
+    if (ast->body->retStmt)
         builder->CreateRet(bodyRet);
     else
         builder->CreateBr(condBlock);
@@ -480,15 +485,21 @@ void ASTCodegenner::insertFuncBlock(llvm::Function* func, llvm::BasicBlock* bloc
     builder->SetInsertPoint(block);
 }
 
-void ASTCodegenner::createRetOrBr(llvm::Value* retV, llvm::BasicBlock* block)
+// void ASTCodegenner::createRetOrBr(llvm::Value* retV, llvm::BasicBlock* block)
+void ASTCodegenner::createRetOrBr(std::shared_ptr<CompoundAST> body, llvm::BasicBlock* block)
 {
     // Used in control flow (primarily if-else if-else-statements)
     // Inserts a branch ('br') or return ('ret') instruction based on if the
     // return value is not null
-    if (retV)
+    if (body->retStmt != nullptr && body->retStmt->hasExpr())
+    {
+        llvm::Value* retV = body->retStmt->accept(*this);
         builder->CreateRet(retV);
+    }
     else
+    {
         builder->CreateBr(block);
+    }
 }
 
 llvm::Type* ASTCodegenner::typeToLlvm(Type type)

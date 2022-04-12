@@ -214,7 +214,8 @@ std::unique_ptr<PrototypeAST> Parser::parseExternStmt()
 std::unique_ptr<FunctionAST> Parser::parseFuncDef()
 {
     eat(Token::TOK_KWD);
-    return std::make_unique<FunctionAST>(parseFuncProto(), parseCompound());
+    auto ast = std::make_unique<FunctionAST>(parseFuncProto(), parseCompound());
+    return ast;
 }
 
 std::unique_ptr<PrototypeAST> Parser::parseFuncProto()
@@ -334,6 +335,11 @@ std::unique_ptr<CompoundAST> Parser::parseCompound()
 std::unique_ptr<ReturnAST> Parser::parseReturnStmt()
 {
     eat(Token::TOK_KWD);
+    if (tok.type == Token::TOK_SCOLON)
+    {
+        eat(Token::TOK_SCOLON);
+        return ReturnAST::retVoid();
+    }
     std::unique_ptr<AST> expr = parseExpr();
     eat(Token::TOK_SCOLON);
     return std::make_unique<ReturnAST>(std::move(expr));
