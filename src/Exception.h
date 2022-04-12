@@ -65,6 +65,13 @@ class ReferenceError : public BaseSourceException
         virtual std::string getExcName() const override;
 };
 
+class TypeError : public BaseSourceException
+{
+    public:
+        TypeError(const std::string& fname, const std::string& msg, const std::string& line, SourceLocation loc);
+        virtual std::string getExcName() const override;
+};
+
 std::string getFileNameFromPath(const std::string& fullPath);
 
 #endif

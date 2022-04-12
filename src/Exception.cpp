@@ -65,3 +65,8 @@ ReferenceError::ReferenceError(const std::string& fname, const std::string& msg,
     : BaseSourceException(fname, msg, line, loc) {}
 
 std::string ReferenceError::getExcName() const {return "ReferenceError";}
+
+TypeError::TypeError(const std::string& fname, const std::string& msg, const std::string& line, SourceLocation loc)
+    : BaseSourceException(fname, msg, line, loc) {}
+
+std::string TypeError::getExcName() const {return "TypeError";}
