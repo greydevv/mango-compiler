@@ -1,8 +1,9 @@
-#ifndef AST_VALIDATOR
-#define AST_VALIDATOR
+#ifndef AST_VALIDATOR_H
+#define AST_VALIDATOR_H
 
 #include <string>
 #include "../Types.h"
+#include "../SymbolTable.h"
 
 class ModuleAST;
 class ExpressionAST;
@@ -21,24 +22,26 @@ class WhileAST;
 class ASTValidator
 {
     public:
-        ASTValidator(std::shared_ptr<ModuleAST> ast);
-        bool validate();
-        bool validate(ModuleAST* ast);
-        bool validate(ExpressionAST* ast);
-        bool validate(VariableAST* ast);
-        bool validate(NumberAST* ast);
-        bool validate(ArrayAST* ast);
-        bool validate(CompoundAST* ast);
-        bool validate(FunctionAST* ast);
-        bool validate(PrototypeAST* ast);
-        bool validate(ReturnAST* ast);
-        bool validate(CallAST* ast);
-        bool validate(IfAST* ast);
-        bool validate(ForAST* ast);
-        bool validate(WhileAST* ast);
+        ASTValidator(const std::string& fname, std::shared_ptr<ModuleAST> ast);
+        void validate();
+        Type validate(ModuleAST* ast);
+        Type validate(ExpressionAST* ast);
+        Type validate(VariableAST* ast);
+        Type validate(NumberAST* ast);
+        Type validate(ArrayAST* ast);
+        Type validate(CompoundAST* ast);
+        Type validate(FunctionAST* ast);
+        Type validate(PrototypeAST* ast);
+        Type validate(ReturnAST* ast);
+        Type validate(CallAST* ast);
+        Type validate(IfAST* ast);
+        Type validate(ForAST* ast);
+        Type validate(WhileAST* ast);
 
     private:
+        const std::string fname;
         std::shared_ptr<ModuleAST> ast;
+        SymbolTable st;
 };
 
 #endif
