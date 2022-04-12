@@ -60,11 +60,7 @@ std::string ASTStringifier::toString(VariableAST* ast, int tabs)
     }
     else
     {
-        if (ast->type == Type::eUnd)
-            // don't print type if it's undefined
-            s << "VariableAST(" << ast->id << ')';
-        else
-            s << "VariableAST(" << ast->id << ", " << typeToString(ast->type) << ')';
+        s << "VariableAST(" << ast->id << ", " << typeToString(ast->type) << ')';
     }
     return s.str();
 }
