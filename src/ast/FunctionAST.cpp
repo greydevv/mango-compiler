@@ -6,8 +6,6 @@
 #include "../visitors/ASTStringifier.h"
 #include "llvm/IR/Value.h"
 
-#include <iostream>
-
 FunctionAST::FunctionAST(std::unique_ptr<PrototypeAST> proto, std::unique_ptr<CompoundAST> body)
     : proto(std::move(proto)), body(std::move(body)) 
 {
