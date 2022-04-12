@@ -1,3 +1,4 @@
+#include <iostream>
 #include <string>
 #include "ASTValidator.h"
 #include "../io.h"
@@ -37,11 +38,17 @@ Type ASTValidator::validate(ModuleAST* ast)
 
 Type ASTValidator::validate(ExpressionAST* ast)
 {
-    // throw NotImplementedError("Validation of ExpressionAST");
-    ast->LHS->accept(*this);
-    ast->RHS->accept(*this);
+    Type lType = ast->LHS->accept(*this);
+    Type rType = ast->RHS->accept(*this);
 
-    return Type::eUnd;
+    if (lType != rType)
+    {
+        if (ast->op == Operator::OP_EQL)
+            throw TypeError(fname, fmt::format("Cannot initialize {} with a value of {}", typeValues[lType], typeValues[rType]), "N/A", SourceLocation(0,0));
+        else
+            throw TypeError(fname, fmt::format("{} and {} are not compatible in binary expression", typeValues[lType], typeValues[rType]), "N/A", SourceLocation(0,0));
+    }
+    return lType;
 }
 
 Type ASTValidator::validate(VariableAST* ast)
@@ -51,7 +58,9 @@ Type ASTValidator::validate(VariableAST* ast)
         case VarCtx::eAlloc:
         {
             if (st.contains(ast->id))
+            {
                 throw ReferenceError(fname, fmt::format("Variable '{}' was already defined", ast->id), "N/A", SourceLocation(0,0));
+            }
             else
             {
                 st.insert(ast->id, ast->type);
@@ -59,13 +68,20 @@ Type ASTValidator::validate(VariableAST* ast)
             }
         }
         case VarCtx::eParam:
+        {
+            st.insert(ast->id, ast->type);
             return ast->type;
+        }
         case VarCtx::eReference:
         case VarCtx::eStore:
         {
             if (!st.contains(ast->id))
                 throw ReferenceError(fname, fmt::format("Reference to unknown variable '{}'", ast->id), "N/A", SourceLocation(0,0));
-            return ast->type;
+            // give AST node the type as it is unknown during syntax analysis
+            // (parser) but known during semantic analysis (here)
+            Type varType = st.lookup(ast->id);
+            ast->type = varType;
+            return varType;
         }
     }
 }
@@ -82,18 +98,15 @@ Type ASTValidator::validate(ArrayAST* ast)
 
 Type ASTValidator::validate(CompoundAST* ast)
 {
-    for (int i = 0; i < ast->children.size(); i++)
-    {
-        ast->children[i]->accept(*this);
-    }
-    if (ast->retStmt)
-        ast->retStmt->accept(*this);
-    return Type::eUnd;
+    for (auto& child : ast->children)
+        child->accept(*this);
+    return ast->retStmt->accept(*this);
 }
 
 Type ASTValidator::validate(FunctionAST* ast)
 {
-    Type expectedType = ast->proto->retType;
+    Type expectedType = ast->proto->accept(*this);
+    ast->body->accept(*this);
     if (ast->body->retStmt)
     {
         // actual return type
@@ -101,15 +114,17 @@ Type ASTValidator::validate(FunctionAST* ast)
         if (actualType != expectedType)
             throw TypeError(fname, fmt::format("returning '{}' but expected '{}'", typeValues[actualType], typeValues[expectedType]), "N/A", SourceLocation(0,0));
     }
-
-    ast->body->accept(*this);
     return expectedType;
 }
 
 Type ASTValidator::validate(PrototypeAST* ast)
 {
-    // throw NotImplementedError("Validation of PrototypeAST");
-    return Type::eUnd;
+    if (st.contains(ast->name))
+        throw ReferenceError(fname, fmt::format("Function '{}' was already defined", ast->name), "N/A", SourceLocation(0,0));
+    st.insert(ast->name, ast->retType);
+    for (auto& param : ast->params)
+        param->accept(*this);
+    return ast->retType;
 }
 
 Type ASTValidator::validate(ReturnAST* ast)
@@ -121,7 +136,9 @@ Type ASTValidator::validate(ReturnAST* ast)
 
 Type ASTValidator::validate(CallAST* ast)
 {
-    throw NotImplementedError("Validation of CallAST");
+    if (!st.contains(ast->id))
+        throw ReferenceError(fname, fmt::format("Reference to unknown function '{}'", ast->id), "N/A", SourceLocation(0,0));
+    return st.lookup(ast->id);
 }
 
 Type ASTValidator::validate(IfAST* ast)
