@@ -277,6 +277,7 @@ bool Lexer::isKwd(const std::string& s)
 bool Lexer::isType(const std::string& s)
 {
     return (s == "int"
+            || s == "void"
             || s == "array");
 }
 
