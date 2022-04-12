@@ -19,7 +19,7 @@ class FunctionAST : public AST
 
         FunctionAST(std::unique_ptr<PrototypeAST> proto, std::unique_ptr<CompoundAST> body);
         FunctionAST(const FunctionAST& other);
-        virtual bool accept(ASTValidator& vd) override;
+        virtual Type accept(ASTValidator& vd) override;
         virtual llvm::Value* accept(ASTCodegenner& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:

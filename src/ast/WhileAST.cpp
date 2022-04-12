@@ -12,7 +12,7 @@ WhileAST::WhileAST(const WhileAST& other)
     : expr(std::unique_ptr<AST>(other.expr->clone())),
       body(std::unique_ptr<CompoundAST>(dynamic_cast<CompoundAST*>(other.expr->clone()))) {}
 
-bool WhileAST::accept(ASTValidator& vd)
+Type WhileAST::accept(ASTValidator& vd)
 {
     return vd.validate(this);
 }

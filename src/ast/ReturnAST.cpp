@@ -11,7 +11,17 @@ ReturnAST::ReturnAST(std::unique_ptr<AST> expr)
 ReturnAST::ReturnAST(const ReturnAST& other)
     : expr(std::unique_ptr<AST>(other.expr->clone())) {}
 
-bool ReturnAST::accept(ASTValidator& vd)
+std::unique_ptr<ReturnAST> ReturnAST::retVoid()
+{
+    return std::make_unique<ReturnAST>(nullptr);
+}
+
+bool ReturnAST::hasExpr()
+{
+    return (expr != nullptr);
+}
+
+Type ReturnAST::accept(ASTValidator& vd)
 {
     return vd.validate(this);
 }

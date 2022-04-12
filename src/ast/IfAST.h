@@ -17,7 +17,7 @@ class IfAST : public AST
 
         IfAST(std::unique_ptr<AST> expr, std::unique_ptr<CompoundAST> body, std::unique_ptr<IfAST> other);
         IfAST(const IfAST& other);
-        virtual bool accept(ASTValidator& cg) override;
+        virtual Type accept(ASTValidator& cg) override;
         virtual llvm::Value* accept(ASTCodegenner& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:

@@ -24,7 +24,7 @@ void CallAST::addParam(std::unique_ptr<AST> param)
     params.push_back(std::move(param));
 }
 
-bool CallAST::accept(ASTValidator& vd)
+Type CallAST::accept(ASTValidator& vd)
 {
     return vd.validate(this);
 }

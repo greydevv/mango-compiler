@@ -20,8 +20,9 @@ class CompoundAST : public AST
         CompoundAST();
         CompoundAST(const CompoundAST& other);
         void addChild(std::unique_ptr<AST> child);
+        bool hasRetStmt();
         void setRetStmt(std::unique_ptr<ReturnAST> retStmt);
-        virtual bool accept(ASTValidator& vd) override;
+        virtual Type accept(ASTValidator& vd) override;
         virtual llvm::Value* accept(ASTCodegenner& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:

@@ -29,12 +29,17 @@ void CompoundAST::addChild(std::unique_ptr<AST> child)
     children.push_back(std::move(child));
 }
 
+bool CompoundAST::hasRetStmt()
+{
+    return (retStmt != nullptr);
+}
+
 void CompoundAST::setRetStmt(std::unique_ptr<ReturnAST> newRetStmt)
 {
     retStmt = std::move(newRetStmt);
 }
 
-bool CompoundAST::accept(ASTValidator& vd)
+Type CompoundAST::accept(ASTValidator& vd)
 {
     return vd.validate(this);
 }

@@ -9,7 +9,7 @@ NumberAST::NumberAST(double val)
 NumberAST::NumberAST(const NumberAST& other)
     : val(other.val) {}
 
-bool NumberAST::accept(ASTValidator& vd)
+Type NumberAST::accept(ASTValidator& vd)
 {
     return vd.validate(this);
 }

@@ -17,7 +17,7 @@ class CallAST : public AST
         CallAST(const std::string& id, std::vector<std::unique_ptr<AST>> param);
         CallAST(const CallAST& other);
         void addParam(std::unique_ptr<AST> param);
-        virtual bool accept(ASTValidator& vd) override;
+        virtual Type accept(ASTValidator& vd) override;
         virtual llvm::Value* accept(ASTCodegenner& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:

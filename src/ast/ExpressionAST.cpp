@@ -19,7 +19,7 @@ llvm::Value* ExpressionAST::accept(ASTCodegenner& cg)
     return cg.codegen(this);
 }
 
-bool ExpressionAST::accept(ASTValidator& vd)
+Type ExpressionAST::accept(ASTValidator& vd)
 {
     return vd.validate(this);
 }

@@ -15,7 +15,7 @@ IfAST::IfAST(const IfAST& other)
       body(std::unique_ptr<CompoundAST>(dynamic_cast<CompoundAST*>(other.body->clone()))),
       other(std::unique_ptr<IfAST>(dynamic_cast<IfAST*>(other.other->clone()))) {}
 
-bool IfAST::accept(ASTValidator& vd)
+Type IfAST::accept(ASTValidator& vd)
 {
     return vd.validate(this);
 }

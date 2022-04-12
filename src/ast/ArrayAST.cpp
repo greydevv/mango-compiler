@@ -25,7 +25,7 @@ void ArrayAST::addElement(std::unique_ptr<AST> ele)
     elements.push_back(std::move(ele));
 }
 
-bool ArrayAST::accept(ASTValidator& vd)
+Type ArrayAST::accept(ASTValidator& vd)
 {
     return vd.validate(this);
 }

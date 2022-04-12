@@ -24,7 +24,7 @@ void PrototypeAST::addParam(std::unique_ptr<VariableAST> param)
     params.push_back(std::move(param));
 }
 
-bool PrototypeAST::accept(ASTValidator& vd)
+Type PrototypeAST::accept(ASTValidator& vd)
 {
     return vd.validate(this);
 }

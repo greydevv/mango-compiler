@@ -6,15 +6,22 @@
 #include "../visitors/ASTStringifier.h"
 #include "llvm/IR/Value.h"
 
+#include <iostream>
+
 FunctionAST::FunctionAST(std::unique_ptr<PrototypeAST> proto, std::unique_ptr<CompoundAST> body)
-    : proto(std::move(proto)), body(std::move(body)) {}
+    : proto(std::move(proto)), body(std::move(body)) 
+{
+    // set return statement to void if none was given
+    if (!this->body->hasRetStmt())
+        this->body->setRetStmt(ReturnAST::retVoid());
+}
 
 FunctionAST::FunctionAST(const FunctionAST& other)
     // : proto(std::unique_ptr<PrototypeAST>(other.proto->clone())),
     //   body(std::unique_ptr<CompoundAST>(other.body->clone()))
 {}
 
-bool FunctionAST::accept(ASTValidator& vd)
+Type FunctionAST::accept(ASTValidator& vd)
 {
     return vd.validate(this);
 }

@@ -21,7 +21,7 @@ class PrototypeAST : public AST
         PrototypeAST(const std::string& name, Type ret_type, std::vector<std::unique_ptr<VariableAST>> params);
         PrototypeAST(const PrototypeAST& other);
         void addParam(std::unique_ptr<VariableAST> param);
-        virtual bool accept(ASTValidator& vd) override;
+        virtual Type accept(ASTValidator& vd) override;
         virtual llvm::Value* accept(ASTCodegenner& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:

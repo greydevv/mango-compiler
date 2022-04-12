@@ -28,7 +28,7 @@ void ModuleAST::print()
     std::cout << stringify(this);
 }
 
-bool ModuleAST::accept(ASTValidator& vd)
+Type ModuleAST::accept(ASTValidator& vd)
 {
     return vd.validate(this);
 }

@@ -16,7 +16,7 @@ ForAST::ForAST(const ForAST& other)
       iter(std::unique_ptr<ArrayAST>(dynamic_cast<ArrayAST*>(other.iter->clone()))), 
       body(std::unique_ptr<CompoundAST>(dynamic_cast<CompoundAST*>(other.body->clone()))) {}
 
-bool ForAST::accept(ASTValidator& vd)
+Type ForAST::accept(ASTValidator& vd)
 {
     return vd.validate(this);
 }

@@ -13,7 +13,7 @@ VariableAST::VariableAST(const std::string& id)
 VariableAST::VariableAST(const VariableAST& other)
     : id(other.id), type(other.type), ctx(other.ctx) {}
 
-bool VariableAST::accept(ASTValidator& vd)
+Type VariableAST::accept(ASTValidator& vd)
 {
     return vd.validate(this);
 }

@@ -14,7 +14,9 @@ class ReturnAST : public AST
 
         ReturnAST(std::unique_ptr<AST> expr);
         ReturnAST(const ReturnAST& other);
-        virtual bool accept(ASTValidator& vd) override;
+        static std::unique_ptr<ReturnAST> retVoid();
+        bool hasExpr();
+        virtual Type accept(ASTValidator& vd) override;
         virtual llvm::Value* accept(ASTCodegenner& cg) override;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:
