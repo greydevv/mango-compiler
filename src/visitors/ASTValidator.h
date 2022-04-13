@@ -41,7 +41,10 @@ class ASTValidator
     private:
         const std::string fname;
         std::shared_ptr<ModuleAST> ast;
-        SymbolTable st;
+        // regular symbol table
+        SymbolTable<Type> st;
+        // function symbol table
+        SymbolTable<std::vector<Type>> fst;
 };
 
 #endif

@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "ASTValidator.h"
+#include "../SymbolTable.h"
 #include "../io.h"
 #include "../Types.h"
 #include "../ast/AST.h"
@@ -20,7 +21,7 @@
 #include "../Exception.h"
 
 ASTValidator::ASTValidator(const std::string& fname, std::shared_ptr<ModuleAST> ast)
-    : fname(fname), ast(ast), st() {}
+    : fname(fname), ast(ast), st(Type::eNot), fst({}) {}
 
 void ASTValidator::validate()
 {
@@ -106,24 +107,26 @@ Type ASTValidator::validate(CompoundAST* ast)
 Type ASTValidator::validate(FunctionAST* ast)
 {
     Type expectedType = ast->proto->accept(*this);
-    ast->body->accept(*this);
-    if (ast->body->retStmt)
-    {
-        // actual return type
-        Type actualType = ast->body->retStmt->accept(*this);
-        if (actualType != expectedType)
-            throw TypeError(fname, fmt::format("returning '{}' but expected '{}'", typeValues[actualType], typeValues[expectedType]), "N/A", SourceLocation(0,0));
-    }
+    // actual return type
+    Type actualType = ast->body->retStmt->accept(*this);
+    if (actualType != expectedType)
+        throw TypeError(fname, fmt::format("returning '{}' but expected '{}'", typeValues[actualType], typeValues[expectedType]), "N/A", SourceLocation(0,0));
     return expectedType;
 }
 
 Type ASTValidator::validate(PrototypeAST* ast)
 {
-    if (st.contains(ast->name))
+    if (fst.contains(ast->name))
         throw ReferenceError(fname, fmt::format("Function '{}' was already defined", ast->name), "N/A", SourceLocation(0,0));
-    st.insert(ast->name, ast->retType);
+    std::vector<Type> params;
     for (auto& param : ast->params)
+    {
+        params.push_back(param->type);
         param->accept(*this);
+    }
+    // put return type as last element in vector
+    params.push_back(ast->retType);
+    fst.insert(ast->name, params);
     return ast->retType;
 }
 
@@ -136,9 +139,22 @@ Type ASTValidator::validate(ReturnAST* ast)
 
 Type ASTValidator::validate(CallAST* ast)
 {
-    if (!st.contains(ast->id))
+    if (!fst.contains(ast->id))
         throw ReferenceError(fname, fmt::format("Reference to unknown function '{}'", ast->id), "N/A", SourceLocation(0,0));
-    return st.lookup(ast->id);
+    std::vector expectedTypes = fst.lookup(ast->id);
+    // expectedTypes.size()-1 because last entry in vector is always return
+    // type, others are params
+    if (ast->params.size() != expectedTypes.size()-1)
+        throw TypeError(fname, fmt::format("{} expected {} arguments but received {}", ast->id, ast->params.size(), expectedTypes.size()), "N/A", SourceLocation(0,0));
+
+    for (int i = 0; i < ast->params.size(); i++)
+    {
+        Type pType = ast->params[i]->accept(*this);
+        if (pType != expectedTypes[i])
+            throw TypeError(fname, fmt::format("No matching call to function {}", ast->id), "N/A", SourceLocation(0,0));
+    }
+    // return return type of function
+    return expectedTypes[expectedTypes.size()-1];
 }
 
 Type ASTValidator::validate(IfAST* ast)
