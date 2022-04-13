@@ -23,6 +23,7 @@ class VariableAST : public AST
         VarCtx ctx;
 
         VariableAST(const std::string& id, Type type, VarCtx ctx);
+        VariableAST(const std::string& id, VarCtx ctx);
         VariableAST(const std::string& id);
         VariableAST(const VariableAST& other);
         virtual Type accept(ASTValidator& vd) override;

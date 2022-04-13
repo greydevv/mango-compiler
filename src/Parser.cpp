@@ -27,7 +27,6 @@
 
 Parser::Parser(const std::string& fname, const std::string& src)
     : fname(fname), 
-      st(),
       lexer(Lexer(src)), 
       tok(lexer.nextToken()) {}
 
@@ -91,7 +90,7 @@ std::unique_ptr<ExpressionAST> Parser::parseVarStore()
     std::string id = tok.value;
     // if (!st.contains(id))
     //     throw ReferenceError(fname, fmt::format("unknown variable name '{}'", id), underlineTok(tok), tok.loc);
-    auto storeVar = std::make_unique<VariableAST>(id, st.lookup(id), VarCtx::eStore);
+    auto storeVar = std::make_unique<VariableAST>(id, VarCtx::eStore);
     eat(Token::TOK_ID);
     return createVarAssignExpr(std::move(storeVar));
 }
@@ -593,11 +592,6 @@ std::string Parser::underlineTok(Token tok)
 
     // helper method for io/underlineError
     return underlineError(lexer.getLine(tok.loc.y), tok.loc.x, len);
-}
-
-SymbolTable Parser::getSt()
-{
-    return st;
 }
 
 std::unique_ptr<ModuleAST> getAstFromFile(const std::string& fname)

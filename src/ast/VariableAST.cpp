@@ -7,6 +7,9 @@
 VariableAST::VariableAST(const std::string& id, Type type, VarCtx ctx)
     : id(id), type(type), ctx(ctx) {}
 
+VariableAST::VariableAST(const std::string& id, VarCtx ctx)
+    : id(id), type(Type::eUnd), ctx(ctx) {}
+
 VariableAST::VariableAST(const std::string& id)
     : id(id), type(Type::eUnd), ctx(VarCtx::eReference) {}
 
