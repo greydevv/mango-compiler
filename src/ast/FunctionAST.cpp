@@ -15,9 +15,8 @@ FunctionAST::FunctionAST(std::unique_ptr<PrototypeAST> proto, std::unique_ptr<Co
 }
 
 FunctionAST::FunctionAST(const FunctionAST& other)
-    // : proto(std::unique_ptr<PrototypeAST>(other.proto->clone())),
-    //   body(std::unique_ptr<CompoundAST>(other.body->clone()))
-{}
+    : proto(std::unique_ptr<PrototypeAST>(dynamic_cast<PrototypeAST*>(other.proto->clone()))),
+      body(std::unique_ptr<CompoundAST>(dynamic_cast<CompoundAST*>(other.body->clone()))) {}
 
 Type FunctionAST::accept(ASTValidator& vd)
 {
