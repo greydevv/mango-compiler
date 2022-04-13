@@ -1,29 +1,35 @@
 #include <map>
+#include "Types.h"
 #include "SymbolTable.h"
 
-SymbolTable::SymbolTable()
-    : st() {}
+template <typename V>
+SymbolTable<V>::SymbolTable(const V& defaultLookup)
+    : st(), defaultLookup(defaultLookup) {}
 
-bool SymbolTable::contains(const std::string& name) const
+template <typename V>
+bool SymbolTable<V>::contains(const std::string& name) const
 {
     return st.contains(name);
 }
 
-bool SymbolTable::insert(const std::string& name, Type type)
+template <typename V>
+bool SymbolTable<V>::insert(const std::string& name, V val)
 {
     if (contains(name))
         return false;
 
-    st.insert(std::pair<std::string, Type>(name, type));
+    st.insert(std::pair<std::string, V>(name, val));
     return true;
 }
 
-Type SymbolTable::lookup(const std::string& name) const
+template <typename V>
+V SymbolTable<V>::lookup(const std::string& name) const
 {
-    return contains(name) ? st.at(name) : Type::eNot;
+    return contains(name) ? st.at(name) : defaultLookup;
 }
 
-std::pair<bool, std::string>  SymbolTable::overwrites(const SymbolTable& other)
+template <typename V>
+std::pair<bool, std::string>  SymbolTable<V>::overwrites(const SymbolTable<V>& other)
 {
     // returns <true, 'id'> if merging the two maps would create duplicate keys
     std::pair<bool, std::string> conflict(false, "");
@@ -39,12 +45,17 @@ std::pair<bool, std::string>  SymbolTable::overwrites(const SymbolTable& other)
     return conflict;
 }
 
-void SymbolTable::merge(const SymbolTable& other)
+template <typename V>
+void SymbolTable<V>::merge(const SymbolTable<V>& other)
 {
     st.merge(other.getSt());
 }
 
-std::map<std::string, Type> SymbolTable::getSt() const
+template <typename V>
+std::map<std::string, V> SymbolTable<V>::getSt() const
 {
     return st;
 }
+
+template class SymbolTable<Type>;
+template class SymbolTable<std::vector<Type>>;
