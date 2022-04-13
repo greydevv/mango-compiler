@@ -21,12 +21,10 @@ class Parser
     public:
         Parser(const std::string& fname, const std::string& src);
         std::unique_ptr<ModuleAST> parse();
-        SymbolTable getSt();
         int getErrState();
         
     private:
         const std::string fname;
-        SymbolTable st;
         Lexer lexer;
         Token tok;
         int errState;
