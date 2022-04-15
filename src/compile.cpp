@@ -16,11 +16,14 @@ std::shared_ptr<ModuleAST> compile(const std::string& fname, std::ostringstream&
     std::shared_ptr<ModuleAST> ast = getAstFromFile(fname);
     if (!ast)
         throw CompilationError(fmt::format("file not found: {}", fname));
-    ASTValidator vd(fname, ast);
-    vd.validate();
-    ASTCodegenner cg(fname, ast);
-    cg.codegen();
-    cg.emitObjectCode();
-    outs << cg.print();
+    if (ast->children.size() > 0)
+    {
+        ASTValidator vd(fname, ast);
+        vd.validate();
+        ASTCodegenner cg(fname, ast);
+        cg.codegen();
+        cg.emitObjectCode();
+        outs << cg.print();
+    }
     return ast;
 }
