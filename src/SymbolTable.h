@@ -14,6 +14,7 @@ class SymbolTable
         V lookup(const std::string& name) const;
         std::pair<bool, std::string>  overwrites(const SymbolTable& other);
         void merge(const SymbolTable& other);
+        void clear();
         std::map<std::string, V> getSt() const;
     private:
         std::map<std::string, V> st;

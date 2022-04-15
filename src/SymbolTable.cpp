@@ -52,6 +52,12 @@ void SymbolTable<V>::merge(const SymbolTable<V>& other)
 }
 
 template <typename V>
+void SymbolTable<V>::clear()
+{
+    st.clear();
+}
+
+template <typename V>
 std::map<std::string, V> SymbolTable<V>::getSt() const
 {
     return st;
