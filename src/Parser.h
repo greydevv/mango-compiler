@@ -6,6 +6,7 @@
 #include "Operator.h"
 #include "SymbolTable.h"
 #include "Lexer.h"
+#include "ContextManager.h"
 #include "ast/AST.h"
 #include "ast/FunctionAST.h"
 #include "ast/ModuleAST.h"
@@ -19,12 +20,13 @@
 class Parser
 {
     public:
-        Parser(const std::string& fname, const std::string& src);
+        Parser(const std::string& fname, ContextManager& ctx, const std::string& src);
         std::unique_ptr<ModuleAST> parse();
         int getErrState();
         
     private:
         const std::string fname;
+        ContextManager& ctx;
         Lexer lexer;
         Token tok;
         int errState;
@@ -62,6 +64,6 @@ class Parser
         std::string underlineTok(Token tok);
 };
 
-std::unique_ptr<ModuleAST> getAstFromFile(const std::string& fname);
+std::unique_ptr<ModuleAST> getAstFromFile(const std::string& fname, ContextManager& ctx);
 
 #endif

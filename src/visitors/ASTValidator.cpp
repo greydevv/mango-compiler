@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include "ASTValidator.h"
+#include "../ContextManager.h"
 #include "../SymbolTable.h"
 #include "../io.h"
 #include "../Types.h"
@@ -20,8 +21,11 @@
 #include "../ast/WhileAST.h"
 #include "../Exception.h"
 
-ASTValidator::ASTValidator(const std::string& fname, std::shared_ptr<ModuleAST> ast)
-    : fname(fname), ast(ast), st(Type::eNot), fst({}) {}
+ASTValidator::ASTValidator(const std::string& fname, std::shared_ptr<ModuleAST> ast, ContextManager& ctx)
+    : fname(fname), ast(ast), ctx(ctx), st(Type::eNot), fst({}) 
+{
+    ctx.clear();
+}
 
 void ASTValidator::validate()
 {
@@ -30,10 +34,12 @@ void ASTValidator::validate()
 
 Type ASTValidator::validate(ModuleAST* ast)
 {
+    ctx.push(ast->modName);
     for (auto& child : ast->children)
     {
         child->accept(*this);
     }
+    ctx.pop();
     return Type::eUnd;
 }
 
@@ -45,9 +51,9 @@ Type ASTValidator::validate(ExpressionAST* ast)
     if (lType != rType)
     {
         if (ast->op == Operator::OP_EQL)
-            throw TypeError(fname, fmt::format("Cannot initialize {} with a value of {}", typeValues[lType], typeValues[rType]), "N/A", SourceLocation(0,0));
+            throw TypeError(fmt::format("Cannot initialize {} with a value of {}", typeValues[lType], typeValues[rType]), "N/A", SourceLocation(0,0));
         else
-            throw TypeError(fname, fmt::format("{} and {} are not compatible in binary expression", typeValues[lType], typeValues[rType]), "N/A", SourceLocation(0,0));
+            throw TypeError(fmt::format("{} and {} are not compatible in binary expression", typeValues[lType], typeValues[rType]), "N/A", SourceLocation(0,0));
     }
     return lType;
 }
@@ -60,7 +66,7 @@ Type ASTValidator::validate(VariableAST* ast)
         {
             if (st.contains(ast->id))
             {
-                throw ReferenceError(fname, fmt::format("Variable '{}' was already defined", ast->id), "N/A", SourceLocation(0,0));
+                throw ReferenceError(fmt::format("Variable '{}' was already defined", ast->id), "N/A", SourceLocation(0,0));
             }
             else
             {
@@ -77,7 +83,7 @@ Type ASTValidator::validate(VariableAST* ast)
         case VarCtx::eStore:
         {
             if (!st.contains(ast->id))
-                throw ReferenceError(fname, fmt::format("Reference to unknown variable '{}'", ast->id), "N/A", SourceLocation(0,0));
+                throw ReferenceError(fmt::format("Reference to unknown variable '{}'", ast->id), "N/A", SourceLocation(0,0));
             // give AST node the type as it is unknown during syntax analysis
             // (parser) but known during semantic analysis (here)
             Type varType = st.lookup(ast->id);
@@ -108,16 +114,17 @@ Type ASTValidator::validate(FunctionAST* ast)
 {
     Type expectedType = ast->proto->accept(*this);
     // actual return type
-    Type actualType = ast->body->retStmt->accept(*this);
+    Type actualType = ast->body->accept(*this);
     if (actualType != expectedType)
-        throw TypeError(fname, fmt::format("returning '{}' but expected '{}'", typeValues[actualType], typeValues[expectedType]), "N/A", SourceLocation(0,0));
+        throw TypeError(fmt::format("returning '{}' but expected '{}'", typeValues[actualType], typeValues[expectedType]), "N/A", SourceLocation(0,0));
+    st.clear();
     return expectedType;
 }
 
 Type ASTValidator::validate(PrototypeAST* ast)
 {
     if (fst.contains(ast->name))
-        throw ReferenceError(fname, fmt::format("Function '{}' was already defined", ast->name), "N/A", SourceLocation(0,0));
+        throw ReferenceError(fmt::format("Function '{}' was already defined", ast->name), "N/A", SourceLocation(0,0));
     std::vector<Type> params;
     for (auto& param : ast->params)
     {
@@ -140,18 +147,18 @@ Type ASTValidator::validate(ReturnAST* ast)
 Type ASTValidator::validate(CallAST* ast)
 {
     if (!fst.contains(ast->id))
-        throw ReferenceError(fname, fmt::format("Reference to unknown function '{}'", ast->id), "N/A", SourceLocation(0,0));
+        throw ReferenceError(fmt::format("Reference to unknown function '{}'", ast->id), "N/A", SourceLocation(0,0));
     std::vector expectedTypes = fst.lookup(ast->id);
     // expectedTypes.size()-1 because last entry in vector is always return
     // type, others are params
     if (ast->params.size() != expectedTypes.size()-1)
-        throw TypeError(fname, fmt::format("{} expected {} arguments but received {}", ast->id, ast->params.size(), expectedTypes.size()), "N/A", SourceLocation(0,0));
+        throw TypeError(fmt::format("{} expected {} arguments but received {}", ast->id, ast->params.size(), expectedTypes.size()), "N/A", SourceLocation(0,0));
 
     for (int i = 0; i < ast->params.size(); i++)
     {
         Type pType = ast->params[i]->accept(*this);
         if (pType != expectedTypes[i])
-            throw TypeError(fname, fmt::format("No matching call to function {}", ast->id), "N/A", SourceLocation(0,0));
+            throw TypeError(fmt::format("No matching call to function {}", ast->id), "N/A", SourceLocation(0,0));
     }
     // return return type of function
     return expectedTypes[expectedTypes.size()-1];

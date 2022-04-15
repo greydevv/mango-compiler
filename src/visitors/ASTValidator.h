@@ -3,6 +3,7 @@
 
 #include <string>
 #include "../Types.h"
+#include "../ContextManager.h"
 #include "../SymbolTable.h"
 
 class ModuleAST;
@@ -22,7 +23,7 @@ class WhileAST;
 class ASTValidator
 {
     public:
-        ASTValidator(const std::string& fname, std::shared_ptr<ModuleAST> ast);
+        ASTValidator(const std::string& fname, std::shared_ptr<ModuleAST> ast, ContextManager& ctx);
         void validate();
         Type validate(ModuleAST* ast);
         Type validate(ExpressionAST* ast);
@@ -41,6 +42,7 @@ class ASTValidator
     private:
         const std::string fname;
         std::shared_ptr<ModuleAST> ast;
+        ContextManager& ctx;
         // regular symbol table
         SymbolTable<Type> st;
         // function symbol table

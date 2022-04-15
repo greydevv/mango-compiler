@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include "ASTCodegenner.h"
+#include "../ContextManager.h"
 #include "../io.h"
 #include "../Token.h"
 #include "../Exception.h"
@@ -35,11 +36,12 @@
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/Target/TargetOptions.h"
 
-ASTCodegenner::ASTCodegenner(const std::string& fname, std::shared_ptr<ModuleAST> ast) 
+ASTCodegenner::ASTCodegenner(const std::string& fname, std::shared_ptr<ModuleAST> ast, ContextManager& ctx) 
     : ast(ast),
-      ctx(std::make_unique<llvm::LLVMContext>()),
-      builder(std::make_unique<llvm::IRBuilder<>>(*ctx)),
-      mainModule(std::make_unique<llvm::Module>(fname, *ctx)) {}
+      ctx(ctx),
+      llvmCtx(std::make_unique<llvm::LLVMContext>()),
+      builder(std::make_unique<llvm::IRBuilder<>>(*llvmCtx)),
+      mainModule(std::make_unique<llvm::Module>(fname, *llvmCtx)) {}
 
 std::string ASTCodegenner::print()
 {
@@ -123,7 +125,7 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
             if (!var)
             {
                 std::string msg = fmt::format("unknown variable '{}' (it was probably used in a nested function when defined outside. this is a compiler bug)", varAst->id);
-                throw ReferenceError(mainModule->getSourceFileName(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
+                throw ReferenceError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
             }
             builder->CreateStore(rhs, var);
         }
@@ -174,17 +176,19 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
         default:
             {
                 // TODO: need to capture the operator's value
-                throw SyntaxError(mainModule->getSourceFileName(), "invalid binary operator", "LINE NOT IMPLEMENTED", SourceLocation(0,0));
+                throw SyntaxError("invalid binary operator", "LINE NOT IMPLEMENTED", SourceLocation(0,0));
             }
     }
 }
 
 llvm::Value* ASTCodegenner::codegen(ModuleAST* ast) 
 {
+    ctx.push(ast->modName);
     for (auto& child : ast->children)
     {
         child->accept(*this);
     }
+    ctx.pop();
     return nullptr;
 }
 
@@ -194,19 +198,19 @@ llvm::Value* ASTCodegenner::codegen(VariableAST* ast)
     if (!val)
     {
         std::string msg = fmt::format("unknown variable '{}' (it was probably used in a nested function when defined outside. this is a compiler bug)", ast->id);
-        throw ReferenceError(mainModule->getSourceFileName(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
+        throw ReferenceError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
     }
     return builder->CreateLoad(val->getAllocatedType(), val, ast->id);
 }
 
 llvm::Value* ASTCodegenner::codegen(NumberAST* ast) 
 {
-    return llvm::ConstantInt::get(*ctx, llvm::APInt(32, ast->val));
+    return llvm::ConstantInt::get(*llvmCtx, llvm::APInt(32, ast->val));
 }
 
 llvm::Value* ASTCodegenner::codegen(ArrayAST* ast)
 {
-    llvm::ArrayType* arrType = llvm::ArrayType::get(llvm::Type::getInt32Ty(*ctx), ast->elements.size());
+    llvm::ArrayType* arrType = llvm::ArrayType::get(llvm::Type::getInt32Ty(*llvmCtx), ast->elements.size());
     mainModule->getOrInsertGlobal("thearray", arrType);
     llvm::GlobalVariable* gArr = mainModule->getNamedGlobal("thearray");
     gArr->setLinkage(llvm::GlobalValue::LinkageTypes::CommonLinkage);
@@ -228,7 +232,7 @@ llvm::Function* ASTCodegenner::codegen(FunctionAST* ast)
             return nullptr;
         }
     }
-    llvm::BasicBlock* BB = llvm::BasicBlock::Create(*ctx, "entry", func);
+    llvm::BasicBlock* BB = llvm::BasicBlock::Create(*llvmCtx, "entry", func);
     builder->SetInsertPoint(BB);
 
     namedValues.clear();
@@ -285,7 +289,7 @@ llvm::Value* ASTCodegenner::codegen(ReturnAST* ast)
 {
     if (ast->hasExpr())
         return ast->expr->accept(*this);
-    // return llvm::UndefValue::get(llvm::Type::getVoidTy(*ctx));
+    // return llvm::UndefValue::get(llvm::Type::getVoidTy(*llvmCtx));
     return nullptr;
 }
 
@@ -295,13 +299,13 @@ llvm::Value* ASTCodegenner::codegen(CallAST* ast)
     if (!callee)
     {
         std::string msg = fmt::format("unknown function '{}'", ast->id);
-        throw ReferenceError(mainModule->getSourceFileName(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
+        throw ReferenceError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
     }
     if (callee->arg_size() != ast->params.size())
     {
         // TODO: make new error for this (Python uses TypeError)
         std::string msg = fmt::format("function received {} arguments but expected {} arguments", callee->arg_size(), ast->params.size());
-        throw SyntaxError(mainModule->getSourceFileName(), msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
+        throw SyntaxError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
     }
     std::vector<llvm::Value*> argValues;
     for (int i = 0; i < ast->params.size(); i++)
@@ -321,9 +325,9 @@ llvm::Value* ASTCodegenner::codegen(IfAST* ast)
 llvm::Value* ASTCodegenner::codegen(IfAST* ast, llvm::BasicBlock* parentMergeBlock)
 {
     llvm::Function* func = builder->GetInsertBlock()->getParent();
-    llvm::BasicBlock* trueBlock = llvm::BasicBlock::Create(*ctx, "if");
-    llvm::BasicBlock* falseBlock = llvm::BasicBlock::Create(*ctx, "else");
-    llvm::BasicBlock* localMergeBlock = llvm::BasicBlock::Create(*ctx, "merge");
+    llvm::BasicBlock* trueBlock = llvm::BasicBlock::Create(*llvmCtx, "if");
+    llvm::BasicBlock* falseBlock = llvm::BasicBlock::Create(*llvmCtx, "else");
+    llvm::BasicBlock* localMergeBlock = llvm::BasicBlock::Create(*llvmCtx, "merge");
     
     llvm::Value* cond = ast->expr->accept(*this);
     builder->CreateCondBr(cond, trueBlock, falseBlock);
@@ -391,9 +395,9 @@ llvm::Value* ASTCodegenner::codegen(ForAST* ast)
     // return nullptr;
     throw NotImplementedError("ForAST codegen");
     // llvm::Function* func = builder->GetInsertBlock()->getParent();
-    // llvm::BasicBlock* condBlock = llvm::BasicBlock::Create(*ctx, "cond");
-    // llvm::BasicBlock* forBlock = llvm::BasicBlock::Create(*ctx, "for");
-    // llvm::BasicBlock* mergeBlock = llvm::BasicBlock::Create(*ctx, "merge");
+    // llvm::BasicBlock* condBlock = llvm::BasicBlock::Create(*llvmCtx, "cond");
+    // llvm::BasicBlock* forBlock = llvm::BasicBlock::Create(*llvmCtx, "for");
+    // llvm::BasicBlock* mergeBlock = llvm::BasicBlock::Create(*llvmCtx, "merge");
     
     // insertFuncBlock(func, condBlock);
     // condBlock = builder->GetInsertBlock();
@@ -423,9 +427,9 @@ llvm::Value* ASTCodegenner::codegen(ForAST* ast)
 llvm::Value* ASTCodegenner::codegen(WhileAST* ast)
 {
     llvm::Function* func = builder->GetInsertBlock()->getParent();
-    llvm::BasicBlock* condBlock = llvm::BasicBlock::Create(*ctx, "cond");
-    llvm::BasicBlock* whileBlock = llvm::BasicBlock::Create(*ctx, "while");
-    llvm::BasicBlock* mergeBlock = llvm::BasicBlock::Create(*ctx, "merge");
+    llvm::BasicBlock* condBlock = llvm::BasicBlock::Create(*llvmCtx, "cond");
+    llvm::BasicBlock* whileBlock = llvm::BasicBlock::Create(*llvmCtx, "while");
+    llvm::BasicBlock* mergeBlock = llvm::BasicBlock::Create(*llvmCtx, "merge");
 
     builder->CreateBr(condBlock);
 
@@ -507,9 +511,9 @@ llvm::Type* ASTCodegenner::typeToLlvm(Type type)
     switch (type)
     {
         case Type::eInt:
-            return llvm::Type::getInt32Ty(*ctx);
+            return llvm::Type::getInt32Ty(*llvmCtx);
         case Type::eVoid:
-            return llvm::Type::getVoidTy(*ctx);
+            return llvm::Type::getVoidTy(*llvmCtx);
         default:
             std::cout << "ERROR - UNHANDLED CODEGEN TYPE '" << typeStrings[type] << "' STOP.\n";
             exit(1);

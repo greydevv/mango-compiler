@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include "Exception.h"
+#include "ContextManager.h"
 #include "compile.h"
 #include "checks.h"
 #include "io.h"
@@ -29,6 +30,8 @@ int main(int argc, char const *argv[])
             return 1;
         }
 
+        ContextManager ctx;
+
         try
         {
             std::ostringstream outs;
@@ -40,7 +43,7 @@ int main(int argc, char const *argv[])
             // using 'weakly_canonical' does not throw an error if the file is
             // not found
             std::filesystem::path absPath = std::filesystem::weakly_canonical(fname);
-            std::shared_ptr<ModuleAST> prog = compile(absPath, outs);
+            std::shared_ptr<ModuleAST> prog = compile(absPath, ctx, outs);
 
             if (args.debug)
             {
@@ -50,10 +53,9 @@ int main(int argc, char const *argv[])
         }
         catch (const BaseException& e)
         {
-            std::cout << e.what() << std::flush;
+            std::cout << e.getMsg(ctx) << std::flush;
             return 1;
         }
-
     }
 
     return 0;

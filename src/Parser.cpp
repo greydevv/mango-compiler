@@ -3,6 +3,7 @@
 #include <memory>
 #include <vector>
 #include "Parser.h"
+#include "ContextManager.h"
 #include "Token.h"
 #include "Operator.h"
 #include "Types.h"
@@ -25,8 +26,9 @@
 #include "ast/ForAST.h"
 #include "ast/WhileAST.h"
 
-Parser::Parser(const std::string& fname, const std::string& src)
+Parser::Parser(const std::string& fname, ContextManager& ctx, const std::string& src)
     : fname(fname), 
+      ctx(ctx),
       lexer(Lexer(src)), 
       tok(lexer.nextToken()) {}
 
@@ -192,12 +194,13 @@ std::unique_ptr<ModuleAST> Parser::parseIncludeStmt()
     std::string includeFname = getAbsoluteImport(fname, tok.value);
     eat(Token::TOK_STR);
     eat(Token::TOK_SCOLON);
-    std::unique_ptr<ModuleAST> incAST = getAstFromFile(includeFname);
+    std::unique_ptr<ModuleAST> incAST = getAstFromFile(includeFname, ctx);
     if (!incAST)
     {
         // need to add quotes back for correct underlining
-        throw FileNotFoundError(fname, includeFname, underlineTok(includeTok), includeTok.loc);
+        throw FileNotFoundError(includeFname, underlineTok(includeTok), includeTok.loc);
     }
+    ctx.pop();
     return incAST;
 }
 
@@ -349,7 +352,7 @@ std::unique_ptr<IfAST> Parser::parseIfStmt()
     eat(Token::TOK_KWD);
     eat(Token::TOK_OPAREN);
     if (tok.type == Token::TOK_CPAREN)
-        throw SyntaxError(fname, "expected expression", underlineTok(tok), tok.loc);
+        throw SyntaxError("expected expression", underlineTok(tok), tok.loc);
     std::unique_ptr<AST> expr = parseExpr();
     eat(Token::TOK_CPAREN);
     std::unique_ptr<CompoundAST> body = parseCompound();
@@ -487,12 +490,12 @@ std::unique_ptr<AST> Parser::parseTerm()
         case Token::TOK_SCOLON:
             {
                 // specific error message
-                throw SyntaxError(fname, "expected expression", underlineTok(tok), tok.loc);
+                throw SyntaxError("expected expression", underlineTok(tok), tok.loc);
             }
         default:
             {
                 std::string msg = fmt::format("'{}' is not a valid operand", tok.value);
-                throw SyntaxError(fname, msg, underlineTok(tok), tok.loc);
+                throw SyntaxError(msg, underlineTok(tok), tok.loc);
             }
     }
 }
@@ -509,7 +512,7 @@ std::unique_ptr<AST> Parser::parseSubExpr(std::unique_ptr<AST> L, int prec)
     {
         if (nextOp.getType() == Operator::OP_EQL)
         {
-            throw SyntaxError(fname, "expression is not assignable", underlineTok(tok), tok.loc);
+            throw SyntaxError("expression is not assignable", underlineTok(tok), tok.loc);
         }
         Operator currOp = nextOp;
         eat();
@@ -518,7 +521,7 @@ std::unique_ptr<AST> Parser::parseSubExpr(std::unique_ptr<AST> L, int prec)
         while ((nextOp > currOp) || ((currOp == nextOp) && (nextOp.getAssoc() == Operator::A_RIGHT)))
         {
             if (nextOp.getType() == Operator::OP_EQL)
-                throw SyntaxError(fname, "expression is not assignable", underlineTok(tok), tok.loc);
+                throw SyntaxError("expression is not assignable", underlineTok(tok), tok.loc);
             auto RHS = std::unique_ptr<AST>(R->clone());
             if (currOp.getAssoc() == Operator::A_RIGHT)
                 R = parseSubExpr(std::move(RHS), currOp.getPrec());
@@ -539,18 +542,28 @@ bool Parser::eat(Token::token_type expectedType)
     {
         setErrState(1);
         std::string msg;
-        switch (expectedType)
+        if (tok.type == Token::TOK_EOF)
         {
-            case Token::TOK_ID:
-                msg = "expected identifier";
-                break;
-            case Token::TOK_TYPE:
-                msg = fmt::format("expected type but got '{}' instead", tok.value);
-                break;
-            default:
-                msg = fmt::format("expected '{}' but got '{}' instead", tokenValues.at(expectedType), tok.value);
+            msg = fmt::format("expected '{}' but encountered end-of-file (EOF)", tokenValues.at(expectedType));
         }
-        throw SyntaxError(fname, msg, underlineTok(tok), tok.loc);
+        else
+        {
+            switch (expectedType)
+            {
+                case Token::TOK_EOF:
+                    break;
+                case Token::TOK_ID:
+                    msg = "expected identifier";
+                    break;
+                case Token::TOK_TYPE:
+                    msg = fmt::format("expected type but got '{}' instead", tok.value);
+                    break;
+                default:
+                    msg = fmt::format("expected '{}' but got '{}' instead", tokenValues.at(expectedType), tok.value);
+                    break;
+            }
+        }
+        throw SyntaxError(msg, underlineTok(tok), tok.loc);
     }
     getToken();
     return badToken;
@@ -568,7 +581,7 @@ void Parser::getToken()
     if (tok.type == Token::TOK_UND)
     {
         std::string msg = fmt::format("encountered unknown character '{}'", tok.value);
-        throw SyntaxError(fname, msg, underlineTok(tok), tok.loc);
+        throw SyntaxError(msg, underlineTok(tok), tok.loc);
     }
 }
 
@@ -585,7 +598,11 @@ void Parser::setErrState(int errState)
 std::string Parser::underlineTok(Token tok)
 {
     int len = tok.value.size();
-    if (tok.type == Token::TOK_STR)
+    if (tok.type == Token::TOK_EOF)
+        // set len to 1, real value is 'EOF' but we don't need to underline
+        // that
+        len = 1;
+    else if (tok.type == Token::TOK_STR)
         // because value of TOK_STR is stored w/o quotes, we need to add 2 to
         // include the quotes in the underline
         len+=2;
@@ -594,12 +611,13 @@ std::string Parser::underlineTok(Token tok)
     return underlineError(lexer.getLine(tok.loc.y), tok.loc.x, len);
 }
 
-std::unique_ptr<ModuleAST> getAstFromFile(const std::string& fname)
+std::unique_ptr<ModuleAST> getAstFromFile(const std::string& fname, ContextManager& ctx)
 {
     std::ifstream fs(fname);
     if (!fs.is_open())
         return nullptr;
+    ctx.push(fname);
     std::string src = readFile(fs);
-    Parser parser(fname, src);
+    Parser parser(fname, ctx, src);
     return parser.parse();
 }

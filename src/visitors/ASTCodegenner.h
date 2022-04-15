@@ -2,6 +2,7 @@
 #define CODEGEN_H
 
 #include <string>
+#include "../ContextManager.h"
 #include "../Types.h"
 #include "llvm/IR/Value.h"
 #include "llvm/IR/IRBuilder.h"
@@ -25,7 +26,7 @@ class WhileAST;
 class ASTCodegenner
 {
     public:
-        ASTCodegenner(const std::string& fname, std::shared_ptr<ModuleAST> ast);
+        ASTCodegenner(const std::string& fname, std::shared_ptr<ModuleAST> ast, ContextManager& ctx);
         std::string print();
         int emitObjectCode();
         llvm::Value* codegen();
@@ -51,7 +52,8 @@ class ASTCodegenner
         // void createRetOrBr(llvm::Value* retV, llvm::BasicBlock* block);
         llvm::Type* typeToLlvm(Type type);
         std::shared_ptr<ModuleAST> ast;
-        std::unique_ptr<llvm::LLVMContext> ctx;
+        ContextManager& ctx;
+        std::unique_ptr<llvm::LLVMContext> llvmCtx;
         std::unique_ptr<llvm::IRBuilder<>> builder;
         std::unique_ptr<llvm::Module> mainModule;
         std::map<std::string, llvm::AllocaInst*> namedValues;
