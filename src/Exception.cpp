@@ -27,8 +27,6 @@ const char* BaseException::what() const throw()
 BaseSourceException::BaseSourceException(const std::string& fname, const std::string& msg, const std::string& line, SourceLocation loc)
     : BaseException(msg), fname(fname), line(line), loc(loc) {}
 
-#include <iostream>
-
 std::string BaseSourceException::getFormattedMsg() const
 {
     // use relative path for shorter err location

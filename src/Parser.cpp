@@ -586,7 +586,7 @@ std::string Parser::underlineTok(Token tok)
 {
     int len = tok.value.size();
     if (tok.type == Token::TOK_STR)
-        // because value of TOK_STR is stored w/out quotes, we need to add 2 to
+        // because value of TOK_STR is stored w/o quotes, we need to add 2 to
         // include the quotes in the underline
         len+=2;
 
