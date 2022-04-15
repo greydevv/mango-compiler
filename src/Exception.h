@@ -3,13 +3,14 @@
 
 #include <exception>
 #include <string>
+#include "ContextManager.h"
 #include "Token.h"
 
 class BaseException : public std::exception
 {
     public:
         BaseException(const std::string& msg);
-        virtual std::string getFormattedMsg() const;
+        virtual std::string getMsg(const ContextManager& ctx) const;
         virtual std::string getExcName() const = 0;
         virtual const char* what() const throw();
     protected:
@@ -19,11 +20,11 @@ class BaseException : public std::exception
 class BaseSourceException : public BaseException
 {
     public:
-        BaseSourceException(const std::string& fname, const std::string& msg, const std::string& line, SourceLocation loc);
-        virtual std::string getFormattedMsg() const override;
+        BaseSourceException(const std::string& msg, const std::string& line, SourceLocation loc);
+        virtual std::string getMsg(const ContextManager& ctx) const override;
         virtual std::string getExcName() const override = 0;
     protected:
-        const std::string fname;
+        std::string fname;
         const std::string line;
         const SourceLocation loc;
 };
@@ -47,28 +48,28 @@ class NotImplementedError : public BaseException
 class FileNotFoundError : public BaseSourceException
 {
     public:
-        FileNotFoundError(const std::string& fname, const std::string& badFname, const std::string& line, SourceLocation loc);
+        FileNotFoundError(const std::string& badFname, const std::string& line, SourceLocation loc);
         virtual std::string getExcName() const override;
 };
 
 class SyntaxError : public BaseSourceException
 {
     public:
-        SyntaxError(const std::string& fname, const std::string& msg, const std::string& line, SourceLocation loc);
+        SyntaxError(const std::string& msg, const std::string& line, SourceLocation loc);
         virtual std::string getExcName() const override;
 };
 
 class ReferenceError : public BaseSourceException
 {
     public:
-        ReferenceError(const std::string& fname, const std::string& msg, const std::string& line, SourceLocation loc);
+        ReferenceError(const std::string& msg, const std::string& line, SourceLocation loc);
         virtual std::string getExcName() const override;
 };
 
 class TypeError : public BaseSourceException
 {
     public:
-        TypeError(const std::string& fname, const std::string& msg, const std::string& line, SourceLocation loc);
+        TypeError(const std::string& msg, const std::string& line, SourceLocation loc);
         virtual std::string getExcName() const override;
 };
 
