@@ -12,7 +12,7 @@ The compiler is still under development. Not everything listed in the [Language 
 - [Development Progress](#development-progress)
 
 ### Introduction
-This repository houses the compiler for Mango, a staticall-typed general purpose programming language.
+This repository houses the compiler for Mango, a statically-typed general purpose programming language.
 
 Mango is a programming language inspired by the likes of
 [Python](https://www.python.org/), [Swift](https://developer.apple.com/swift/),
