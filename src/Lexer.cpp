@@ -148,6 +148,8 @@ Token Lexer::lexString()
 Token Lexer::lexOther()
 {
     Token::token_type type = lexTokenType();
+    if (type == Token::TOK_EOF)
+        return Token(type, "EOF", SourceLocation(loc.x, loc.y));
     std::string value;
     if (type == Token::TOK_UND)
         value = c;
@@ -156,6 +158,7 @@ Token Lexer::lexOther()
     // have to subtract length to get correct start position
     SourceLocation tokLoc(loc.x-(value.size()-1), loc.y);
     Token tok = Token(type, value, tokLoc);
+    assert(tok.value.size() > 0);
     next();
     return tok;
 }
