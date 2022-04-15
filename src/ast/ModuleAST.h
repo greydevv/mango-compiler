@@ -12,7 +12,7 @@ class ModuleAST : public AST
 {
     public:
         std::vector<std::unique_ptr<AST>> children;
-        std::string modName;
+        const std::string modName;
 
         ModuleAST(const std::string& modName);
         ModuleAST(const ModuleAST& other);
