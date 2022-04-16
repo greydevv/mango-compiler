@@ -166,7 +166,23 @@ Type ASTValidator::validate(CallAST* ast)
 
 Type ASTValidator::validate(IfAST* ast)
 {
-    throw NotImplementedError("Validation of IfAST");
+    if (ast->expr)
+    {
+        Type exprType = ast->expr->accept(*this);
+        switch (exprType)
+        {
+            case Type::eInt:
+                throw TypeError(fmt::format("Cannot convert {} to bool", typeValues[exprType]), "N/A", SourceLocation(0,0));
+            case Type::eBool:
+                break;
+            default:
+                throw TypeError(fmt::format("Cannot convert {} to bool", typeValues[exprType]), "N/A", SourceLocation(0,0));
+        }
+    }
+    if (ast->body)
+        return ast->body->accept(*this);
+    else
+        return Type::eNot;
 }
 
 Type ASTValidator::validate(ForAST* ast)
