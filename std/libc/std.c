@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-void print(int i)
+void print(int n)
 {
-    printf("%d\n", i);
+    printf("%d\n", n);
 }
