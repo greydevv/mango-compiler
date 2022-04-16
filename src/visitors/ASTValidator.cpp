@@ -172,7 +172,6 @@ Type ASTValidator::validate(IfAST* ast)
         switch (exprType)
         {
             case Type::eInt:
-                throw TypeError(fmt::format("Cannot convert {} to bool", typeValues[exprType]), "N/A", SourceLocation(0,0));
             case Type::eBool:
                 break;
             default:
