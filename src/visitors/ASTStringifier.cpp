@@ -249,7 +249,6 @@ std::string ASTStringifier::toString(IfAST* ast, int tabs)
 {
 
     std::ostringstream s;
-    std::cout << "ATTEMPT TO STRINGIFY IFAST\n";
     if (simpleExpr)
     {
         if (ast->expr)
@@ -282,7 +281,6 @@ std::string ASTStringifier::toString(IfAST* ast, int tabs)
             s << indent("Other:\n", tabs+1) << indent(ast->other->accept(*this, tabs+2), tabs+2);
         }
     }
-    std::cout << "DONE STRINGIFYING IFAST\n";
     return s.str();
 }
 
