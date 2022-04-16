@@ -124,7 +124,7 @@ Type ASTValidator::validate(FunctionAST* ast)
 Type ASTValidator::validate(PrototypeAST* ast)
 {
     if (fst.contains(ast->name))
-        throw ReferenceError(fmt::format("Function '{}' was already defined", ast->name), "N/A", SourceLocation(0,0));
+        throw ReferenceError(fmt::format("function '{}' was already defined", ast->name), "N/A", SourceLocation(0,0));
     std::vector<Type> params;
     for (auto& param : ast->params)
     {
@@ -147,18 +147,18 @@ Type ASTValidator::validate(ReturnAST* ast)
 Type ASTValidator::validate(CallAST* ast)
 {
     if (!fst.contains(ast->id))
-        throw ReferenceError(fmt::format("Reference to unknown function '{}'", ast->id), "N/A", SourceLocation(0,0));
+        throw ReferenceError(fmt::format("reference to unknown function '{}'", ast->id), "N/A", SourceLocation(0,0));
     std::vector expectedTypes = fst.lookup(ast->id);
     // expectedTypes.size()-1 because last entry in vector is always return
     // type, others are params
     if (ast->params.size() != expectedTypes.size()-1)
-        throw TypeError(fmt::format("{} expected {} arguments but received {}", ast->id, ast->params.size(), expectedTypes.size()), "N/A", SourceLocation(0,0));
+        throw TypeError(fmt::format("function '{}' expected {} arguments but received {}", ast->id, expectedTypes.size()-1, ast->params.size()), "N/A", SourceLocation(0,0));
 
     for (int i = 0; i < ast->params.size(); i++)
     {
         Type pType = ast->params[i]->accept(*this);
         if (pType != expectedTypes[i])
-            throw TypeError(fmt::format("No matching call to function {}", ast->id), "N/A", SourceLocation(0,0));
+            throw TypeError(fmt::format("no matching call to function {}", ast->id), "N/A", SourceLocation(0,0));
     }
     // return return type of function
     return expectedTypes[expectedTypes.size()-1];
