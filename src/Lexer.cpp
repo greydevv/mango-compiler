@@ -72,11 +72,13 @@ Token Lexer::nextToken()
     {
         // remove whitespace
         skipWhitespace();
+        return nextToken();
     }
     if (c == '/' && peek() == '/')
     {
         // remove comments
         skipComment();
+        return nextToken();
     }
     if (isalpha(c) || c == '_')
     {
@@ -311,8 +313,10 @@ void Lexer::skipWhitespace()
 
 void Lexer::skipComment()
 {
+    std::string com = "";
     while (c != '\n' && c != '\0')
     {
+        com += c;
         next();
     }
     loc.y++;
