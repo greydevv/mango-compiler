@@ -51,7 +51,7 @@ Type ASTValidator::validate(ExpressionAST* ast)
     if (lType != rType)
     {
         if (ast->op == Operator::OP_EQL)
-            throw TypeError(fmt::format("Cannot initialize {} with a value of {}", typeValues[lType], typeValues[rType]), "N/A", SourceLocation(0,0));
+            throw TypeError(fmt::format("cannot initialize {} with a value of {}", typeValues[lType], typeValues[rType]), "N/A", SourceLocation(0,0));
         else
             throw TypeError(fmt::format("{} and {} are not compatible in binary expression", typeValues[lType], typeValues[rType]), "N/A", SourceLocation(0,0));
     }
@@ -66,7 +66,7 @@ Type ASTValidator::validate(VariableAST* ast)
         {
             if (st.contains(ast->id))
             {
-                throw ReferenceError(fmt::format("Variable '{}' was already defined", ast->id), "N/A", SourceLocation(0,0));
+                throw ReferenceError(fmt::format("variable '{}' was already defined", ast->id), "N/A", SourceLocation(0,0));
             }
             else
             {
@@ -83,7 +83,7 @@ Type ASTValidator::validate(VariableAST* ast)
         case VarCtx::eStore:
         {
             if (!st.contains(ast->id))
-                throw ReferenceError(fmt::format("Reference to unknown variable '{}'", ast->id), "N/A", SourceLocation(0,0));
+                throw ReferenceError(fmt::format("reference to unknown variable '{}'", ast->id), "N/A", SourceLocation(0,0));
             // give AST node the type as it is unknown during syntax analysis
             // (parser) but known during semantic analysis (here)
             Type varType = st.lookup(ast->id);
@@ -116,7 +116,7 @@ Type ASTValidator::validate(FunctionAST* ast)
     // actual return type
     Type actualType = ast->body->accept(*this);
     if (actualType != expectedType)
-        throw TypeError(fmt::format("returning '{}' but expected '{}'", typeValues[actualType], typeValues[expectedType]), "N/A", SourceLocation(0,0));
+        throw TypeError(fmt::format("returning {} but expected {}", typeValues[actualType], typeValues[expectedType]), "N/A", SourceLocation(0,0));
     st.clear();
     return expectedType;
 }
@@ -175,7 +175,7 @@ Type ASTValidator::validate(IfAST* ast)
             case Type::eBool:
                 break;
             default:
-                throw TypeError(fmt::format("Cannot convert {} to bool", typeValues[exprType]), "N/A", SourceLocation(0,0));
+                throw TypeError(fmt::format("cannot convert {} to bool", typeValues[exprType]), "N/A", SourceLocation(0,0));
         }
     }
     if (ast->body)
