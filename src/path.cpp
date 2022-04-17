@@ -1,5 +1,9 @@
-#include <filesystem>
 #include "path.h"
+
+FilePath::FilePath(fs::path original)
+    : abspath(fs::weakly_canonical(original)),
+      relpath(fs::relative(abspath, fs::current_path())),
+      fname(abspath.filename()) {}
 
 fs::path getAbsoluteImport(fs::path currentFile, fs::path importFile)
 {
