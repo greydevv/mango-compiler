@@ -29,17 +29,25 @@ std::string underlineError(const std::string& line, int xPos, int len)
     return s.str();
 }
 
+std::string underlineError(const std::string& fname, SourceLocation loc)
+{
+    // only use this method if the file is known to exist
+    std::ifstream fs(fname);
+    std::string src = readFile(fs);
+    return "THIS IS A LINE";
+}
+
 CompileArgs parseArgs(std::vector<std::string> argv)
 {
     CompileArgs args;
-    for (auto arg : argv)
+    for (auto arge : argv)
     {
-        if (arg == "-debug")
+        if (arge == "-debug")
             args.debug = true;
-        else if (arg == "-emit")
+        else if (arge == "-emit")
             args.emit = true;
-        else
-            args.fnames.push_back(arg);
+        else if (arge[0] != '-')
+            args.paths.push_back(FilePath(arge));
     }
     return args;
 }

@@ -3,6 +3,7 @@
 
 #include <string>
 #include "AST.h"
+#include "../Token.h"
 #include "../Types.h"
 #include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
@@ -21,10 +22,11 @@ class VariableAST : public AST
         std::string id;
         Type type;
         VarCtx ctx;
+        SourceLocation loc;
 
-        VariableAST(const std::string& id, Type type, VarCtx ctx);
-        VariableAST(const std::string& id, VarCtx ctx);
-        VariableAST(const std::string& id);
+        VariableAST(const std::string& id, Type type, VarCtx ctx, SourceLocation loc);
+        VariableAST(const std::string& id, VarCtx ctx, SourceLocation loc);
+        VariableAST(const std::string& id, SourceLocation loc);
         VariableAST(const VariableAST& other);
         virtual Type accept(ASTValidator& vd) override;
         virtual llvm::Value* accept(ASTCodegenner& cg) override;

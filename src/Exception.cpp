@@ -6,6 +6,7 @@
 #include "fmt/color.h"
 #include "path.h"
 #include "io.h"
+#include "Lexer.h"
 
 BaseException::BaseException(const std::string& msg)
     : msg(msg) {}
@@ -29,15 +30,26 @@ const char* BaseException::what() const throw()
 BaseSourceException::BaseSourceException(const std::string& msg, const std::string& line, SourceLocation loc)
     : BaseException(msg), line(line), loc(loc) {}
 
+BaseSourceException::BaseSourceException(const std::string& msg, SourceLocation loc)
+    : BaseException(msg), line(""), loc(loc) {}
+
 std::string BaseSourceException::getMsg(const ContextManager& ctx) const
 {
     // use relative path for shorter/readable error message
+    std::string tmpLine = line;
+    if (line.empty())
+    {
+        std::ifstream fs(ctx.peek());
+        std::string src = readFile(fs);
+        Lexer lexer(src);
+        tmpLine = underlineError(lexer.getLine(loc.y), loc.x, 1);
+    }
     std::string relPath = fs::relative(ctx.peek());
     std::ostringstream s;
     s << fmt::format(fmt::emphasis::bold, "{}:{}:{}: ", relPath, loc.y, loc.x);
     s << fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::orange_red), getExcName());
     s << fmt::format(fmt::emphasis::bold, ": {}\n", msg);
-    s << line << '\n';
+    s << tmpLine << '\n';
     return s.str();
 }
 
@@ -63,6 +75,9 @@ std::string SyntaxError::getExcName() const {return "SyntaxError";}
 
 ReferenceError::ReferenceError(const std::string& msg, const std::string& line, SourceLocation loc)
     : BaseSourceException(msg, line, loc) {}
+
+ReferenceError::ReferenceError(const std::string& msg, SourceLocation loc)
+    : BaseSourceException(msg, loc) {}
 
 std::string ReferenceError::getExcName() const {return "ReferenceError";}
 

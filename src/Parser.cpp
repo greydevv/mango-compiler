@@ -82,7 +82,7 @@ std::unique_ptr<ExpressionAST> Parser::parseVarDef()
     //     throw ReferenceError(fname, fmt::format("variable '{}' already defined", id), underlineTok(tok), tok.loc);
     // else
     //     st.insert(id, allocType);
-    auto allocVar = std::make_unique<VariableAST>(tok.value, allocType, VarCtx::eAlloc);
+    auto allocVar = std::make_unique<VariableAST>(tok.value, allocType, VarCtx::eAlloc, tok.loc);
     eat(Token::TOK_ID);
     return createVarAssignExpr(std::move(allocVar));
 }
@@ -92,7 +92,7 @@ std::unique_ptr<ExpressionAST> Parser::parseVarStore()
     std::string id = tok.value;
     // if (!st.contains(id))
     //     throw ReferenceError(fname, fmt::format("unknown variable name '{}'", id), underlineTok(tok), tok.loc);
-    auto storeVar = std::make_unique<VariableAST>(id, VarCtx::eStore);
+    auto storeVar = std::make_unique<VariableAST>(id, VarCtx::eStore, tok.loc);
     eat(Token::TOK_ID);
     return createVarAssignExpr(std::move(storeVar));
 }
@@ -251,7 +251,7 @@ std::vector<std::unique_ptr<VariableAST>> Parser::parseFuncParams()
             Type paramType = typeFromString(tok.value);
             eat(Token::TOK_TYPE);
             // st.insert(tok.value, paramType);
-            auto param = std::make_unique<VariableAST>(tok.value, paramType, VarCtx::eParam);
+            auto param = std::make_unique<VariableAST>(tok.value, paramType, VarCtx::eParam, tok.loc);
             params.push_back(std::move(param));
             eat(Token::TOK_ID);
             if (tok == Token::TOK_COMMA)
@@ -379,11 +379,11 @@ std::unique_ptr<ForAST> Parser::parseForStmt()
     {
         Type varType = tok.toType();
         eat(Token::TOK_TYPE);
-        var = std::make_unique<VariableAST>(tok.value, varType, VarCtx::eAlloc);
+        var = std::make_unique<VariableAST>(tok.value, varType, VarCtx::eAlloc, tok.loc);
     }
     else
     {
-        var = std::make_unique<VariableAST>(tok.value);
+        var = std::make_unique<VariableAST>(tok.value, tok.loc);
     }
     eat(Token::TOK_ID);
     eat(Token::TOK_KWD);
@@ -466,7 +466,7 @@ std::unique_ptr<AST> Parser::parseIdTerm()
     }
     // if (!st.contains(id))
     //     throw ReferenceError(fname, fmt::format("unknown variable name '{}'", id), underlineTok(tmpIdTok), tmpIdTok.loc);
-    auto varAST = std::make_unique<VariableAST>(tmpIdTok.value);
+    auto varAST = std::make_unique<VariableAST>(tmpIdTok.value, tmpIdTok.loc);
     return varAST;
 }
 

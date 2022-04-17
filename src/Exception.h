@@ -21,6 +21,7 @@ class BaseSourceException : public BaseException
 {
     public:
         BaseSourceException(const std::string& msg, const std::string& line, SourceLocation loc);
+        BaseSourceException(const std::string& msg, SourceLocation loc);
         virtual std::string getMsg(const ContextManager& ctx) const override;
         virtual std::string getExcName() const override = 0;
     protected:
@@ -63,6 +64,7 @@ class ReferenceError : public BaseSourceException
 {
     public:
         ReferenceError(const std::string& msg, const std::string& line, SourceLocation loc);
+        ReferenceError(const std::string& msg, SourceLocation loc);
         virtual std::string getExcName() const override;
 };
 
