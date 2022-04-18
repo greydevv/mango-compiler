@@ -334,6 +334,8 @@ std::unique_ptr<CompoundAST> Parser::parseCompound()
 
     }
     eat(Token::TOK_CBRACK);
+    if (tok.type == Token::TOK_SCOLON)
+        eat(Token::TOK_SCOLON);
     return compound;
 }
 
