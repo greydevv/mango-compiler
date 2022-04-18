@@ -19,3 +19,8 @@ FilePath FilePath::asImport(const FilePath& currFp, const std::string& importStr
     fs::path currPath = fs::path(currFp.abspath).parent_path() / fs::path(importStr);
     return FilePath(cwd / currPath);
 }
+
+bool FilePath::exists() const
+{
+    return fs::exists(abspath);
+}
