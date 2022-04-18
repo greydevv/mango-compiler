@@ -8,7 +8,7 @@ int ContextManager::getStackSize() const
     return incStack.size();
 }
 
-FilePath ContextManager::peek() const
+const FilePath& ContextManager::peek() const
 {
     return incStack[incStack.size()-1];
 }

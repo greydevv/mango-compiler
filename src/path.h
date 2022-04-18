@@ -13,7 +13,7 @@ struct FilePath
 
     FilePath(fs::path original);
 
-    static FilePath asImport(FilePath currFp, const std::string& importStr);
+    static FilePath asImport(const FilePath& currFp, const std::string& importStr);
 };
 
 #endif

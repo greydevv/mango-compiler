@@ -9,11 +9,12 @@ class ContextManager
     public:
         ContextManager();
         int getStackSize() const;
-        FilePath peek() const;
+        const FilePath& peek() const;
         void push(FilePath fp);
         FilePath pop();
         void clear();
     private:
+        // std::ifstream& is;
         // stack of file names (how deep are we in include tree)
         std::vector<FilePath> incStack;
 };

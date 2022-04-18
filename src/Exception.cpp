@@ -33,21 +33,23 @@ BaseSourceException::BaseSourceException(const std::string& msg, const std::stri
 BaseSourceException::BaseSourceException(const std::string& msg, SourceLocation loc)
     : BaseException(msg), line(""), loc(loc) {}
 
+#include <iostream>
+
 std::string BaseSourceException::getMsg(const ContextManager& ctx) const
 {
     // use relative path for shorter/readable error message
     std::string tmpLine = line;
     // FilePath object of file that contained the error
-    FilePath excFp = ctx.peek();
+    const FilePath& fp = ctx.peek();
     if (line.empty())
     {
-        std::ifstream fs(excFp.abspath);
+        std::ifstream fs(fp.abspath);
         std::string src = readFile(fs);
         Lexer lexer(src);
         tmpLine = underlineError(lexer.getLine(loc.y), loc.x, 1);
     }
     std::ostringstream s;
-    s << fmt::format(fmt::emphasis::bold, "{}:{}:{}: ", excFp.relpath, loc.y, loc.x);
+    s << fmt::format(fmt::emphasis::bold, "{}:{}:{}: ", fp.relpath, loc.y, loc.x);
     s << fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::orange_red), getExcName());
     s << fmt::format(fmt::emphasis::bold, ": {}\n", msg);
     s << tmpLine << '\n';

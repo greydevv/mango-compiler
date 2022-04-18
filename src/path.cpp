@@ -12,7 +12,7 @@ FilePath::FilePath(fs::path original)
       relpath(fs::relative(abspath, fs::current_path())),
       fname(original.filename()) {}
 
-FilePath FilePath::asImport(FilePath currFp, const std::string& importStr)
+FilePath FilePath::asImport(const FilePath& currFp, const std::string& importStr)
 {
     // get cwd (directory from which the compile command was invoked from)
     fs::path cwd = fs::current_path();
