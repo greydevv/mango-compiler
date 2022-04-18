@@ -5,8 +5,8 @@
 #include "Token.h"
 #include "Lexer.h"
 
-Lexer::Lexer(const FilePath& fp, const std::string& src)
-    : is(fp.abspath), src(src), pos(0), c('\0'), loc({1,1})
+Lexer::Lexer(const FilePath& fp)
+    : is(fp.abspath), pos(0), c('\0'), loc({1,1})
 {
     is.get(c);
     // std::cout << "========== START DEBUG READ ==========\n";
@@ -271,7 +271,6 @@ void Lexer::next()
 {
     pos++;
     loc.x++;
-    // c = src[pos];
     is.get(c);
 }
 

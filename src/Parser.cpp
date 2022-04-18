@@ -26,10 +26,10 @@
 #include "ast/ForAST.h"
 #include "ast/WhileAST.h"
 
-Parser::Parser(FilePath fp, ContextManager& ctx, const std::string& src)
+Parser::Parser(FilePath fp, ContextManager& ctx)
     : fp(fp), 
       ctx(ctx),
-      lexer(Lexer(fp, src)), 
+      lexer(Lexer(fp)), 
       tok(lexer.nextToken()) 
 {
     ctx.push(fp);
@@ -620,10 +620,8 @@ std::string Parser::underlineTok(Token tok)
 
 std::unique_ptr<ModuleAST> getAstFromFile(const FilePath& fp, ContextManager& ctx)
 {
-    std::ifstream fs(fp.abspath);
-    if (!fs.is_open())
+    if (!fp.exists())
         return nullptr;
-    std::string src = readFile(fs);
-    Parser parser(fp, ctx, src);
+    Parser parser(fp, ctx);
     return parser.parse();
 }

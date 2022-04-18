@@ -43,9 +43,7 @@ std::string BaseSourceException::getMsg(const ContextManager& ctx) const
     const FilePath& fp = ctx.peek();
     if (line.empty())
     {
-        std::ifstream fs(fp.abspath);
-        std::string src = readFile(fs);
-        Lexer lexer(fp, src);
+        Lexer lexer(fp);
         tmpLine = underlineError(lexer.getLine(loc.y), loc.x, 1);
     }
     std::ostringstream s;

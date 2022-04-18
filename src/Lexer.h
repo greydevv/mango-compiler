@@ -7,7 +7,7 @@
 class Lexer
 {
     public:
-        Lexer(const FilePath& fp, const std::string& src);
+        Lexer(const FilePath& fp);
         void debugRead(bool pretty = false);
         Token peekToken();
         Token nextToken();
@@ -15,7 +15,6 @@ class Lexer
 
     private:
         std::ifstream is;
-        const std::string src;
         int pos;
         char c;
         SourceLocation loc;

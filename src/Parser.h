@@ -20,7 +20,7 @@
 class Parser
 {
     public:
-        Parser(FilePath fp, ContextManager& ctx, const std::string& src);
+        Parser(FilePath fp, ContextManager& ctx);
         std::unique_ptr<ModuleAST> parse();
         int getErrState();
         
