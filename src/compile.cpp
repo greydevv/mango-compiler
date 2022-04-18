@@ -23,10 +23,10 @@ std::shared_ptr<ModuleAST> compile(const FilePath& fp, ContextManager& ctx, std:
     {
         ASTValidator vd(ast, ctx);
         vd.validate();
-        // ASTCodegenner cg(ast, ctx);
-        // cg.codegen();
-        // cg.emitObjectCode();
-        // outs << cg.print();
+        ASTCodegenner cg(ast, ctx);
+        cg.codegen();
+        cg.emitObjectCode();
+        outs << cg.print();
     }
     return ast;
 }
