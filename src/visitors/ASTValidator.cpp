@@ -21,8 +21,8 @@
 #include "../ast/WhileAST.h"
 #include "../Exception.h"
 
-ASTValidator::ASTValidator(const std::string& fname, std::shared_ptr<ModuleAST> ast, ContextManager& ctx)
-    : fname(fname), ast(ast), ctx(ctx), st(Type::eNot), fst({}) 
+ASTValidator::ASTValidator(std::shared_ptr<ModuleAST> ast, ContextManager& ctx)
+    : ast(ast), ctx(ctx), st(Type::eNot), fst({}) 
 {
     ctx.clear();
 }
@@ -34,7 +34,7 @@ void ASTValidator::validate()
 
 Type ASTValidator::validate(ModuleAST* ast)
 {
-    ctx.push(ast->modName);
+    ctx.push(ast->fp);
     for (auto& child : ast->children)
     {
         child->accept(*this);
@@ -83,7 +83,9 @@ Type ASTValidator::validate(VariableAST* ast)
         case VarCtx::eStore:
         {
             if (!st.contains(ast->id))
+            {
                 throw ReferenceError(fmt::format("reference to unknown variable '{}'", ast->id), ast->loc);
+            }
             // give AST node the type as it is unknown during syntax analysis
             // (parser) but known during semantic analysis (here)
             Type varType = st.lookup(ast->id);
@@ -147,7 +149,9 @@ Type ASTValidator::validate(ReturnAST* ast)
 Type ASTValidator::validate(CallAST* ast)
 {
     if (!fst.contains(ast->id))
+    {
         throw ReferenceError(fmt::format("reference to unknown function '{}'", ast->id), "N/A", SourceLocation(0,0));
+    }
     std::vector expectedTypes = fst.lookup(ast->id);
     // expectedTypes.size()-1 because last entry in vector is always return
     // type, others are params

@@ -1,16 +1,17 @@
 #include <iostream>
 #include <memory>
 #include "ModuleAST.h"
+#include "../path.h"
 #include "../io.h"
 #include "../visitors/ASTValidator.h"
 #include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
-ModuleAST::ModuleAST(const std::string& modName)
-    : modName(modName) {}
+ModuleAST::ModuleAST(FilePath fp)
+    : fp(fp) {}
 
 ModuleAST::ModuleAST(const ModuleAST& other)
-    : modName(other.modName)
+    : fp(other.fp)
 {
     for (auto& child : other.children)
     {

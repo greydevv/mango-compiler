@@ -1,5 +1,5 @@
-#include <string>
 #include "ContextManager.h"
+#include "path.h"
 
 ContextManager::ContextManager() {}
 
@@ -8,21 +8,21 @@ int ContextManager::getStackSize() const
     return incStack.size();
 }
 
-std::string ContextManager::peek() const
+FilePath ContextManager::peek() const
 {
     return incStack[incStack.size()-1];
 }
 
-void ContextManager::push(const std::string& fname)
+void ContextManager::push(FilePath fp)
 {
-    incStack.push_back(fname);
+    incStack.push_back(fp);
 }
 
-std::string ContextManager::pop()
+FilePath ContextManager::pop()
 {
-    std::string fname = std::move(incStack.back());
+    FilePath fp = std::move(incStack.back());
     incStack.pop_back();
-    return fname;
+    return fp;
 }
 
 void ContextManager::clear()

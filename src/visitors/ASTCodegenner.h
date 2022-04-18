@@ -26,7 +26,7 @@ class WhileAST;
 class ASTCodegenner
 {
     public:
-        ASTCodegenner(const std::string& fname, std::shared_ptr<ModuleAST> ast, ContextManager& ctx);
+        ASTCodegenner(std::shared_ptr<ModuleAST> ast, ContextManager& ctx);
         std::string print();
         int emitObjectCode();
         llvm::Value* codegen();

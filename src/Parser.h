@@ -20,12 +20,12 @@
 class Parser
 {
     public:
-        Parser(const std::string& fname, ContextManager& ctx, const std::string& src);
+        Parser(FilePath fp, ContextManager& ctx, const std::string& src);
         std::unique_ptr<ModuleAST> parse();
         int getErrState();
         
     private:
-        const std::string fname;
+        const FilePath fp;
         ContextManager& ctx;
         Lexer lexer;
         Token tok;
@@ -64,6 +64,6 @@ class Parser
         std::string underlineTok(Token tok);
 };
 
-std::unique_ptr<ModuleAST> getAstFromFile(const std::string& fname, ContextManager& ctx);
+std::unique_ptr<ModuleAST> getAstFromFile(const FilePath& fp, ContextManager& ctx);
 
 #endif

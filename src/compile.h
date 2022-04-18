@@ -5,7 +5,6 @@
 #include "ContextManager.h"
 #include "io.h"
 
-std::shared_ptr<ModuleAST> compile(const std::string& fname, ContextManager& ctx, std::ostringstream& outs);
-std::unique_ptr<ModuleAST> getAstFromFile(const std::string& fname);
+std::shared_ptr<ModuleAST> compile(const FilePath& fp, ContextManager& ctx, std::ostringstream& outs);
 
 #endif

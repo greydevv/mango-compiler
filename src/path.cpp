@@ -1,15 +1,21 @@
 #include "path.h"
 
+// the 'canonical' methods resolve things like '../' and './' in
+// the given paths
+// for example, a/b/c/../d is resolved to the literal a/b/d
+//
+// using 'weakly_canonical' does not throw an error if the file is
+// not found
+// std::filesystem::path absPath = std::filesystem::weakly_canonical(fname);
 FilePath::FilePath(fs::path original)
     : abspath(fs::weakly_canonical(original)),
       relpath(fs::relative(abspath, fs::current_path())),
-      fname(abspath.filename()) {}
+      fname(original.filename()) {}
 
-fs::path getAbsoluteImport(fs::path currentFile, fs::path importFile)
+FilePath FilePath::asImport(FilePath currFp, const std::string& importStr)
 {
-    // Creates an absolute import path based off of currentFile
-    // This is meant to create absolute paths from relative import definitions
+    // get cwd (directory from which the compile command was invoked from)
     fs::path cwd = fs::current_path();
-    fs::path currPath = currentFile.parent_path() / importFile;
-    return cwd / currPath;
+    fs::path currPath = fs::path(currFp.abspath).parent_path() / fs::path(importStr);
+    return FilePath(cwd / currPath);
 }

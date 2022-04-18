@@ -37,16 +37,17 @@ std::string BaseSourceException::getMsg(const ContextManager& ctx) const
 {
     // use relative path for shorter/readable error message
     std::string tmpLine = line;
+    // FilePath object of file that contained the error
+    FilePath excFp = ctx.peek();
     if (line.empty())
     {
-        std::ifstream fs(ctx.peek());
+        std::ifstream fs(excFp.abspath);
         std::string src = readFile(fs);
         Lexer lexer(src);
         tmpLine = underlineError(lexer.getLine(loc.y), loc.x, 1);
     }
-    std::string relPath = fs::relative(ctx.peek());
     std::ostringstream s;
-    s << fmt::format(fmt::emphasis::bold, "{}:{}:{}: ", relPath, loc.y, loc.x);
+    s << fmt::format(fmt::emphasis::bold, "{}:{}:{}: ", excFp.relpath, loc.y, loc.x);
     s << fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::orange_red), getExcName());
     s << fmt::format(fmt::emphasis::bold, ": {}\n", msg);
     s << tmpLine << '\n';
@@ -63,8 +64,8 @@ NotImplementedError::NotImplementedError(const std::string& msg)
 
 std::string NotImplementedError::getExcName() const {return "NotImplementedError";}
 
-FileNotFoundError::FileNotFoundError(const std::string& badFname, const std::string& line, SourceLocation loc)
-    : BaseSourceException(badFname, line, loc) {}
+FileNotFoundError::FileNotFoundError(const FilePath& badFp, const std::string& line, SourceLocation loc)
+    : BaseSourceException(badFp.relpath, line, loc) {}
 
 std::string FileNotFoundError::getExcName() const {return "FileNotFoundError";}
 

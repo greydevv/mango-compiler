@@ -24,7 +24,7 @@ ASTStringifier::ASTStringifier(bool simpleExpr)
 std::string ASTStringifier::toString(ModuleAST* ast, int tabs) 
 {
     std::ostringstream s;
-    s << "ModuleAST(" << ast->modName << "):\n";
+    s << "ModuleAST(" << ast->fp.abspath << "):\n";
     for (int i = 0; i < ast->children.size(); i++)
     {
         // ModuleAST is always top level, only need to indent once

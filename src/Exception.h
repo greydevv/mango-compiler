@@ -49,7 +49,7 @@ class NotImplementedError : public BaseException
 class FileNotFoundError : public BaseSourceException
 {
     public:
-        FileNotFoundError(const std::string& badFname, const std::string& line, SourceLocation loc);
+        FileNotFoundError(const FilePath& badFp, const std::string& line, SourceLocation loc);
         virtual std::string getExcName() const override;
 };
 

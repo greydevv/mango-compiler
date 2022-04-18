@@ -26,15 +26,18 @@
 #include "ast/ForAST.h"
 #include "ast/WhileAST.h"
 
-Parser::Parser(const std::string& fname, ContextManager& ctx, const std::string& src)
-    : fname(fname), 
+Parser::Parser(FilePath fp, ContextManager& ctx, const std::string& src)
+    : fp(fp), 
       ctx(ctx),
       lexer(Lexer(src)), 
-      tok(lexer.nextToken()) {}
+      tok(lexer.nextToken()) 
+{
+    ctx.push(fp);
+}
 
 std::unique_ptr<ModuleAST> Parser::parse()
 {
-    auto modAST = std::make_unique<ModuleAST>(fname);
+    auto modAST = std::make_unique<ModuleAST>(fp);
     while (tok.type != Token::TOK_EOF)
     {
         modAST->addChild(parsePrimary());
@@ -79,7 +82,7 @@ std::unique_ptr<ExpressionAST> Parser::parseVarDef()
 
     std::string id = tok.value;
     // if (st.contains(id))
-    //     throw ReferenceError(fname, fmt::format("variable '{}' already defined", id), underlineTok(tok), tok.loc);
+    //     throw ReferenceError(fp, fmt::format("variable '{}' already defined", id), underlineTok(tok), tok.loc);
     // else
     //     st.insert(id, allocType);
     auto allocVar = std::make_unique<VariableAST>(tok.value, allocType, VarCtx::eAlloc, tok.loc);
@@ -91,7 +94,7 @@ std::unique_ptr<ExpressionAST> Parser::parseVarStore()
 {
     std::string id = tok.value;
     // if (!st.contains(id))
-    //     throw ReferenceError(fname, fmt::format("unknown variable name '{}'", id), underlineTok(tok), tok.loc);
+    //     throw ReferenceError(fp, fmt::format("unknown variable name '{}'", id), underlineTok(tok), tok.loc);
     auto storeVar = std::make_unique<VariableAST>(id, VarCtx::eStore, tok.loc);
     eat(Token::TOK_ID);
     return createVarAssignExpr(std::move(storeVar));
@@ -162,7 +165,7 @@ std::unique_ptr<NumberAST> Parser::parseNum()
 
 std::unique_ptr<AST> Parser::parseArray(Type eleType)
 {
-    // throw NotImplementedError(fname, "array parsing", tok.loc);
+    // throw NotImplementedError(fp, "array parsing", tok.loc);
     // either basic array '[a,b,c,d]' or string '"abcd"'
     // if (eleType != Type::eString) {}
 
@@ -191,14 +194,14 @@ std::unique_ptr<ModuleAST> Parser::parseIncludeStmt()
 {
     eat(Token::TOK_KWD);
     Token includeTok = tok;
-    std::string includeFname = getAbsoluteImport(fname, tok.value);
+    FilePath includeFp = FilePath::asImport(fp, includeTok.value);
     eat(Token::TOK_STR);
     eat(Token::TOK_SCOLON);
-    std::unique_ptr<ModuleAST> incAST = getAstFromFile(includeFname, ctx);
+    std::unique_ptr<ModuleAST> incAST = getAstFromFile(includeFp, ctx);
     if (!incAST)
     {
         // need to add quotes back for correct underlining
-        throw FileNotFoundError(includeFname, underlineTok(includeTok), includeTok.loc);
+        throw FileNotFoundError(includeFp, underlineTok(includeTok), includeTok.loc);
     }
     ctx.pop();
     return incAST;
@@ -224,7 +227,7 @@ std::unique_ptr<PrototypeAST> Parser::parseFuncProto()
 {
     std::string name = tok.value;
     // if (st.contains(name))
-    //     throw ReferenceError(fname, fmt::format("function '{}' already defined", name), underlineTok(tok), tok.loc);
+    //     throw ReferenceError(fp, fmt::format("function '{}' already defined", name), underlineTok(tok), tok.loc);
     // else
     //     st.insert(name, Type::eFunc);
     eat(Token::TOK_ID);
@@ -392,7 +395,7 @@ std::unique_ptr<ForAST> Parser::parseForStmt()
     eat(Token::TOK_CPAREN);
     std::unique_ptr<CompoundAST> body = parseCompound();
     return std::make_unique<ForAST>(std::move(expr), std::move(gen), std::move(body));
-    // throw NotImplementedError(fname, "For loop parsing.", SourceLocation(0,0));
+    // throw NotImplementedError(fp, "For loop parsing.", SourceLocation(0,0));
 }
 
 std::unique_ptr<ArrayAST> Parser::parseIntArrayGen()
@@ -460,12 +463,12 @@ std::unique_ptr<AST> Parser::parseIdTerm()
     if (tok.type == Token::TOK_OPAREN)
     {
         // if (!st.contains(id))
-        //     throw ReferenceError(fname, fmt::format("unknown function name '{}'", id), underlineTok(tmpIdTok), tmpIdTok.loc);
+        //     throw ReferenceError(fp, fmt::format("unknown function name '{}'", id), underlineTok(tmpIdTok), tmpIdTok.loc);
         auto callAST = std::make_unique<CallAST>(tmpIdTok.value, parseCallParams());
         return callAST;
     }
     // if (!st.contains(id))
-    //     throw ReferenceError(fname, fmt::format("unknown variable name '{}'", id), underlineTok(tmpIdTok), tmpIdTok.loc);
+    //     throw ReferenceError(fp, fmt::format("unknown variable name '{}'", id), underlineTok(tmpIdTok), tmpIdTok.loc);
     auto varAST = std::make_unique<VariableAST>(tmpIdTok.value, tmpIdTok.loc);
     return varAST;
 }
@@ -611,13 +614,12 @@ std::string Parser::underlineTok(Token tok)
     return underlineError(lexer.getLine(tok.loc.y), tok.loc.x, len);
 }
 
-std::unique_ptr<ModuleAST> getAstFromFile(const std::string& fname, ContextManager& ctx)
+std::unique_ptr<ModuleAST> getAstFromFile(const FilePath& fp, ContextManager& ctx)
 {
-    std::ifstream fs(fname);
+    std::ifstream fs(fp.abspath);
     if (!fs.is_open())
         return nullptr;
-    ctx.push(fname);
     std::string src = readFile(fs);
-    Parser parser(fname, ctx, src);
+    Parser parser(fp, ctx, src);
     return parser.parse();
 }

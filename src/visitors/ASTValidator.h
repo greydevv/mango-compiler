@@ -23,7 +23,7 @@ class WhileAST;
 class ASTValidator
 {
     public:
-        ASTValidator(const std::string& fname, std::shared_ptr<ModuleAST> ast, ContextManager& ctx);
+        ASTValidator(std::shared_ptr<ModuleAST> ast, ContextManager& ctx);
         void validate();
         Type validate(ModuleAST* ast);
         Type validate(ExpressionAST* ast);
@@ -40,13 +40,10 @@ class ASTValidator
         Type validate(WhileAST* ast);
 
     private:
-        const std::string fname;
         std::shared_ptr<ModuleAST> ast;
         ContextManager& ctx;
-        // regular symbol table
         SymbolTable<Type> st;
-        // function symbol table
-        SymbolTable<std::vector<Type>> fst;
+        SymbolTable<std::vector<Type>> fst; // function symbol table
 };
 
 #endif

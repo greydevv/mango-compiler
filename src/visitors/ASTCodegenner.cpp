@@ -36,12 +36,12 @@
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/Target/TargetOptions.h"
 
-ASTCodegenner::ASTCodegenner(const std::string& fname, std::shared_ptr<ModuleAST> ast, ContextManager& ctx) 
+ASTCodegenner::ASTCodegenner(std::shared_ptr<ModuleAST> ast, ContextManager& ctx) 
     : ast(ast),
       ctx(ctx),
       llvmCtx(std::make_unique<llvm::LLVMContext>()),
       builder(std::make_unique<llvm::IRBuilder<>>(*llvmCtx)),
-      mainModule(std::make_unique<llvm::Module>(fname, *llvmCtx)) {}
+      mainModule(std::make_unique<llvm::Module>(ast->fp.abspath, *llvmCtx)) {}
 
 std::string ASTCodegenner::print()
 {
@@ -183,7 +183,7 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
 
 llvm::Value* ASTCodegenner::codegen(ModuleAST* ast) 
 {
-    ctx.push(ast->modName);
+    ctx.push(ast->fp);
     for (auto& child : ast->children)
     {
         child->accept(*this);

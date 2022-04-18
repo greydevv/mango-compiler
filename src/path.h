@@ -7,13 +7,13 @@ namespace fs = std::filesystem;
 
 struct FilePath
 {
-    fs::path abspath;
-    fs::path relpath;
-    fs::path fname;
+    std::string abspath;
+    std::string relpath;
+    std::string fname;
 
     FilePath(fs::path original);
-};
 
-fs::path getAbsoluteImport(fs::path currentFile, fs::path importFile);
+    static FilePath asImport(FilePath currFp, const std::string& importStr);
+};
 
 #endif
