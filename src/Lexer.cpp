@@ -6,34 +6,20 @@
 #include "Lexer.h"
 
 Lexer::Lexer(const FilePath& fp)
-    : is(fp.abspath), pos(0), c('\0'), loc({1,1})
+    : is(fp.abspath), c('\0'), loc({1,1})
 {
     is.get(c);
-    // std::cout << "========== START DEBUG READ ==========\n";
-    // debugRead(true);
-    // std::cout << "=========== END DEBUG READ ===========\n";
-}
-
-void Lexer::debugRead(bool pretty)
-{
-    int debugLineNo = 1;
-    std::string line;
-    while (std::getline(is, line))
-    {
-        std::cout << fmt::format("{}: {}\n", debugLineNo, line);
-        debugLineNo++;
-    }
 }
 
 Token Lexer::peekToken()
 {
     SourceLocation prevLoc = loc;
-    // get next token
     Token tok = nextToken();
 
-    // seek back to original position
-    // need to make value negative because it moves relative to the current
-    // position. also need to subtract one so that the 'next()' call consumes the correct character
+    // seek back to original position need to make value negative because it
+    // moves relative to the current position. Also need to subtract one so
+    // that the 'next()' call consumes the correct character and sets the
+    // pointer at the right position
     is.seekg(-tok.value.size()-1, std::ios_base::cur);
     next();
     loc = prevLoc;
@@ -145,7 +131,6 @@ Token Lexer::lexOther()
 
 Token::token_type Lexer::lexTokenType()
 {
-    skipWhitespace();
     switch(c)
     {
         case '(':
@@ -238,7 +223,6 @@ Token::token_type Lexer::lexTokenType()
         }
         default:
         {
-            std::cout << "HERE\n";
             if (is.eof())
                 return Token::TOK_EOF;
             return Token::TOK_UND;
@@ -269,7 +253,6 @@ bool Lexer::isType(const std::string& s)
 
 void Lexer::next()
 {
-    pos++;
     loc.x++;
     is.get(c);
 }
@@ -304,13 +287,13 @@ void Lexer::skipComment()
 
 std::string Lexer::getLine(int lineNo)
 {
-    int currPos = is.tellg();
+    int prevPos = is.tellg();
     is.seekg(0);
 
     std::string line;
     for (int i = 1; i <= lineNo; i++)
         std::getline(is, line);
 
-    is.seekg(currPos, std::ios_base::beg);
+    is.seekg(prevPos, std::ios_base::beg);
     return line;
 }

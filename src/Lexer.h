@@ -8,14 +8,12 @@ class Lexer
 {
     public:
         Lexer(const FilePath& fp);
-        void debugRead(bool pretty = false);
         Token peekToken();
         Token nextToken();
         std::string getLine(int lineNo);
 
     private:
         std::ifstream is;
-        int pos;
         char c;
         SourceLocation loc;
 
