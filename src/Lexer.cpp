@@ -1,12 +1,14 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include "io.h"
 #include "Token.h"
 #include "Lexer.h"
 
-Lexer::Lexer(const std::string& src)
-    : src(src), pos(0), c(src[pos]), loc({1,1})
+Lexer::Lexer(const FilePath& fp, const std::string& src)
+    : is(fp.abspath), src(src), pos(0), c('\0'), loc({1,1})
 {
+    is.get(c);
     // std::cout << "========== START DEBUG READ ==========\n";
     // debugRead(true);
     // std::cout << "=========== END DEBUG READ ===========\n";
@@ -15,72 +17,48 @@ Lexer::Lexer(const std::string& src)
 void Lexer::debugRead(bool pretty)
 {
     int debugLineNo = 1;
-    while (c != '\0')
+    std::string line;
+    while (std::getline(is, line))
     {
-        if (pretty)
-        {
-            std::cout << debugLineNo << ": ";
-            while (c != '\n' && c != '\0')
-            {
-                std::cout << c;
-                pos++;
-                c = src[pos];
-            }
-            std::cout << '\n';
-            debugLineNo++;
-        }
-        else
-        {
-            std::cout << (int) c << ' ';
-        }
-        pos++;
-        c = src[pos];
+        std::cout << fmt::format("{}: {}\n", debugLineNo, line);
+        debugLineNo++;
     }
 }
 
-Token Lexer::peekToken(int offset)
+Token Lexer::peekToken()
 {
-    // TODO: handle overflowing past EOF
-
-    // store previous lexer position
-    int prevPos = pos;
-    char prevChar = c;
     SourceLocation prevLoc = loc;
-
     // get next token
     Token tok = nextToken();
-    if (offset > 1)
-    {
-        // subtract 1 from offset because first peek is already done above
-        for (int i = 0; i < offset-1; i++)
-        {
-            tok = nextToken();
-        }
-    }
 
-    // reset lexer position
-    pos = prevPos;
-    c = prevChar;
+    // seek back to original position
+    // need to make value negative because it moves relative to the current
+    // position. also need to subtract one so that the 'next()' call consumes the correct character
+    is.seekg(-tok.value.size()-1, std::ios_base::cur);
+    next();
     loc = prevLoc;
-
     return tok;
 }
 
 Token Lexer::nextToken()
 {
-    if (isspace(c))
+    if (is.eof())
+    {
+        return Token(Token::TOK_EOF, loc);
+    }
+    else if (isspace(c))
     {
         // remove whitespace
         skipWhitespace();
         return nextToken();
     }
-    if (c == '/' && peek() == '/')
+    else if (c == '/' && peek() == '/')
     {
         // remove comments
         skipComment();
         return nextToken();
     }
-    if (isalpha(c) || c == '_')
+    else if (isalpha(c) || c == '_')
     {
         return lexAlpha();
     }
@@ -258,10 +236,13 @@ Token::token_type Lexer::lexTokenType()
                 return Token::TOK_DBAR;
             }
         }
-        case '\0':
-            return Token::TOK_EOF;
         default:
+        {
+            std::cout << "HERE\n";
+            if (is.eof())
+                return Token::TOK_EOF;
             return Token::TOK_UND;
+        }
     }
 }
 
@@ -290,17 +271,18 @@ void Lexer::next()
 {
     pos++;
     loc.x++;
-    c = src[pos];
+    // c = src[pos];
+    is.get(c);
 }
 
-char Lexer::peek(int offset)
+char Lexer::peek()
 {
-    return src[pos+1];
+    return is.peek();
 }
 
 void Lexer::skipWhitespace()
 {
-    while (isspace(c))
+    while (!is.eof() && isspace(c))
     {
         if (c == '\n')
         {
@@ -313,42 +295,23 @@ void Lexer::skipWhitespace()
 
 void Lexer::skipComment()
 {
-    std::string com = "";
-    while (c != '\n' && c != '\0')
-    {
-        com += c;
+    while (!is.eof() && c != '\n')
         next();
-    }
     loc.y++;
     loc.x = 0;
     if (isspace(c))
-    {
         skipWhitespace();
-    }
 }
 
 std::string Lexer::getLine(int lineNo)
 {
-    char srcChar = src[0];
-    int srcPos = 0;
-    for (int i = 0; i < lineNo-1; i++)
-    {
-        while (srcChar != '\n' && srcChar != '\0')
-        {
-            srcPos++;
-            srcChar = src[srcPos];
-        }
-        srcPos++;
-        srcChar = src[srcPos];
-    }
+    int currPos = is.tellg();
+    is.seekg(0);
 
     std::string line;
-    while (srcChar != '\n' && srcChar != '\0')
-    {
-        line += srcChar;
-        srcPos++;
-        srcChar = src[srcPos];
-    }
+    for (int i = 1; i <= lineNo; i++)
+        std::getline(is, line);
 
+    is.seekg(currPos, std::ios_base::beg);
     return line;
 }

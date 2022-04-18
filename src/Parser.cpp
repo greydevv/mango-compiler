@@ -29,10 +29,11 @@
 Parser::Parser(FilePath fp, ContextManager& ctx, const std::string& src)
     : fp(fp), 
       ctx(ctx),
-      lexer(Lexer(src)), 
+      lexer(Lexer(fp, src)), 
       tok(lexer.nextToken()) 
 {
     ctx.push(fp);
+    // std::cout << tok << '\n';
 }
 
 std::unique_ptr<ModuleAST> Parser::parse()
@@ -583,6 +584,7 @@ bool Parser::eat()
 void Parser::getToken()
 {
     tok = lexer.nextToken();
+    // std::cout << tok << '\n';
     if (tok.type == Token::TOK_UND)
     {
         std::string msg = fmt::format("encountered unknown character '{}'", tok.value);
