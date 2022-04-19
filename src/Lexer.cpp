@@ -13,7 +13,7 @@ Lexer::Lexer(const FilePath& fp, ContextManager& ctx)
 
 Token Lexer::peekToken()
 {
-    SourceLocation prevLoc = loc;
+    FileLocation prevLoc = loc;
     Token tok = nextToken();
 
     // seek back to original position need to make value negative because it
@@ -30,7 +30,7 @@ Token Lexer::nextToken()
 {
     if (is.eof())
     {
-        return Token(Token::TOK_EOF, loc);
+        return Token(Token::TOK_EOF, "EOF", SourceLocation(loc, 0));
     }
     else if (isspace(c))
     {
@@ -67,7 +67,7 @@ Token Lexer::lexAlpha()
     // TODO: refactor below while loop into separate function
     std::string s;
     // want loc of token to start at beginning of token's value
-    SourceLocation tmpLoc(loc.x, loc.y);
+    FileLocation tmpLoc = loc;
     while (isalnum(c) || c == '_')
     {
         s += c;
@@ -79,26 +79,26 @@ Token Lexer::lexAlpha()
         type = Token::TOK_KWD;
     else if (isType(s))
         type = Token::TOK_TYPE;
-    return Token(type, s, tmpLoc);
+    return Token(type, s, SourceLocation(tmpLoc, s.size()));
 }
 
 Token Lexer::lexNum()
 {
     // TODO: refactor below while loop into separate function
     std::string s;
-    SourceLocation tmpLoc(loc.x, loc.y);
+    FileLocation tmpLoc = loc;
     while (isalnum(c))
     {
         s += c;
         next();
     }
-    return Token(Token::TOK_NUM, s, tmpLoc);
+    return Token(Token::TOK_NUM, s, SourceLocation(tmpLoc, s.size()));
 }
 
 Token Lexer::lexString()
 {
     std::string s;
-    SourceLocation tmpLoc(loc.x, loc.y);
+    FileLocation tmpLoc = loc;
     // external 'next' calls are for skipping the quotes. If encountering
     // "hello world", we only want to store hello world without the quotes
     next();
@@ -108,21 +108,21 @@ Token Lexer::lexString()
         next();
     }
     next();
-    return Token(Token::TOK_STR, s, tmpLoc);
+    return Token(Token::TOK_STR, s, SourceLocation(tmpLoc, s.size()));
 }
 
 Token Lexer::lexOther()
 {
     Token::token_type type = lexTokenType();
     if (type == Token::TOK_EOF)
-        return Token(type, "EOF", SourceLocation(loc.x, loc.y));
+        return Token(type, "EOF", SourceLocation(loc, 0));
     std::string value;
     if (type == Token::TOK_UND)
         value = c;
     else
         value = tokenValues.at(type);
     // have to subtract length to get correct start position
-    SourceLocation tokLoc(loc.x-(value.size()-1), loc.y);
+    SourceLocation tokLoc(loc.x-(value.size()-1), loc.y, value.size());
     Token tok = Token(type, value, tokLoc);
     assert(tok.value.size() > 0);
     next();

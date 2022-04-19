@@ -42,7 +42,7 @@ std::string BaseSourceException::getMsg(ContextManager& ctx) const
     if (line.empty())
     {
         Lexer lexer(fp, ctx);
-        tmpLine = underlineError(lexer.getLine(loc.y), loc.x, 1);
+        tmpLine = underlineError(lexer.getLine(loc.y), loc.x, loc.len);
     }
     std::ostringstream s;
     s << fmt::format(fmt::emphasis::bold, "{}:{}:{}: ", fp.relpath, loc.y, loc.x);

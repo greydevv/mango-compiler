@@ -15,7 +15,7 @@ class Lexer
     private:
         std::ifstream is;
         char c;
-        SourceLocation loc;
+        FileLocation loc;
 
         Token lexAlpha();
         Token lexNum();

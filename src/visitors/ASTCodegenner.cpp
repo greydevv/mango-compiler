@@ -125,7 +125,7 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
             if (!var)
             {
                 std::string msg = fmt::format("unknown variable '{}' (it was probably used in a nested function when defined outside. this is a compiler bug)", varAst->id);
-                throw ReferenceError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
+                throw ReferenceError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0,0));
             }
             builder->CreateStore(rhs, var);
         }
@@ -176,7 +176,7 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
         default:
             {
                 // TODO: need to capture the operator's value
-                throw SyntaxError("invalid binary operator", "LINE NOT IMPLEMENTED", SourceLocation(0,0));
+                throw SyntaxError("invalid binary operator", "LINE NOT IMPLEMENTED", SourceLocation(0,0,0));
             }
     }
 }
@@ -198,7 +198,7 @@ llvm::Value* ASTCodegenner::codegen(VariableAST* ast)
     if (!val)
     {
         std::string msg = fmt::format("unknown variable '{}' (it was probably used in a nested function when defined outside. this is a compiler bug)", ast->id);
-        throw ReferenceError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
+        throw ReferenceError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0,0));
     }
     return builder->CreateLoad(val->getAllocatedType(), val, ast->id);
 }
@@ -299,13 +299,13 @@ llvm::Value* ASTCodegenner::codegen(CallAST* ast)
     if (!callee)
     {
         std::string msg = fmt::format("unknown function '{}'", ast->id);
-        throw ReferenceError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
+        throw ReferenceError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0,0));
     }
     if (callee->arg_size() != ast->params.size())
     {
         // TODO: make new error for this (Python uses TypeError)
         std::string msg = fmt::format("function received {} arguments but expected {} arguments", callee->arg_size(), ast->params.size());
-        throw SyntaxError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0));
+        throw SyntaxError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0,0));
     }
     std::vector<llvm::Value*> argValues;
     for (int i = 0; i < ast->params.size(); i++)

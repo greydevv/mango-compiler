@@ -7,12 +7,22 @@
 #include "Operator.h"
 #include "Types.h"
 
+struct FileLocation
+{
+    int x;
+    int y;
+
+    FileLocation(int x, int y);
+};
+
 struct SourceLocation
 {
     int x; // line
     int y; // character on line
+    int len;
 
-    SourceLocation(int x, int y);
+    SourceLocation(int x, int y, int len);
+    SourceLocation(const FileLocation& fLoc, int len);
 };
 
 class Token final

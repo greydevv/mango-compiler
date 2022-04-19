@@ -3,8 +3,14 @@
 #include "Operator.h"
 #include "Types.h"
 
-SourceLocation::SourceLocation(int x, int y)
+FileLocation::FileLocation(int x, int y)
     : x(x), y(y) {}
+
+SourceLocation::SourceLocation(int x, int y, int len)
+    : x(x), y(y), len(len) {}
+
+SourceLocation::SourceLocation(const FileLocation& floc, int len)
+    : x(floc.x), y(floc.y), len(len) {}
 
 Token::Token(token_type type, SourceLocation loc)
     : type(type), value(tokenValues.at(type)), loc(loc) {}
