@@ -12,6 +12,7 @@ struct FileLocation
     int x;
     int y;
 
+    FileLocation();
     FileLocation(int x, int y);
 };
 

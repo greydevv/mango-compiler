@@ -3,6 +3,9 @@
 #include "Operator.h"
 #include "Types.h"
 
+FileLocation::FileLocation()
+    : x(1), y(1) {}
+
 FileLocation::FileLocation(int x, int y)
     : x(x), y(y) {}
 

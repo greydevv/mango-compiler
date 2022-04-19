@@ -6,7 +6,7 @@
 #include "Lexer.h"
 
 Lexer::Lexer(const FilePath& fp, ContextManager& ctx)
-    : is(fp.abspath), c('\0'), loc({1,1})
+    : is(fp.abspath), c('\0'), loc()
 {
     is.get(c);
 }
@@ -30,7 +30,7 @@ Token Lexer::nextToken()
 {
     if (is.eof())
     {
-        return Token(Token::TOK_EOF, "EOF", SourceLocation(loc, 0));
+        return Token(Token::TOK_EOF, "EOF", SourceLocation(loc, 1));
     }
     else if (isspace(c))
     {
@@ -115,7 +115,7 @@ Token Lexer::lexOther()
 {
     Token::token_type type = lexTokenType();
     if (type == Token::TOK_EOF)
-        return Token(type, "EOF", SourceLocation(loc, 0));
+        return Token(type, "EOF", SourceLocation(loc, 1));
     std::string value;
     if (type == Token::TOK_UND)
         value = c;
