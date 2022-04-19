@@ -5,7 +5,7 @@
 #include "Token.h"
 #include "Lexer.h"
 
-Lexer::Lexer(const FilePath& fp)
+Lexer::Lexer(const FilePath& fp, ContextManager& ctx)
     : is(fp.abspath), c('\0'), loc({1,1})
 {
     is.get(c);

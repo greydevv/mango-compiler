@@ -25,7 +25,7 @@ int main(int argc, char const *argv[])
 
     for (const auto& p : args.paths)
     {
-        ContextManager ctx;
+        ContextManager ctx(p);
 
         try
         {
@@ -44,6 +44,7 @@ int main(int argc, char const *argv[])
             std::cout << e.getMsg(ctx) << std::flush;
             return 1;
         }
+        ctx.clear();
     }
 
     return 0;

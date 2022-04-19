@@ -29,11 +29,10 @@
 Parser::Parser(FilePath fp, ContextManager& ctx)
     : fp(fp), 
       ctx(ctx),
-      lexer(Lexer(fp)), 
+      lexer(Lexer(fp, ctx)), 
       tok(lexer.nextToken()) 
 {
     ctx.push(fp);
-    // std::cout << tok << '\n';
 }
 
 std::unique_ptr<ModuleAST> Parser::parse()

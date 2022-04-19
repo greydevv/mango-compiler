@@ -11,7 +11,7 @@
 BaseException::BaseException(const std::string& msg)
     : msg(msg) {}
 
-std::string BaseException::getMsg(const ContextManager& ctx) const
+std::string BaseException::getMsg(ContextManager& ctx) const
 {
     std::ostringstream s;
     s << fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::orange_red), getExcName());
@@ -33,9 +33,7 @@ BaseSourceException::BaseSourceException(const std::string& msg, const std::stri
 BaseSourceException::BaseSourceException(const std::string& msg, SourceLocation loc)
     : BaseException(msg), line(""), loc(loc) {}
 
-#include <iostream>
-
-std::string BaseSourceException::getMsg(const ContextManager& ctx) const
+std::string BaseSourceException::getMsg(ContextManager& ctx) const
 {
     // use relative path for shorter/readable error message
     std::string tmpLine = line;
@@ -43,7 +41,7 @@ std::string BaseSourceException::getMsg(const ContextManager& ctx) const
     const FilePath& fp = ctx.peek();
     if (line.empty())
     {
-        Lexer lexer(fp);
+        Lexer lexer(fp, ctx);
         tmpLine = underlineError(lexer.getLine(loc.y), loc.x, 1);
     }
     std::ostringstream s;

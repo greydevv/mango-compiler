@@ -10,7 +10,7 @@ class BaseException : public std::exception
 {
     public:
         BaseException(const std::string& msg);
-        virtual std::string getMsg(const ContextManager& ctx) const;
+        virtual std::string getMsg(ContextManager& ctx) const;
         virtual std::string getExcName() const = 0;
         virtual const char* what() const throw();
     protected:
@@ -22,7 +22,7 @@ class BaseSourceException : public BaseException
     public:
         BaseSourceException(const std::string& msg, const std::string& line, SourceLocation loc);
         BaseSourceException(const std::string& msg, SourceLocation loc);
-        virtual std::string getMsg(const ContextManager& ctx) const override;
+        virtual std::string getMsg(ContextManager& ctx) const override;
         virtual std::string getExcName() const override = 0;
     protected:
         std::string fname;

@@ -7,7 +7,7 @@
 class Lexer
 {
     public:
-        Lexer(const FilePath& fp);
+        Lexer(const FilePath& fp, ContextManager& ctx);
         Token peekToken();
         Token nextToken();
         std::string getLine(int lineNo);
