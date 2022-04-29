@@ -12,6 +12,10 @@ Type typeFromString(const std::string& str)
         return Type::eVoid;
     else if (str == "int")
         return Type::eInt;
+    else if (str == "bool")
+        return Type::eBool;
+    else if (str == "int")
+        return Type::eInt;
     else if (str == "array")
         return Type::eArray;
     else
