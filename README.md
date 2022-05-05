@@ -20,7 +20,7 @@ Mango is a programming language inspired by the likes of
 [C++](https://en.wikipedia.org/wiki/C%2B%2B). The goal of this project is to
 create a compiler with Mango as the proof-of-concept.    
 
-### Why Another Programming Language
+### Why Another Programming Language?
 
 Let's adress the elephant in the room: why *yet another programming language*?
 Well, I don't really know, I just wanted to make a compiler. The language itself is just a byproduct of it.
@@ -50,7 +50,7 @@ int b = (3 + 4) * 10; // 3 + 4 evaluated first
 ```
 This is all trivial and should be very familiar.
 
-The operator precedence was stolen straight from the [C++ Operator Precedence
+The operator precedence was inspired by the [C++ Operator Precedence
 table](https://en.cppreference.com/w/cpp/language/operator_precedence). In
 descending order, the operator precedence is as follows:
 
@@ -81,7 +81,7 @@ int c = a + b;
 
 Mango implements if statements, for-loops, and while-loops (no do-while). The
 structure of if-statements are exaclty the same to C++ where else-if and else
-blocks are otional:
+blocks are optional:
 ```
 if ( [expression] )
 {
@@ -130,7 +130,7 @@ Comments begin with a double forward slash, `//`.
 ### About the Compiler
 
 This compiler employs the classic lexer-parser front end where tokens are read
-into the parser form the lexer. The parser then builds an [Abstract-Syntax-Tree
+into the parser from the lexer. The parser then builds an [Abstract-Syntax-Tree
 (AST)](https://en.wikipedia.org/wiki/Abstract_syntax_tree), while performing
 syntax analysis. The parser works by 'expecting' certain tokens depending on
 what the current/previous token(s) were. 
