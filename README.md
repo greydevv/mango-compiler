@@ -12,17 +12,17 @@ The compiler is still under development. Not everything listed in the [Language 
 - [Development Progress](#development-progress)
 
 ### Introduction
-This repository houses the compiler for Mango, a statically-typed general purpose programming language.
+This repository houses the compiler for Mango, a statically-typed general-purpose programming language.
 
 Mango is a programming language inspired by the likes of
 [Python](https://www.python.org/), [Swift](https://developer.apple.com/swift/),
 [C](https://en.wikipedia.org/wiki/C_%28programming_language%29), and
 [C++](https://en.wikipedia.org/wiki/C%2B%2B). The goal of this project is to
-create a compiler with Mango as the proof-of-concept.    
+create a compiler with Mango as the proof of concept.    
 
 ### Why Another Programming Language?
 
-Let's adress the elephant in the room: why *yet another programming language*?
+Let's address the elephant in the room: why *yet another programming language*?
 Well, I don't really know, I just wanted to make a compiler. The language itself is just a byproduct of it.
 
 ### Language Reference
@@ -30,7 +30,7 @@ Well, I don't really know, I just wanted to make a compiler. The language itself
 #### Basic Syntax
 
 Compound statements are composed within curly braces, `{` and `}`. Like many
-languages, standalone statements and expressions must end in a semicolon, `;`.
+languages, standalone statements, and expressions must end in a semicolon, `;`.
 
 #### Types
 
@@ -80,7 +80,7 @@ int c = a + b;
 #### Control Flow
 
 Mango implements if statements, for-loops, and while-loops (no do-while). The
-structure of if-statements are exaclty the same to C++ where else-if and else
+structure of if-statements are the same as C++ where else-if and else
 blocks are optional:
 ```
 if ( [expression] )
@@ -145,8 +145,8 @@ a SyntaxError.
 
 In the back end of the compiler, the code generation module takes control of the
 AST that the parser creates. This module's job is to convert the AST into an
-intermediate form between source code (human readable) and machine code
-(definitely not human readable), known as intermediate representation (IR). For
+intermediate form between source code (human-readable) and machine code
+(definitely not human-readable), known as Intermediate Representation (IR). For
 this, [LLVM-IR](https://llvm.org/docs/LangRef.html) is used as it is a very
 robust, flexible, and scalable IR generation API.
 
