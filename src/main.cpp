@@ -25,7 +25,7 @@ int main(int argc, char const *argv[])
 
     for (const auto& p : args.paths)
     {
-        ContextManager ctx(p);
+        ContextManager ctx;
 
         try
         {

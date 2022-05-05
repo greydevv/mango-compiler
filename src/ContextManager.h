@@ -8,16 +8,16 @@
 class ContextManager
 {
     public:
-        ContextManager(const FilePath& fp);
+        ContextManager();
         int getStackSize() const;
         const FilePath& peek() const;
-        std::ifstream& getIs();
+        std::shared_ptr<std::ifstream> getIs();
         void push(FilePath fp);
         FilePath pop();
         void open(const FilePath& fp);
         void clear();
     private:
-        std::ifstream is;
+        std::shared_ptr<std::ifstream> is;
         // stack of file names (how deep are we in include tree)
         std::vector<FilePath> incStack;
 };

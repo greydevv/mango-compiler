@@ -2,8 +2,7 @@
 #include "ContextManager.h"
 #include "path.h"
 
-ContextManager::ContextManager(const FilePath& fp) 
-    : is() {}
+ContextManager::ContextManager() {}
 
 int ContextManager::getStackSize() const
 {
@@ -13,11 +12,6 @@ int ContextManager::getStackSize() const
 const FilePath& ContextManager::peek() const
 {
     return incStack[incStack.size()-1];
-}
-
-std::ifstream& ContextManager::getIs()
-{
-    return is;
 }
 
 void ContextManager::push(FilePath fp)
@@ -35,5 +29,4 @@ FilePath ContextManager::pop()
 void ContextManager::clear()
 {
     incStack.clear();
-    is.close();
 }
