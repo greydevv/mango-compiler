@@ -7,7 +7,7 @@ libcmg.a
 
 # Development Testing
 output.cpp
-sample/
+samples/
 
 # Assets
 assets/
