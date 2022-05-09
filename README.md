@@ -1,6 +1,6 @@
-# Mango Language
+# 🥭 Mango Language
 
-### Warning
+### ❗️Warning
 The compiler is still under development. Not everything listed in the [Language Reference](#language-reference) is completely implemented.
 
 ### Contents
@@ -84,11 +84,15 @@ if ( [expression] ) { [body...] }
 else if ( [expression] ) { [body...] } 
 else { [body...] }
 ```
+While loops are also similar to most languages.
+```
+while ( [expression] ) { [body...] }
+```
 
-##### WARNING: FOR-LOOPS ARE NOT CURRENTLY IMPLEMENTED; THEY ARE EXPERIMENTAL.
+**❗️Warning: For-loops are only experimental right now and therefore not fully implemented.**
 Inspiration for for-loops is a combination of Python and Swift.
 ```
-for (int i in 1..3) { [body...] }
+for ( [type] [variable name] in [iterable] ) { [body...] }
 ```
 
 #### Functions
