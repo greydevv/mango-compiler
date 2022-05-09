@@ -379,6 +379,8 @@ std::unique_ptr<ForAST> Parser::parseForStmt()
 {
     eat(Token::TOK_KWD);
     eat(Token::TOK_OPAREN);
+    if (tok.type == Token::TOK_CPAREN)
+        throw SyntaxError("expected expression", underlineTok(tok), tok.loc);
     std::unique_ptr<VariableAST> var;
     if (tok.isType())
     {
@@ -451,6 +453,8 @@ std::unique_ptr<WhileAST> Parser::parseWhileStmt()
 {
     eat(Token::TOK_KWD);
     eat(Token::TOK_OPAREN);
+    if (tok.type == Token::TOK_CPAREN)
+        throw SyntaxError("expected expression", underlineTok(tok), tok.loc);
     std::unique_ptr<AST> expr = parseExpr();
     eat(Token::TOK_CPAREN);
     std::unique_ptr<CompoundAST> body = parseCompound();
