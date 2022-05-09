@@ -1,7 +1,6 @@
 # 🥭 Mango Language
 
-### ❗️Warning
-The compiler is still under development. Not everything listed in the [Language Reference](#language-reference) is completely implemented.
+**📝 Note**: The Mango compiler is still under development and therefore does not implement everything in the [Language Reference](#language-reference).
 
 ### Contents
 
@@ -12,9 +11,8 @@ The compiler is still under development. Not everything listed in the [Language 
 - [Development Progress](#development-progress)
 
 ### Introduction
-This repository houses the compiler for Mango, a statically-typed general-purpose programming language.
-
-Mango is a programming language inspired by the likes of
+This repository houses the compiler for Mango, a statically-typed,
+general-purpose programming language inspired by
 [Python](https://www.python.org/), [Swift](https://developer.apple.com/swift/),
 [C](https://en.wikipedia.org/wiki/C_%28programming_language%29), and
 [C++](https://en.wikipedia.org/wiki/C%2B%2B). The goal of this project is to
