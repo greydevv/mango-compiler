@@ -490,6 +490,8 @@ std::unique_ptr<AST> Parser::parseTerm()
         case Token::TOK_OPAREN:
             {
                 eat(Token::TOK_OPAREN);
+                if (tok.type == Token::TOK_CPAREN)
+                    throw SyntaxError("expected expression", underlineTok(tok), tok.loc);
                 std::unique_ptr<AST> expr = parseExpr();
                 eat(Token::TOK_CPAREN);
                 return expr;
