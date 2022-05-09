@@ -30,7 +30,7 @@ Well, I don't really know, I just wanted to make a compiler. The language itself
 #### Basic Syntax
 
 Compound statements are composed within curly braces, `{` and `}`. Like many
-languages, standalone statements, and expressions must end in a semicolon, `;`.
+languages, statements must end with a semicolon, `;`.
 
 #### Types
 
@@ -45,7 +45,7 @@ languages, standalone statements, and expressions must end in a semicolon, `;`.
 This language handles expressions no different than C++ and other similar
 languages. Parenthesis can be used for correct evaluation order, like so:
 ```
-int a = 3 + 4 * 10; // 4 * 10 evaluated first (* has higher precedence than +)
+int a = 3 + 4 * 10;   // 4 * 10 evaluated first (* has higher precedence than +)
 int b = (3 + 4) * 10; // 3 + 4 evaluated first
 ```
 This is all trivial and should be very familiar.
@@ -69,62 +69,50 @@ descending order, the operator precedence is as follows:
 
 Similar to most statically-typed languages:
 ```
-// define
+// define 
 int a = 10;
 int b = 3;
 
 // reference
-int c = a + b;
+a = a + b;
 ```
 
 #### Control Flow
-
-Mango implements if statements, for-loops, and while-loops (no do-while). The
-structure of if-statements are the same as C++ where else-if and else
-blocks are optional:
+If/else-if/else statements are similar to most languages where multiple else-if statements can be chained together and else-if/else statements are optional.
 ```
-if ( [expression] )
-{
-    [body...]
-}
-else if ( [expression] )
-{
-    [body...]
-}
-else
-{
-    [body...]
-}
+if ( [expression] ) { [body...] }
+else if ( [expression] ) { [body...] } 
+else { [body...] }
 ```
 
-##### WARNING: FOR-LOOPS ARE NOT IMPLEMENTED. EVERYTHING FROM DESIGN TO FUNCTIONALITY IS VERY EXPERIMENTAL CURRENTLY.
-Inspiration for for-loops is a combination of Python and Swift:
+##### WARNING: FOR-LOOPS ARE NOT CURRENTLY IMPLEMENTED; THEY ARE EXPERIMENTAL.
+Inspiration for for-loops is a combination of Python and Swift.
 ```
-for (int i in 1..3)
-{
-    [body...]
-}
+for (int i in 1..3) { [body...] }
 ```
 
 #### Functions
-
-Functions can be defined in the following ways. Parameters are optional, as always.
+Functions in the Swift programming language look very similar to Python
+type-hinting which both inspired Mango's function prototypes.
 ```
 func [id]([params...]) -> [return type]
 {
     [body...]
 }
 ```
+The parameters are a comma-separated list where each parameter is specified as
+`[type] [variable name]`. If the return type is omitted, the compiler will
+assume the function returns `void`.
+
+#### Includes
+Include statements are denoted by the `include` keyword followed by the path to
+the module which is supplied as a string.
 ```
-func [id]([params...])
-{
-    [body...]
-}
+include "path/to/module.mg";
 ```
-If the return type is omitted, the compiler will assume the function returns `void`.
+At the moment, include paths are only resolved as relative imports.
 
 #### Miscellaneous
-
 Comments begin with a double forward slash, `//`.
 
 ### About the Compiler
@@ -176,5 +164,6 @@ emits the IR:
 - [x] IR: expressions (arithmetic, boolean, etc.)
 - [x] IR: functions
 - [x] IR: if/else if/else
-- [ ] IR: loops (for, while)
+- [x] IR: while loops
+- [ ] IR: for loops (need arrays first)
 - [ ] Static (and weak) type-checking
