@@ -44,6 +44,8 @@ class ASTValidator
         ContextManager& ctx;
         SymbolTable<Type> st;
         SymbolTable<std::vector<Type>> fst; // function symbol table
+
+        void validateBoolExpr(Type exprType);
 };
 
 #endif

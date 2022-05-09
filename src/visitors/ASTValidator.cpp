@@ -109,7 +109,9 @@ Type ASTValidator::validate(CompoundAST* ast)
 {
     for (auto& child : ast->children)
         child->accept(*this);
-    return ast->retStmt->accept(*this);
+    if (ast->retStmt)
+        return ast->retStmt->accept(*this);
+    return Type::eVoid;
 }
 
 Type ASTValidator::validate(FunctionAST* ast)
@@ -171,21 +173,10 @@ Type ASTValidator::validate(CallAST* ast)
 Type ASTValidator::validate(IfAST* ast)
 {
     if (ast->expr)
-    {
-        Type exprType = ast->expr->accept(*this);
-        switch (exprType)
-        {
-            case Type::eInt:
-            case Type::eBool:
-                break;
-            default:
-                throw TypeError(fmt::format("cannot convert {} to bool", typeValues[exprType]), "N/A", SourceLocation(0,0,0));
-        }
-    }
-    if (ast->body)
-        return ast->body->accept(*this);
-    else
-        return Type::eNot;
+        // could be 'else' statement w/ no expr
+        validateBoolExpr(ast->expr->accept(*this));
+
+    return ast->body->accept(*this);
 }
 
 Type ASTValidator::validate(ForAST* ast)
@@ -195,5 +186,19 @@ Type ASTValidator::validate(ForAST* ast)
 
 Type ASTValidator::validate(WhileAST* ast)
 {
-    throw NotImplementedError("Validation of WhileAST");
+    validateBoolExpr(ast->expr->accept(*this));
+
+    return ast->body->accept(*this);
+}
+
+void ASTValidator::validateBoolExpr(Type exprType)
+{
+    switch (exprType)
+    {
+        case Type::eInt:
+        case Type::eBool:
+            break;
+        default:
+            throw TypeError(fmt::format("cannot convert {} to bool", typeValues[exprType]), "N/A", SourceLocation(0,0,0));
+    }
 }
