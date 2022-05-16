@@ -19,6 +19,8 @@ enum Type
 
 std::string typeToString(Type t);
 Type typeFromString(const std::string& str);
+bool isNumeric(Type t);
+bool typeCompat(Type a, Type b);
 bool isArrayType(Type t);
 
 static std::vector<std::string> typeStrings = {
