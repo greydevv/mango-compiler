@@ -5,15 +5,15 @@
 #include "../visitors/ASTStringifier.h"
 #include "llvm/IR/Value.h"
 
-IfAST::IfAST(std::unique_ptr<AST> expr, std::unique_ptr<CompoundAST> body, std::unique_ptr<IfAST> other)
+IfAST::IfAST(std::shared_ptr<AST> expr, std::unique_ptr<CompoundAST> body, std::unique_ptr<IfAST> other)
     : expr(std::move(expr)),
       body(std::move(body)),
       other(std::move(other)) {}
 
 IfAST::IfAST(const IfAST& other)
-    : expr(std::unique_ptr<AST>(other.expr->clone())),
-      body(std::unique_ptr<CompoundAST>(dynamic_cast<CompoundAST*>(other.body->clone()))),
-      other(std::unique_ptr<IfAST>(dynamic_cast<IfAST*>(other.other->clone()))) {}
+    : expr(std::shared_ptr<AST>(other.expr->clone())),
+      body(std::shared_ptr<CompoundAST>(dynamic_cast<CompoundAST*>(other.body->clone()))),
+      other(std::shared_ptr<IfAST>(dynamic_cast<IfAST*>(other.other->clone()))) {}
 
 Type IfAST::accept(ASTValidator& vd)
 {
