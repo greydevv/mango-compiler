@@ -503,6 +503,17 @@ std::unique_ptr<AST> Parser::parseTerm()
                 // specific error message
                 throw SyntaxError("expected expression", underlineTok(tok), tok.loc);
             }
+        case Token::TOK_KWD:
+            if (tok.value == "true")
+            {
+                eat(Token::TOK_KWD);
+                return std::make_unique<NumberAST>(1);
+            }
+            else if (tok.value == "false")
+            {
+                eat(Token::TOK_KWD);
+                return std::make_unique<NumberAST>(0);
+            }
         default:
             {
                 std::string msg = fmt::format("'{}' is not a valid operand", tok.value);
