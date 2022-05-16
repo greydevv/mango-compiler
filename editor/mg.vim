@@ -21,10 +21,11 @@ syntax keyword mgFuncKwd func nextgroup=mgFuncIds skipwhite
 syntax keyword mgKwds return if else for while in extern include
 
 " Types
-syntax keyword mgTypes int void
+syntax keyword mgTypes int bool void
 
 " Numeric literals
 syntax match mgNums '\d\+\.\?\d*'
+syntax keyword mgBools true false 
 
 " Comments
 syntax keyword mgTodos TODO FIXME XXX NOTE
@@ -40,6 +41,7 @@ highlight default link mgFuncKwd Keyword
 highlight default link mgKwds Keyword
 highlight default link mgTypes Type
 highlight default link mgNums Number
+highlight default link mgBools Number
 highlight default link mgTodos Todo
 highlight default link mgComments Comment
 highlight default link mgStrings String
