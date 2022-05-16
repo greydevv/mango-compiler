@@ -334,7 +334,6 @@ llvm::Value* ASTCodegenner::codegen(IfAST* ast, llvm::BasicBlock* parentMergeBlo
 
     // trueBlock will always be filled out
     insertFuncBlock(func, trueBlock);
-    // createRetOrBr(ast->body->accept(*this), localMergeBlock);
     createRetOrBr(std::move(ast->body), localMergeBlock);
     trueBlock = builder->GetInsertBlock();
 
@@ -347,13 +346,12 @@ llvm::Value* ASTCodegenner::codegen(IfAST* ast, llvm::BasicBlock* parentMergeBlo
             // prepare recursion by setting insertion point
             insertFuncBlock(func, falseBlock);
             // recur
-            codegen(ast->other.get(), localMergeBlock);
+            codegen(dynamic_cast<IfAST*>(ast->other->clone()), localMergeBlock);
         }
         else
         {
             // 'else' block encountered
             insertFuncBlock(func, falseBlock);
-            // createRetOrBr(ast->other->body->accept(*this), localMergeBlock);
             createRetOrBr(std::move(ast->other->body), localMergeBlock);
             falseBlock = builder->GetInsertBlock();
         }
@@ -495,15 +493,12 @@ void ASTCodegenner::createRetOrBr(std::shared_ptr<CompoundAST> body, llvm::Basic
     // Used in control flow (primarily if-else if-else-statements)
     // Inserts a branch ('br') or return ('ret') instruction based on if the
     // return value is not null
-    if (body->retStmt != nullptr && body->retStmt->hasExpr())
-    {
-        llvm::Value* retV = body->retStmt->accept(*this);
-        builder->CreateRet(retV);
-    }
-    else
-    {
+    // if (body->retStmt != nullptr && body->retStmt->hasExpr())
+    llvm::Value* retV = body->accept(*this);
+    if (retV == nullptr)
         builder->CreateBr(block);
-    }
+    else
+        builder->CreateRet(retV);
 }
 
 llvm::Type* ASTCodegenner::typeToLlvm(Type type)
