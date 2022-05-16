@@ -2,6 +2,7 @@
 #define NUMBER_AST_H
 
 #include "AST.h"
+#include "../Types.h"
 #include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
@@ -9,7 +10,9 @@ class NumberAST : public AST
 {
     public:
         double val;
+        Type type;
 
+        NumberAST(double val, Type type);
         NumberAST(double val);
         NumberAST(const NumberAST& other);
         virtual Type accept(ASTValidator& vd) override;

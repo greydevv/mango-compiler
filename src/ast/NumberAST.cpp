@@ -1,13 +1,17 @@
 #include "NumberAST.h"
+#include "../Types.h"
 #include "../visitors/ASTValidator.h"
 #include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
+NumberAST::NumberAST(double val, Type type)
+    : val(val), type(type) {}
+
 NumberAST::NumberAST(double val)
-    : val(val) {}
+    : val(val), type(Type::eInt) {}
 
 NumberAST::NumberAST(const NumberAST& other)
-    : val(other.val) {}
+    : val(other.val), type(other.type) {}
 
 Type NumberAST::accept(ASTValidator& vd)
 {
