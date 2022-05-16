@@ -48,7 +48,8 @@ Type ASTValidator::validate(ExpressionAST* ast)
     Type lType = ast->LHS->accept(*this);
     Type rType = ast->RHS->accept(*this);
 
-    if (lType != rType)
+    // check if types are compatible with one another
+    if (!typeCompat(lType, rType))
     {
         if (ast->op == Operator::OP_EQL)
             throw TypeError(fmt::format("cannot initialize {} with a value of {}", typeValues[lType], typeValues[rType]), "N/A", SourceLocation(0,0,0));
@@ -97,7 +98,7 @@ Type ASTValidator::validate(VariableAST* ast)
 
 Type ASTValidator::validate(NumberAST* ast)
 {
-    return Type::eInt;
+    return ast->type;
 }
 
 Type ASTValidator::validate(ArrayAST* ast)
