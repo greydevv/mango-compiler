@@ -125,6 +125,8 @@ std::string ASTStringifier::toString(CompoundAST* ast, int tabs)
         for (int i = 0; i < ast->children.size(); i++)
         {
             s << indent(ast->children[i]->accept(*this, tabs+1), tabs+1);
+            if (i < ast->children.size() - 1)
+                s << '\n';
         }
         if (ast->retStmt)
         {
