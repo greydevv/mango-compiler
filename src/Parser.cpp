@@ -72,19 +72,15 @@ std::unique_ptr<ExpressionAST> Parser::parseVarDef()
     eat(Token::TOK_TYPE);
     if (isArrayType(allocType))
     {
-        // need to eat second type that denotes the type of the elements
-        eat(Token::TOK_LT);
-        // Type eleType = typeFromString(tok.value);
-        eat(Token::TOK_TYPE);
-        eat(Token::TOK_GT);
         throw NotImplementedError("parsing of ArrayAST");
+        // need to eat second type that denotes the type of the elements
+        // eat(Token::TOK_LT);
+        // Type eleType = typeFromString(tok.value);
+        // eat(Token::TOK_TYPE);
+        // eat(Token::TOK_GT);
     }
 
     std::string id = tok.value;
-    // if (st.contains(id))
-    //     throw ReferenceError(fp, fmt::format("variable '{}' already defined", id), underlineTok(tok), tok.loc);
-    // else
-    //     st.insert(id, allocType);
     auto allocVar = std::make_unique<VariableAST>(tok.value, allocType, VarCtx::eAlloc, tok.loc);
     eat(Token::TOK_ID);
     return createVarAssignExpr(std::move(allocVar));
@@ -93,8 +89,6 @@ std::unique_ptr<ExpressionAST> Parser::parseVarDef()
 std::unique_ptr<ExpressionAST> Parser::parseVarStore()
 {
     std::string id = tok.value;
-    // if (!st.contains(id))
-    //     throw ReferenceError(fp, fmt::format("unknown variable name '{}'", id), underlineTok(tok), tok.loc);
     auto storeVar = std::make_unique<VariableAST>(id, VarCtx::eStore, tok.loc);
     eat(Token::TOK_ID);
     return createVarAssignExpr(std::move(storeVar));
