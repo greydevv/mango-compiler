@@ -59,6 +59,11 @@ Type ASTValidator::validate(ExpressionAST* ast)
     return lType;
 }
 
+Type ASTValidator::validate(UnaryExprAST* ast)
+{
+    throw NotImplementedError("UnaryExprAST validation");
+}
+
 Type ASTValidator::validate(VariableAST* ast)
 {
     switch (ast->ctx)

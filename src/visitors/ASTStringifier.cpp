@@ -51,7 +51,12 @@ std::string ASTStringifier::toString(ExpressionAST* ast, int tabs)
     return s.str();
 }
 
-std::string ASTStringifier::toString(VariableAST* ast, int tabs) 
+std::string ASTStringifier::toString(UnaryExprAST* ast, int tabs)
+{
+    return "UnaryExprAST";
+}
+
+std::string ASTStringifier::toString(VariableAST* ast, int tabs)
 {
     std::ostringstream s;
     if (simpleExpr)

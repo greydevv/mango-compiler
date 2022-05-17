@@ -7,6 +7,7 @@
 
 class ModuleAST;
 class ExpressionAST;
+class UnaryExprAST;
 class VariableAST;
 class NumberAST;
 class ArrayAST;
@@ -25,6 +26,7 @@ class ASTStringifier
         ASTStringifier(bool simpleExpr = false);
         std::string toString(ModuleAST* ast, int tabs = 0);
         std::string toString(ExpressionAST* ast, int tabs = 0);
+        std::string toString(UnaryExprAST* ast, int tabs);
         std::string toString(VariableAST* ast, int tabs = 0);
         std::string toString(NumberAST* ast, int tabs = 0);
         std::string toString(ArrayAST* ast, int tabs = 0);

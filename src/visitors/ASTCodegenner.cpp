@@ -181,6 +181,11 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
     }
 }
 
+llvm::Value* ASTCodegenner::codegen(UnaryExprAST* ast) 
+{
+    throw NotImplementedError("UnaryExprAST codegen");
+}
+
 llvm::Value* ASTCodegenner::codegen(ModuleAST* ast) 
 {
     ctx.push(ast->fp);

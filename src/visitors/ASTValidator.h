@@ -8,6 +8,7 @@
 
 class ModuleAST;
 class ExpressionAST;
+class UnaryExprAST;
 class VariableAST;
 class NumberAST;
 class ArrayAST;
@@ -27,6 +28,7 @@ class ASTValidator
         void validate();
         Type validate(ModuleAST* ast);
         Type validate(ExpressionAST* ast);
+        Type validate(UnaryExprAST* ast);
         Type validate(VariableAST* ast);
         Type validate(NumberAST* ast);
         Type validate(ArrayAST* ast);

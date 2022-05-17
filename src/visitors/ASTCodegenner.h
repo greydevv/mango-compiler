@@ -10,6 +10,7 @@
 #include "llvm/IR/Value.h"
 
 class ExpressionAST;
+class UnaryExprAST;
 class ModuleAST;
 class VariableAST;
 class NumberAST;
@@ -31,6 +32,7 @@ class ASTCodegenner
         int emitObjectCode();
         llvm::Value* codegen();
         llvm::Value* codegen(ExpressionAST* ast);
+        llvm::Value* codegen(UnaryExprAST* ast);
         llvm::Value* codegen(ModuleAST* ast);
         llvm::Value* codegen(VariableAST* ast);
         llvm::Value* codegen(NumberAST* ast);
