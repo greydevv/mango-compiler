@@ -154,15 +154,31 @@ Token::token_type Lexer::lexTokenType()
         case '.':
             return Token::TOK_PERIOD;
         case '+':
-            return Token::TOK_PLUS;
-        case '-':
         {
-            if (peek() == '>')
+            if (peek() == '+')
             {
                 next();
-                return Token::TOK_RARROW;
+                return Token::TOK_DPLUS;
             }
-            return Token::TOK_MINUS;
+            return Token::TOK_PLUS;
+        }
+        case '-':
+        {
+            switch(peek())
+            {
+                case '>':
+                {
+                    next();
+                    return Token::TOK_RARROW;
+                }
+                case '-':
+                {
+                    next();
+                    return Token::TOK_DMINUS;
+                }
+                default:
+                    return Token::TOK_MINUS;
+            }
         }
         case '*':
             return Token::TOK_STAR;
