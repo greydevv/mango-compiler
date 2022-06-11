@@ -19,6 +19,7 @@
 #include "../ast/IfAST.h"
 #include "../ast/ForAST.h"
 #include "../ast/WhileAST.h"
+#include "../ast/UnaryExprAST.h"
 #include "../Exception.h"
 
 ASTValidator::ASTValidator(std::shared_ptr<ModuleAST> ast, ContextManager& ctx)
@@ -61,7 +62,8 @@ Type ASTValidator::validate(ExpressionAST* ast)
 
 Type ASTValidator::validate(UnaryExprAST* ast)
 {
-    throw NotImplementedError("UnaryExprAST validation");
+    // TODO: validate the type we're incrementing / decrementing
+    return ast->operand->accept(*this);
 }
 
 Type ASTValidator::validate(VariableAST* ast)

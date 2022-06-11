@@ -16,6 +16,7 @@
 #include "../ast/IfAST.h"
 #include "../ast/ForAST.h"
 #include "../ast/WhileAST.h"
+#include "../ast/UnaryExprAST.h"
 #include "ASTStringifier.h"
 
 ASTStringifier::ASTStringifier(bool simpleExpr)
@@ -53,7 +54,25 @@ std::string ASTStringifier::toString(ExpressionAST* ast, int tabs)
 
 std::string ASTStringifier::toString(UnaryExprAST* ast, int tabs)
 {
-    return "UnaryExprAST";
+    std::ostringstream s;
+    if (simpleExpr)
+    {
+        s << '(';
+        if (ast->isPrefix())
+            s << operatorValues.at(ast->op) << ast->operand->accept(*this, tabs);
+        else
+
+        s << ')';
+    }
+    else
+    {
+        s << "UnaryExprAST(";
+        s << (ast->isPrefix() ? "prefix" : "postfix") << ", ";
+        s << operatorValues.at(ast->op) << "):\n";
+        s << indent(ast->operand->accept(*this, tabs+1), tabs+1);
+    }
+
+    return s.str();
 }
 
 std::string ASTStringifier::toString(VariableAST* ast, int tabs)
