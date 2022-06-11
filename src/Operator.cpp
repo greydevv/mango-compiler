@@ -84,6 +84,27 @@ Operator Operator::opDivide()
     return Operator(Operator::OP_DIV, 7, Operator::A_LEFT);
 }
 
+Operator Operator::opDecrement()
+{
+    return Operator(Operator::OP_DEC, 8, Operator::A_RIGHT);
+}
+
+Operator Operator::opIncrement()
+{
+    return Operator(Operator::OP_INC, 8, Operator::A_RIGHT);
+}
+
+Operator Operator::opPreDecrement()
+{
+    return Operator(Operator::OP_INC, 9, Operator::A_RIGHT);
+}
+
+Operator Operator::opPreIncrement()
+{
+    return Operator(Operator::OP_INC, 9, Operator::A_RIGHT);
+}
+
+
 // Operator Operator::opPower()
 // {
 //     // TODO: should I support this?
