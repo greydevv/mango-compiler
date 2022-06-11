@@ -1,4 +1,9 @@
 #include "UnaryExprAST.h"
+#include "../Operator.h"
+#include "../visitors/ASTValidator.h"
+#include "../visitors/ASTCodegenner.h"
+#include "../visitors/ASTStringifier.h"
+#include "llvm/IR/Value.h"
 
 UnaryExprAST::UnaryExprAST(std::unique_ptr<AST> operand, Operator::op_type op)
     : operand(std::move(operand)), op(op) {}
