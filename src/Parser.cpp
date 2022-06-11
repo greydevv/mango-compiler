@@ -25,6 +25,7 @@
 #include "ast/IfAST.h"
 #include "ast/ForAST.h"
 #include "ast/WhileAST.h"
+#include "ast/UnaryExprAST.h"
 
 Parser::Parser(FilePath fp, ContextManager& ctx)
     : fp(fp), 
@@ -473,7 +474,31 @@ std::unique_ptr<AST> Parser::parseIdTerm()
     return varAST;
 }
 
-std::unique_ptr<AST> Parser::parseTerm() 
+std::unique_ptr<AST> Parser::parsePreUnaryExpr()
+{
+    // refactor this (duplicated in parsePostUnaryExpr()
+    Operator::op_type unaryOpType;
+    if (tok.type == Token::TOK_DPLUS)
+        unaryOpType = Operator::OP_INC_PRE;
+    else
+        unaryOpType = Operator::OP_DEC_PRE;
+    eat();
+    return UnaryExprAST::unaryPrefix(parseOperand(), unaryOpType);
+}
+
+std::unique_ptr<AST> Parser::parsePostUnaryExpr(std::unique_ptr<AST> operand)
+{
+    // refactor this (duplicated in parsePreUnaryExpr()
+    Operator::op_type unaryOpType;
+    if (tok.type == Token::TOK_DPLUS)
+        unaryOpType = Operator::OP_INC;
+    else
+        unaryOpType = Operator::OP_DEC;
+    eat();
+    return UnaryExprAST::unaryPostfix(std::move(operand), unaryOpType);
+}
+
+std::unique_ptr<AST> Parser::parseOperand() 
 {
     switch (tok.type)
     {
@@ -514,6 +539,26 @@ std::unique_ptr<AST> Parser::parseTerm()
                 throw SyntaxError(msg, underlineTok(tok), tok.loc);
             }
     }
+
+}
+
+std::unique_ptr<AST> Parser::parseTerm() 
+{
+    if (isUnary())
+    {
+        // prefixed unary operator
+        return parsePreUnaryExpr();
+    } else {
+        std::unique_ptr<AST> operand = parseOperand();
+        if (isUnary())
+            return parsePostUnaryExpr(std::move(operand));
+        return operand;
+    }
+}
+
+bool Parser::isUnary()
+{
+    return (tok.type == Token::TOK_DPLUS || tok.type == Token::TOK_DMINUS);
 }
 
 std::unique_ptr<AST> Parser::parseExpr()
