@@ -67,8 +67,8 @@ std::string ASTStringifier::toString(UnaryExprAST* ast, int tabs)
     else
     {
         s << "UnaryExprAST(";
-        s << (ast->isPrefix() ? "prefix" : "postfix") << ", ";
-        s << operatorValues.at(ast->op) << "):\n";
+        s << operatorValues.at(ast->op) << ", ";
+        s << (ast->isPrefix() ? "prefix" : "postfix") << "):\n";
         s << indent(ast->operand->accept(*this, tabs+1), tabs+1);
     }
 
