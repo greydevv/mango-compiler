@@ -53,8 +53,8 @@ class Parser
         std::unique_ptr<ArrayAST> parseIntArrayGen();
         std::unique_ptr<WhileAST> parseWhileStmt();
         std::unique_ptr<AST> parseIdTerm();
-        std::unique_ptr<AST> parsePreUnaryExpr();
-        std::unique_ptr<AST> parsePostUnaryExpr(std::unique_ptr<AST> operand);
+        std::unique_ptr<UnaryExprAST> parsePreUnaryExpr();
+        std::unique_ptr<UnaryExprAST> parsePostUnaryExpr(std::unique_ptr<AST> operand);
         std::unique_ptr<AST> parseOperand();
         std::unique_ptr<AST> parseTerm();
         bool isUnary();

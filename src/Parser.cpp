@@ -474,26 +474,17 @@ std::unique_ptr<AST> Parser::parseIdTerm()
     return varAST;
 }
 
-std::unique_ptr<AST> Parser::parsePreUnaryExpr()
+std::unique_ptr<UnaryExprAST> Parser::parsePreUnaryExpr()
 {
-    // refactor this (duplicated in parsePostUnaryExpr()
-    Operator::op_type unaryOpType;
-    if (tok.type == Token::TOK_DPLUS)
-        unaryOpType = Operator::OP_INC_PRE;
-    else
-        unaryOpType = Operator::OP_DEC_PRE;
+    Operator::op_type unaryOpType = tok.toOperator().getType();
     eat();
     return UnaryExprAST::unaryPrefix(parseOperand(), unaryOpType);
 }
 
-std::unique_ptr<AST> Parser::parsePostUnaryExpr(std::unique_ptr<AST> operand)
+std::unique_ptr<UnaryExprAST> Parser::parsePostUnaryExpr(std::unique_ptr<AST> operand)
 {
     // refactor this (duplicated in parsePreUnaryExpr()
-    Operator::op_type unaryOpType;
-    if (tok.type == Token::TOK_DPLUS)
-        unaryOpType = Operator::OP_INC;
-    else
-        unaryOpType = Operator::OP_DEC;
+    Operator::op_type unaryOpType = tok.toOperator().getType();
     eat();
     return UnaryExprAST::unaryPostfix(std::move(operand), unaryOpType);
 }
@@ -526,6 +517,8 @@ std::unique_ptr<AST> Parser::parseOperand()
             if (tok.value == "true")
             {
                 eat(Token::TOK_KWD);
+                // TODO: NumberAST creates 32-bit ints, but we need 1-bit for
+                // bool type
                 return std::make_unique<NumberAST>(1);
             }
             else if (tok.value == "false")

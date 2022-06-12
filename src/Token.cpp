@@ -25,6 +25,10 @@ Operator Token::toOperator()
 {
     switch (type)
     {
+        case Token::TOK_DPLUS:
+            return Operator::opIncrement();
+        case Token::TOK_DMINUS:
+            return Operator::opDecrement();
         case Token::TOK_EQUALS:
             return Operator::opEqual();
         case Token::TOK_PLUS:
