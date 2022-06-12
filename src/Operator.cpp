@@ -94,17 +94,6 @@ Operator Operator::opIncrement()
     return Operator(Operator::OP_INC, 8, Operator::A_RIGHT);
 }
 
-Operator Operator::opPreDecrement()
-{
-    return Operator(Operator::OP_INC, 9, Operator::A_RIGHT);
-}
-
-Operator Operator::opPreIncrement()
-{
-    return Operator(Operator::OP_INC, 9, Operator::A_RIGHT);
-}
-
-
 // Operator Operator::opPower()
 // {
 //     // TODO: should I support this?

@@ -11,10 +11,8 @@ class Operator final
     public:
         enum op_type
         {
-            OP_DEC,     // post-decrement (n--)
-            OP_DEC_PRE, // pre-decrement  (--n)
-            OP_INC,     // post-increment (n++)
-            OP_INC_PRE, // pre-increment  (++n)
+            OP_DEC,     // unary decrement (--)
+            OP_INC,     // unary increment (++)
             OP_EQL,
             OP_ADD,
             OP_SUB,
@@ -48,8 +46,6 @@ class Operator final
         static Operator opDivide();
         static Operator opDecrement();
         static Operator opIncrement();
-        static Operator opPreDecrement();
-        static Operator opPreIncrement();
         // static Operator opPower();
         static Operator opGT();
         static Operator opLT();
@@ -96,8 +92,6 @@ static const std::vector<std::string> operatorStrings = {
     "OP_DIV",
     "OP_DEC",
     "OP_INC",
-    "OP_DEC_PRE",
-    "OP_INC_PRE",
     // "OP_EXP",
     "OP_NOP",
     "OP_BOOL_GT",
@@ -118,8 +112,6 @@ static const std::map<Operator::op_type, std::string> operatorValues = {
     {Operator::OP_DIV, "/"},
     {Operator::OP_DEC, "--"},
     {Operator::OP_INC, "++"},
-    {Operator::OP_DEC_PRE, "--"},
-    {Operator::OP_INC_PRE, "++"},
     {Operator::OP_BOOL_GT, ">"},
     {Operator::OP_BOOL_LT, "<"},
     {Operator::OP_BOOL_GTE, ">="},
