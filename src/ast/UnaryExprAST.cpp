@@ -21,6 +21,17 @@ bool UnaryExprAST::isPostfix()
     return type == UNARY_POST;
 }
 
+bool UnaryExprAST::isInc()
+{
+    return op == Operator::OP_INC;
+}
+
+bool UnaryExprAST::isDec()
+{
+
+    return op == Operator::OP_DEC;
+}
+
 std::unique_ptr<UnaryExprAST> UnaryExprAST::unaryPrefix(std::unique_ptr<AST> operand, Operator::op_type op)
 {
     return std::make_unique<UnaryExprAST>(std::move(operand), op, UNARY_PRE);

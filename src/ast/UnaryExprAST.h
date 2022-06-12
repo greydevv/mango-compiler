@@ -22,6 +22,8 @@ class UnaryExprAST : public AST
         UnaryExprAST(const UnaryExprAST& other);
         bool isPrefix();
         bool isPostfix();
+        bool isInc();
+        bool isDec();
         static std::unique_ptr<UnaryExprAST> unaryPrefix(std::unique_ptr<AST> operand, Operator::op_type op);
         static std::unique_ptr<UnaryExprAST> unaryPostfix(std::unique_ptr<AST> operand, Operator::op_type op);
         virtual Type accept(ASTValidator& vd) override;
