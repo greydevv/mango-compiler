@@ -478,7 +478,8 @@ std::unique_ptr<UnaryExprAST> Parser::parsePreUnaryExpr()
 {
     Operator::op_type unaryOpType = tok.toOperator().getType();
     eat();
-    return UnaryExprAST::unaryPrefix(parseOperand(), unaryOpType);
+    std::unique_ptr<AST> operand = parseOperand(); 
+    return UnaryExprAST::unaryPrefix(std::move(operand), unaryOpType);
 }
 
 std::unique_ptr<UnaryExprAST> Parser::parsePostUnaryExpr(std::unique_ptr<AST> operand)
@@ -537,19 +538,18 @@ std::unique_ptr<AST> Parser::parseOperand()
 
 std::unique_ptr<AST> Parser::parseTerm() 
 {
-    if (isUnary())
-    {
-        // prefixed unary operator
+    // check if current token is a unary operator
+    if (isTokUnary())
         return parsePreUnaryExpr();
-    } else {
-        std::unique_ptr<AST> operand = parseOperand();
-        if (isUnary())
-            return parsePostUnaryExpr(std::move(operand));
-        return operand;
-    }
+
+    // if not a pre-unary, it could be post-unary
+    std::unique_ptr<AST> operand = parseOperand();
+    if (isTokUnary())
+        return parsePostUnaryExpr(std::move(operand));
+    return operand;
 }
 
-bool Parser::isUnary()
+bool Parser::isTokUnary()
 {
     return (tok.type == Token::TOK_DPLUS || tok.type == Token::TOK_DMINUS);
 }

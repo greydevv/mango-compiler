@@ -57,7 +57,7 @@ class Parser
         std::unique_ptr<UnaryExprAST> parsePostUnaryExpr(std::unique_ptr<AST> operand);
         std::unique_ptr<AST> parseOperand();
         std::unique_ptr<AST> parseTerm();
-        bool isUnary();
+        bool isTokUnary();
         std::unique_ptr<AST> parseExpr();
         std::unique_ptr<AST> parseSubExpr(std::unique_ptr<AST> L, int prec = 0);
 
