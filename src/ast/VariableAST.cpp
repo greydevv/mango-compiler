@@ -17,7 +17,7 @@ VariableAST::VariableAST(const VariableAST& other)
     : id(other.id), type(other.type), ctx(other.ctx), loc(other.loc) {}
 
 bool VariableAST::isAssignable() {
-    return ctx == VarCtx::eReference;
+    return ctx != VarCtx::eParam;
 }
 
 Type VariableAST::accept(ASTValidator& vd)

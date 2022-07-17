@@ -183,7 +183,7 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
 
 llvm::Value* ASTCodegenner::codegen(UnaryExprAST* ast) 
 {
-    // codegen operand. if it's a VariableAST, this returns a load instruction
+    // if it's a VariableAST, this returns a load instruction
     llvm::LoadInst* target = static_cast<llvm::LoadInst*>(ast->operand->accept(*this));
 
     // retrieve AllocaInst* from namedValues table
