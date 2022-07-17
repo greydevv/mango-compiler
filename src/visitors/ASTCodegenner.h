@@ -4,6 +4,7 @@
 #include <string>
 #include "../ContextManager.h"
 #include "../Types.h"
+#include "../Operator.h"
 #include "llvm/IR/Value.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/Instructions.h"
@@ -51,6 +52,7 @@ class ASTCodegenner
         void debugPrint(IfAST* ast);
         void insertFuncBlock(llvm::Function* func, llvm::BasicBlock* block);
         void createRetOrBr(std::shared_ptr<CompoundAST> body, llvm::BasicBlock* block);
+        llvm::Value* applyUnaryOperation(llvm::Value* res, Operator::op_type op);
         // void createRetOrBr(llvm::Value* retV, llvm::BasicBlock* block);
         llvm::Type* typeToLlvm(Type type);
         std::shared_ptr<ModuleAST> ast;

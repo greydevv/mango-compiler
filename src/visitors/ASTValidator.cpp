@@ -62,7 +62,9 @@ Type ASTValidator::validate(ExpressionAST* ast)
 
 Type ASTValidator::validate(UnaryExprAST* ast)
 {
-    // TODO: validate the type we're incrementing / decrementing
+    if (!ast->operand->isAssignable()) {
+        throw TypeError("expression is not assignable", "N/A", SourceLocation(0,0,0));
+    }
     return ast->operand->accept(*this);
 }
 

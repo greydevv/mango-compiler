@@ -21,6 +21,7 @@
 #include "../ast/IfAST.h"
 #include "../ast/ForAST.h"
 #include "../ast/WhileAST.h"
+#include "../ast/UnaryExprAST.h"
 #include "llvm/ADT/APFloat.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Value.h"
@@ -121,6 +122,7 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
         }
         else
         {
+            // otherwise, it's a redefinition
             llvm::Value* var = namedValues[varAst->id];
             if (!var)
             {
@@ -134,9 +136,7 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
     llvm::Value* L = ast->LHS->accept(*this);
     llvm::Value* R = ast->RHS->accept(*this);
     if (!L || !R)
-    {
         return nullptr;
-    }
 
     /*
      * CreateOp Notes:
@@ -152,7 +152,7 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
 
     switch (ast->op) {
         case Operator::OP_ADD:
-            return builder->CreateAdd(L, R, "addtmp");
+            return builder->CreateNSWAdd(L, R, "addtmp");
         case Operator::OP_SUB:
             return builder->CreateNSWSub(L, R, "subtmp");
         case Operator::OP_MUL:
@@ -183,16 +183,35 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
 
 llvm::Value* ASTCodegenner::codegen(UnaryExprAST* ast) 
 {
-    throw NotImplementedError("UnaryExprAST codegen");
+    // codegen operand. if it's a VariableAST, this returns a load instruction
+    llvm::LoadInst* target = static_cast<llvm::LoadInst*>(ast->operand->accept(*this));
+
+    // retrieve AllocaInst* from namedValues table
+    // std::unique_ptr<VariableAST> operand = std::unique_ptr<VariableAST>(dynamic_cast<VariableAST*>(ast->operand->clone()));
+    // llvm::AllocaInst* targetAlloca = namedValues[operand->id];
+    llvm::Value* targetAlloca = target->getPointerOperand();  
+    
+    // create new incremented value
+    llvm::Value* res = applyUnaryOperation(target, ast->op);
+    // store incremented value
+    builder->CreateStore(res, targetAlloca);
+
+    // if prefix, return incremented value; otherwise, original value before
+    // incrementation
+    return ast->isPrefix() ? res : target;
 }
 
 llvm::Value* ASTCodegenner::codegen(ModuleAST* ast) 
 {
+    // push file path of ModuleAST
     ctx.push(ast->fp);
     for (auto& child : ast->children)
     {
         child->accept(*this);
     }
+    // pop the filepath, done codegenning it
+    // this method is meant to work recursively if there is another ModuleAST
+    // as a child of a ModuleAST
     ctx.pop();
     return nullptr;
 }
@@ -205,6 +224,7 @@ llvm::Value* ASTCodegenner::codegen(VariableAST* ast)
         std::string msg = fmt::format("unknown variable '{}' (it was probably used in a nested function when defined outside. this is a compiler bug)", ast->id);
         throw ReferenceError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0,0));
     }
+
     return builder->CreateLoad(val->getAllocatedType(), val, ast->id);
 }
 
@@ -504,6 +524,24 @@ void ASTCodegenner::createRetOrBr(std::shared_ptr<CompoundAST> body, llvm::Basic
         builder->CreateBr(block);
     else
         builder->CreateRet(retV);
+}
+
+llvm::Value* ASTCodegenner::applyUnaryOperation(llvm::Value* target, Operator::op_type op)
+{
+    llvm::Value* res;
+    llvm::ConstantInt* other = llvm::ConstantInt::get(*llvmCtx, llvm::APInt(32, 1));
+    switch (op)
+    {
+        case Operator::OP_INC:
+            res = builder->CreateNSWAdd(target, other, "inctmp");
+            break;
+        case Operator::OP_DEC:
+            res = builder->CreateNSWSub(target, other, "dectmp");
+            break;
+        default:
+            throw SyntaxError("invalid unary operator", "LINE NOT IMPLEMENTED", SourceLocation(0,0,0));
+    }
+    return res;
 }
 
 llvm::Type* ASTCodegenner::typeToLlvm(Type type)
