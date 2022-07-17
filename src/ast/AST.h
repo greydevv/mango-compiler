@@ -10,6 +10,7 @@ class AST
 {
     public:
         virtual ~AST() {};
+        virtual bool isAssignable();
         virtual Type accept(ASTValidator& vd) = 0;
         virtual llvm::Value* accept(ASTCodegenner& cg) = 0;
         virtual std::string accept(ASTStringifier& sf, int tabs = 0) = 0;
