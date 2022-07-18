@@ -29,9 +29,7 @@ Token Lexer::peekToken()
 Token Lexer::nextToken()
 {
     if (is.eof())
-    {
         return Token(Token::TOK_EOF, "EOF", SourceLocation(loc, 1));
-    }
     else if (isspace(c))
     {
         // remove whitespace
@@ -45,21 +43,13 @@ Token Lexer::nextToken()
         return nextToken();
     }
     else if (isalpha(c) || c == '_')
-    {
         return lexAlpha();
-    }
     else if (isnumber(c))
-    {
         return lexNum();
-    }
     else if (c == '"')
-    {
         return lexString();
-    }
     else
-    {
         return lexOther();
-    }
 }
 
 Token Lexer::lexAlpha()

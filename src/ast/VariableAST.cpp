@@ -16,7 +16,8 @@ VariableAST::VariableAST(const std::string& id, SourceLocation loc)
 VariableAST::VariableAST(const VariableAST& other)
     : id(other.id), type(other.type), ctx(other.ctx), loc(other.loc) {}
 
-bool VariableAST::isAssignable() {
+bool VariableAST::isAssignable()
+{
     return ctx != VarCtx::eParam;
 }
 

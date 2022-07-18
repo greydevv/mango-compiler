@@ -64,7 +64,8 @@ int ASTCodegenner::emitObjectCode()
     
     std::string error;
     auto target = llvm::TargetRegistry::lookupTarget(targetTriple, error);
-    if (!target) {
+    if (!target)
+    {
         llvm::errs() << error;
         return 1;
     }
@@ -80,7 +81,8 @@ int ASTCodegenner::emitObjectCode()
     std::error_code ec;
     llvm::raw_fd_ostream dest(filename, ec, llvm::sys::fs::OF_None);
 
-    if (ec) {
+    if (ec)
+    {
         llvm::errs() << "Could not open file: " << ec.message();
         return 1;
     }
@@ -88,7 +90,8 @@ int ASTCodegenner::emitObjectCode()
     llvm::legacy::PassManager pass;
     auto ftype = llvm::CGFT_ObjectFile;
 
-    if (targetMachine->addPassesToEmitFile(pass, dest, nullptr, ftype)) {
+    if (targetMachine->addPassesToEmitFile(pass, dest, nullptr, ftype))
+    {
         llvm::errs() << "TargetMachine can't emit a file of this type";
         return 1;
     }
@@ -150,7 +153,8 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
      *
      */
 
-    switch (ast->op) {
+    switch (ast->op)
+    {
         case Operator::OP_ADD:
             return builder->CreateNSWAdd(L, R, "addtmp");
         case Operator::OP_SUB:
