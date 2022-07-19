@@ -13,7 +13,7 @@ class IfAST : public AST
     public:
         std::shared_ptr<AST> expr;
         std::shared_ptr<CompoundAST> body;
-        std::shared_ptr<IfAST> other; // else if, else, etc...
+        std::shared_ptr<IfAST> other;  // else if, else, etc...
 
         IfAST(std::shared_ptr<AST> expr, std::unique_ptr<CompoundAST> body, std::unique_ptr<IfAST> other);
         IfAST(const IfAST& other);
