@@ -17,12 +17,12 @@ Type WhileAST::accept(ASTValidator& vd)
     return vd.validate(this);
 }
 
-llvm::Value* WhileAST::accept(ASTCodegenner& cg) 
+llvm::Value* WhileAST::accept(ASTCodegenner& cg)
 {
     return cg.codegen(this);
 }
 
-std::string WhileAST::accept(ASTStringifier& sf, int tabs) 
+std::string WhileAST::accept(ASTStringifier& sf, int tabs)
 {
     return sf.toString(this, tabs);
 }

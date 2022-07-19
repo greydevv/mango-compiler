@@ -37,7 +37,7 @@
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/Target/TargetOptions.h"
 
-ASTCodegenner::ASTCodegenner(std::shared_ptr<ModuleAST> ast, ContextManager& ctx) 
+ASTCodegenner::ASTCodegenner(std::shared_ptr<ModuleAST> ast, ContextManager& ctx)
     : ast(ast),
       ctx(ctx),
       llvmCtx(std::make_unique<llvm::LLVMContext>()),
@@ -61,7 +61,7 @@ int ASTCodegenner::emitObjectCode()
     llvm::InitializeAllTargetMCs();
     llvm::InitializeAllAsmParsers();
     llvm::InitializeAllAsmPrinters();
-    
+
     std::string error;
     auto target = llvm::TargetRegistry::lookupTarget(targetTriple, error);
     if (!target)
@@ -86,7 +86,7 @@ int ASTCodegenner::emitObjectCode()
         llvm::errs() << "Could not open file: " << ec.message();
         return 1;
     }
-    
+
     llvm::legacy::PassManager pass;
     auto ftype = llvm::CGFT_ObjectFile;
 
@@ -101,12 +101,12 @@ int ASTCodegenner::emitObjectCode()
     return 0;
 }
 
-llvm::Value* ASTCodegenner::codegen() 
+llvm::Value* ASTCodegenner::codegen()
 {
     return ast->accept(*this);
 }
 
-llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast) 
+llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
 {
     // handle special case of variable declaration / reassignment
     // in this case, we don't want to codegen LHS as a separate expression
@@ -122,15 +122,14 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
             namedValues[varAst->id] = varAlloca;
             // store value at current insert point
             builder->CreateStore(rhs, varAlloca);
-        }
-        else
+        } else
         {
             // otherwise, it's a redefinition
             llvm::Value* var = namedValues[varAst->id];
             if (!var)
             {
                 std::string msg = fmt::format("unknown variable '{}' (it was probably used in a nested function when defined outside. this is a compiler bug)", varAst->id);
-                throw ReferenceError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0,0));
+                throw ReferenceError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0, 0, 0));
             }
             builder->CreateStore(rhs, var);
         }
@@ -149,7 +148,7 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
      * NUS = No Unsigned Wrap
      *
      * NEVER DELETE THIS LINK LOL:
-     * https://stackoverflow.com/questions/61207663/how-to-use-llvmirbuilder-create-add-sub-mul-div 
+     * https://stackoverflow.com/questions/61207663/how-to-use-llvmirbuilder-create-add-sub-mul-div
      *
      */
 
@@ -180,12 +179,12 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
         default:
             {
                 // TODO: need to capture the operator's value
-                throw SyntaxError("invalid binary operator", "LINE NOT IMPLEMENTED", SourceLocation(0,0,0));
+                throw SyntaxError("invalid binary operator", "LINE NOT IMPLEMENTED", SourceLocation(0, 0, 0));
             }
     }
 }
 
-llvm::Value* ASTCodegenner::codegen(UnaryExprAST* ast) 
+llvm::Value* ASTCodegenner::codegen(UnaryExprAST* ast)
 {
     // if it's a VariableAST, this returns a load instruction
     llvm::LoadInst* target = static_cast<llvm::LoadInst*>(ast->operand->accept(*this));
@@ -193,8 +192,8 @@ llvm::Value* ASTCodegenner::codegen(UnaryExprAST* ast)
     // retrieve AllocaInst* from namedValues table
     // std::unique_ptr<VariableAST> operand = std::unique_ptr<VariableAST>(dynamic_cast<VariableAST*>(ast->operand->clone()));
     // llvm::AllocaInst* targetAlloca = namedValues[operand->id];
-    llvm::Value* targetAlloca = target->getPointerOperand();  
-    
+    llvm::Value* targetAlloca = target->getPointerOperand();
+
     // create new incremented value
     llvm::Value* res = applyUnaryOperation(target, ast->op);
     // store incremented value
@@ -205,7 +204,7 @@ llvm::Value* ASTCodegenner::codegen(UnaryExprAST* ast)
     return ast->isPrefix() ? res : target;
 }
 
-llvm::Value* ASTCodegenner::codegen(ModuleAST* ast) 
+llvm::Value* ASTCodegenner::codegen(ModuleAST* ast)
 {
     // push file path of ModuleAST
     ctx.push(ast->fp);
@@ -220,19 +219,19 @@ llvm::Value* ASTCodegenner::codegen(ModuleAST* ast)
     return nullptr;
 }
 
-llvm::Value* ASTCodegenner::codegen(VariableAST* ast) 
+llvm::Value* ASTCodegenner::codegen(VariableAST* ast)
 {
     llvm::AllocaInst* val = namedValues[ast->id];
     if (!val)
     {
         std::string msg = fmt::format("unknown variable '{}' (it was probably used in a nested function when defined outside. this is a compiler bug)", ast->id);
-        throw ReferenceError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0,0));
+        throw ReferenceError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0, 0, 0));
     }
 
     return builder->CreateLoad(val->getAllocatedType(), val, ast->id);
 }
 
-llvm::Value* ASTCodegenner::codegen(NumberAST* ast) 
+llvm::Value* ASTCodegenner::codegen(NumberAST* ast)
 {
     return llvm::ConstantInt::get(*llvmCtx, llvm::APInt(32, ast->val));
 }
@@ -249,7 +248,7 @@ llvm::Value* ASTCodegenner::codegen(ArrayAST* ast)
     return nullptr;
 }
 
-llvm::Function* ASTCodegenner::codegen(FunctionAST* ast) 
+llvm::Function* ASTCodegenner::codegen(FunctionAST* ast)
 {
     llvm::Function* func = mainModule->getFunction(ast->proto->name);
     if (!func)
@@ -271,7 +270,7 @@ llvm::Function* ASTCodegenner::codegen(FunctionAST* ast)
         builder->CreateStore(&param, argAlloca);
         namedValues[param.getName().str()] = argAlloca;
     }
-    
+
     llvm::Value* retVal = ast->body->accept(*this);
     if (ast->body->retStmt)
     {
@@ -284,7 +283,7 @@ llvm::Function* ASTCodegenner::codegen(FunctionAST* ast)
     return nullptr;
 }
 
-llvm::Value* ASTCodegenner::codegen(CompoundAST* ast) 
+llvm::Value* ASTCodegenner::codegen(CompoundAST* ast)
 {
     // children.size() - 1 to skip return statement (only temporary)
     for (int i = 0; i < ast->children.size(); i++)
@@ -296,7 +295,7 @@ llvm::Value* ASTCodegenner::codegen(CompoundAST* ast)
     return nullptr;
 }
 
-llvm::Function* ASTCodegenner::codegen(PrototypeAST* ast) 
+llvm::Function* ASTCodegenner::codegen(PrototypeAST* ast)
 {
     std::vector<llvm::Type*> paramTypes;
     for (auto& param : ast->params)
@@ -314,7 +313,7 @@ llvm::Function* ASTCodegenner::codegen(PrototypeAST* ast)
     return func;
 }
 
-llvm::Value* ASTCodegenner::codegen(ReturnAST* ast) 
+llvm::Value* ASTCodegenner::codegen(ReturnAST* ast)
 {
     if (ast->hasExpr())
         return ast->expr->accept(*this);
@@ -322,19 +321,19 @@ llvm::Value* ASTCodegenner::codegen(ReturnAST* ast)
     return nullptr;
 }
 
-llvm::Value* ASTCodegenner::codegen(CallAST* ast) 
+llvm::Value* ASTCodegenner::codegen(CallAST* ast)
 {
     llvm::Function* callee = mainModule->getFunction(ast->id);
     if (!callee)
     {
         std::string msg = fmt::format("unknown function '{}'", ast->id);
-        throw ReferenceError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0,0));
+        throw ReferenceError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0, 0, 0));
     }
     if (callee->arg_size() != ast->params.size())
     {
         // TODO: make new error for this (Python uses TypeError)
         std::string msg = fmt::format("function received {} arguments but expected {} arguments", callee->arg_size(), ast->params.size());
-        throw SyntaxError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0,0,0));
+        throw SyntaxError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0, 0, 0));
     }
     std::vector<llvm::Value*> argValues;
     for (int i = 0; i < ast->params.size(); i++)
@@ -357,7 +356,7 @@ llvm::Value* ASTCodegenner::codegen(IfAST* ast, llvm::BasicBlock* parentMergeBlo
     llvm::BasicBlock* trueBlock = llvm::BasicBlock::Create(*llvmCtx, "if");
     llvm::BasicBlock* falseBlock = llvm::BasicBlock::Create(*llvmCtx, "else");
     llvm::BasicBlock* localMergeBlock = llvm::BasicBlock::Create(*llvmCtx, "merge");
-    
+
     llvm::Value* cond = ast->expr->accept(*this);
     builder->CreateCondBr(cond, trueBlock, falseBlock);
 
@@ -376,16 +375,14 @@ llvm::Value* ASTCodegenner::codegen(IfAST* ast, llvm::BasicBlock* parentMergeBlo
             insertFuncBlock(func, falseBlock);
             // recur
             codegen(dynamic_cast<IfAST*>(ast->other->clone()), localMergeBlock);
-        }
-        else
+        } else
         {
             // 'else' block encountered
             insertFuncBlock(func, falseBlock);
             createRetOrBr(std::move(ast->other->body), localMergeBlock);
             falseBlock = builder->GetInsertBlock();
         }
-    }
-    else
+    } else
     {
         // implicit 'else' block, need to generate one
         insertFuncBlock(func, falseBlock);
@@ -425,7 +422,7 @@ llvm::Value* ASTCodegenner::codegen(ForAST* ast)
     // llvm::BasicBlock* condBlock = llvm::BasicBlock::Create(*llvmCtx, "cond");
     // llvm::BasicBlock* forBlock = llvm::BasicBlock::Create(*llvmCtx, "for");
     // llvm::BasicBlock* mergeBlock = llvm::BasicBlock::Create(*llvmCtx, "merge");
-    
+
     // insertFuncBlock(func, condBlock);
     // condBlock = builder->GetInsertBlock();
 
@@ -492,14 +489,12 @@ void ASTCodegenner::debugPrint(IfAST* ast)
             // if statement with an else if after it
             std::cout << "true block, cond block\n";
             debugPrint(ast->other.get());
-        }
-        else
+        } else
         {
             std::cout << "true block, false block\n";
             // if statement with an else after it
         }
-    }
-    else
+    } else
     {
         // if statement without else
         std::cout << "true block, br block\n";
@@ -543,7 +538,7 @@ llvm::Value* ASTCodegenner::applyUnaryOperation(llvm::Value* target, Operator::o
             res = builder->CreateNSWSub(target, other, "dectmp");
             break;
         default:
-            throw SyntaxError("invalid unary operator", "LINE NOT IMPLEMENTED", SourceLocation(0,0,0));
+            throw SyntaxError("invalid unary operator", "LINE NOT IMPLEMENTED", SourceLocation(0, 0, 0));
     }
     return res;
 }

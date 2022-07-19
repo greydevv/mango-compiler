@@ -6,7 +6,7 @@
 #include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
-class NumberAST : public AST 
+class NumberAST : public AST
 {
     public:
         double val;

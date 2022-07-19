@@ -1,11 +1,11 @@
 #include "AST.h"
 
-bool AST::isAssignable() 
+bool AST::isAssignable()
 {
     return false;
 }
 
-AST* AST::clone() 
+AST* AST::clone()
 {
     return cloneImpl();
 }

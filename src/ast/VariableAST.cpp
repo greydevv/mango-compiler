@@ -26,17 +26,17 @@ Type VariableAST::accept(ASTValidator& vd)
     return vd.validate(this);
 }
 
-llvm::Value* VariableAST::accept(ASTCodegenner& cg) 
+llvm::Value* VariableAST::accept(ASTCodegenner& cg)
 {
     return cg.codegen(this);
 }
 
-std::string VariableAST::accept(ASTStringifier& sf, int tabs) 
+std::string VariableAST::accept(ASTStringifier& sf, int tabs)
 {
     return sf.toString(this, tabs);
 }
 
 VariableAST* VariableAST::cloneImpl()
 {
-    return new VariableAST(*this);    
+    return new VariableAST(*this);
 }

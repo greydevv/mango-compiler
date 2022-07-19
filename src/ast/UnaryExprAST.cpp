@@ -42,7 +42,7 @@ std::unique_ptr<UnaryExprAST> UnaryExprAST::unaryPostfix(std::unique_ptr<AST> op
     return std::make_unique<UnaryExprAST>(std::move(operand), op, UNARY_POST);
 }
 
-llvm::Value* UnaryExprAST::accept(ASTCodegenner& cg) 
+llvm::Value* UnaryExprAST::accept(ASTCodegenner& cg)
 {
     return cg.codegen(this);
 }
@@ -52,7 +52,7 @@ Type UnaryExprAST::accept(ASTValidator& vd)
     return vd.validate(this);
 }
 
-std::string UnaryExprAST::accept(ASTStringifier& sf, int tabs) 
+std::string UnaryExprAST::accept(ASTStringifier& sf, int tabs)
 {
     return sf.toString(this, tabs);
 }

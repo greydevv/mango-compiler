@@ -30,12 +30,12 @@ Type ArrayAST::accept(ASTValidator& vd)
     return vd.validate(this);
 }
 
-llvm::Value* ArrayAST::accept(ASTCodegenner& cg) 
+llvm::Value* ArrayAST::accept(ASTCodegenner& cg)
 {
     return cg.codegen(this);
 }
 
-std::string ArrayAST::accept(ASTStringifier& sf, int tabs) 
+std::string ArrayAST::accept(ASTStringifier& sf, int tabs)
 {
     return sf.toString(this, tabs);
 }

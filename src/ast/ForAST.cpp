@@ -13,7 +13,7 @@ ForAST::ForAST(std::unique_ptr<ExpressionAST> expr, std::unique_ptr<ArrayAST> it
 
 ForAST::ForAST(const ForAST& other)
     : expr(std::unique_ptr<ExpressionAST>(dynamic_cast<ExpressionAST*>(other.expr->clone()))),
-      iter(std::unique_ptr<ArrayAST>(dynamic_cast<ArrayAST*>(other.iter->clone()))), 
+      iter(std::unique_ptr<ArrayAST>(dynamic_cast<ArrayAST*>(other.iter->clone()))),
       body(std::unique_ptr<CompoundAST>(dynamic_cast<CompoundAST*>(other.body->clone()))) {}
 
 Type ForAST::accept(ASTValidator& vd)
@@ -21,12 +21,12 @@ Type ForAST::accept(ASTValidator& vd)
     return vd.validate(this);
 }
 
-llvm::Value* ForAST::accept(ASTCodegenner& cg) 
+llvm::Value* ForAST::accept(ASTCodegenner& cg)
 {
     return cg.codegen(this);
 }
 
-std::string ForAST::accept(ASTStringifier& sf, int tabs) 
+std::string ForAST::accept(ASTStringifier& sf, int tabs)
 {
     return sf.toString(this, tabs);
 }

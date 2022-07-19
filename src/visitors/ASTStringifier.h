@@ -38,7 +38,7 @@ class ASTStringifier
         std::string toString(IfAST* ast, int tabs = 0);
         std::string toString(ForAST* ast, int tabs = 0);
         std::string toString(WhileAST* ast, int tabs = 0);
-    
+
     private:
         bool simpleExpr;
         std::string indent(std::string str, int tabs = 1);
