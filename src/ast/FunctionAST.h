@@ -1,6 +1,7 @@
 #ifndef FUNCTION_AST_H
 #define FUNCTION_AST_H
 
+#include <string>
 #include <memory>
 #include "AST.h"
 #include "ExpressionAST.h"

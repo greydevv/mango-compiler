@@ -1,6 +1,8 @@
 #ifndef RETURN_AST_H
 #define RETURN_AST_H
 
+#include <string>
+#include <memory>
 #include "AST.h"
 #include "../visitors/ASTValidator.h"
 #include "../visitors/ASTCodegenner.h"

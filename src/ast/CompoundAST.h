@@ -1,6 +1,7 @@
 #ifndef COMPOUND_AST_H
 #define COMPOUND_AST_H
 
+#include <string>
 #include <memory>
 #include <vector>
 #include "AST.h"

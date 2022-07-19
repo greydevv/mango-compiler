@@ -3,6 +3,8 @@
 #include <memory>
 #include <sstream>
 #include <string>
+#include <vector>
+#include <utility>
 #include "ASTCodegenner.h"
 #include "../ContextManager.h"
 #include "../io.h"

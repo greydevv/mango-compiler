@@ -1,4 +1,6 @@
+#include <string>
 #include <memory>
+#include <utility>
 #include "ForAST.h"
 #include "ExpressionAST.h"
 #include "ArrayAST.h"

@@ -1,6 +1,9 @@
 #ifndef ARRAY_AST_H
 #define ARRAY_AST_H
 
+#include <string>
+#include <memory>
+#include <vector>
 #include "AST.h"
 #include "../Types.h"
 #include "../visitors/ASTValidator.h"

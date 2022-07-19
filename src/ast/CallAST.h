@@ -1,6 +1,7 @@
 #ifndef CALL_AST_H
 #define CALL_AST_H
 
+#include <string>
 #include <memory>
 #include <vector>
 #include "AST.h"

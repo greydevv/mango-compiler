@@ -2,6 +2,8 @@
 #define AST_VALIDATOR_H
 
 #include <string>
+#include <memory>
+#include <vector>
 #include "../Types.h"
 #include "../ContextManager.h"
 #include "../SymbolTable.h"

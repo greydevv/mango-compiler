@@ -1,6 +1,7 @@
 #ifndef NUMBER_AST_H
 #define NUMBER_AST_H
 
+#include <string>
 #include "AST.h"
 #include "../Types.h"
 #include "../visitors/ASTCodegenner.h"

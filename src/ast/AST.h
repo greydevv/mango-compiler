@@ -1,6 +1,7 @@
 #ifndef AST_H
 #define AST_H
 
+#include <string>
 #include "llvm/IR/Value.h"
 #include "../visitors/ASTValidator.h"
 #include "../visitors/ASTCodegenner.h"

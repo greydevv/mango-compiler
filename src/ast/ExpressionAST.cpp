@@ -1,3 +1,5 @@
+#include <string>
+#include <utility>
 #include "AST.h"
 #include "ExpressionAST.h"
 #include "../Operator.h"

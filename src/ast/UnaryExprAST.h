@@ -1,6 +1,7 @@
 #ifndef UNARY_EXPR_AST
 #define UNARY_EXPR_AST
 
+#include <string>
 #include <memory>
 #include "AST.h"
 #include "../Operator.h"

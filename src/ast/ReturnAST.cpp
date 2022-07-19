@@ -1,3 +1,6 @@
+#include <string>
+#include <memory>
+#include <utility>
 #include "AST.h"
 #include "ReturnAST.h"
 #include "../visitors/ASTValidator.h"

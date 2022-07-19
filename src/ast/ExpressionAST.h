@@ -1,6 +1,7 @@
 #ifndef EXPRESSION_AST_H
 #define EXPRESSION_AST_H
 
+#include <string>
 #include <memory>
 #include "AST.h"
 #include "../Operator.h"

@@ -1,8 +1,9 @@
 #ifndef PROTOTYPE_AST_H
 #define PROTOTYPE_AST_H
 
-#include <vector>
+#include <string>
 #include <memory>
+#include <vector>
 #include "AST.h"
 #include "../Types.h"
 #include "VariableAST.h"

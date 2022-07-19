@@ -1,6 +1,7 @@
 #ifndef MODULE_AST_H
 #define MODULE_AST_H
 
+#include <string>
 #include <memory>
 #include <vector>
 #include "AST.h"

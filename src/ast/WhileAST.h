@@ -1,6 +1,8 @@
 #ifndef WHILE_AST_H
 #define WHILE_AST_H
 
+#include <string>
+#include <memory>
 #include "AST.h"
 #include "CompoundAST.h"
 #include "../visitors/ASTValidator.h"
