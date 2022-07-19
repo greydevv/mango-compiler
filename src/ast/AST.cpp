@@ -1,6 +1,7 @@
 #include "AST.h"
 
-bool AST::isAssignable() {
+bool AST::isAssignable() 
+{
     return false;
 }
 

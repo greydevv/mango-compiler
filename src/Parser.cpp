@@ -40,9 +40,7 @@ std::unique_ptr<ModuleAST> Parser::parse()
 {
     auto modAST = std::make_unique<ModuleAST>(fp);
     while (tok.type != Token::TOK_EOF)
-    {
         modAST->addChild(parsePrimary());
-    }
     return modAST;
 }
 
@@ -106,33 +104,19 @@ std::unique_ptr<ExpressionAST> Parser::createVarAssignExpr(std::unique_ptr<Varia
 std::unique_ptr<AST> Parser::parseKwd()
 {
     if (tok.value == "return")
-    {
         return parseReturnStmt();
-    }
     else if (tok.value == "func")
-    {
         return parseFuncDef();
-    }
     else if (tok.value == "if")
-    {
         return parseIfStmt();
-    }
     else if (tok.value == "for")
-    {
         return parseForStmt();
-    }
     else if (tok.value == "while")
-    {
         return parseWhileStmt();
-    }
     else if (tok.value == "extern")
-    {
         return parseExternStmt();
-    }
     else if (tok.value == "include")
-    {
         return parseIncludeStmt();
-    }
     else
     {
         std::cout << "[Dev Error] Keyword handling for '" << tok.value << "' not yet implemented in parser.\n";
@@ -143,9 +127,7 @@ std::unique_ptr<AST> Parser::parseKwd()
 std::unique_ptr<AST> Parser::parseId()
 {
     if (lexer.peekToken().type == Token::TOK_EQUALS)
-    {
         return parseVarStore();
-    }
     std::unique_ptr<AST> expr = parseExpr();
     eat(Token::TOK_SCOLON);
     return expr;
@@ -153,16 +135,14 @@ std::unique_ptr<AST> Parser::parseId()
 
 std::unique_ptr<NumberAST> Parser::parseNum() 
 {
-    std::unique_ptr<NumberAST> numAST = std::make_unique<NumberAST>(std::stod(tok.value));
+    auto numAST = std::make_unique<NumberAST>(std::stod(tok.value));
     eat(Token::TOK_NUM);
     return numAST;
 }
 
 std::unique_ptr<AST> Parser::parseArray(Type eleType)
 {
-    // throw NotImplementedError(fp, "array parsing", tok.loc);
     // either basic array '[a,b,c,d]' or string '"abcd"'
-    // if (eleType != Type::eString) {}
 
     auto arr = std::make_unique<ArrayAST>(eleType);
     eat(Token::TOK_OSQUARE);
@@ -194,10 +174,8 @@ std::unique_ptr<ModuleAST> Parser::parseIncludeStmt()
     eat(Token::TOK_SCOLON);
     std::unique_ptr<ModuleAST> incAST = getAstFromFile(includeFp, ctx);
     if (!incAST)
-    {
         // need to add quotes back for correct underlining
         throw FileNotFoundError(includeFp, underlineTok(includeTok), includeTok.loc);
-    }
     ctx.pop();
     return incAST;
 }
@@ -221,10 +199,6 @@ std::unique_ptr<FunctionAST> Parser::parseFuncDef()
 std::unique_ptr<PrototypeAST> Parser::parseFuncProto()
 {
     std::string name = tok.value;
-    // if (st.contains(name))
-    //     throw ReferenceError(fp, fmt::format("function '{}' already defined", name), underlineTok(tok), tok.loc);
-    // else
-    //     st.insert(name, Type::eFunc);
     eat(Token::TOK_ID);
     std::vector<std::unique_ptr<VariableAST>> params = parseFuncParams();
     Type retType = Type::eVoid;
@@ -253,13 +227,9 @@ std::vector<std::unique_ptr<VariableAST>> Parser::parseFuncParams()
             params.push_back(std::move(param));
             eat(Token::TOK_ID);
             if (tok == Token::TOK_COMMA)
-            {
                 eat(Token::TOK_COMMA);
-            }
             else
-            {
                 break;
-            }
         }
     }
     eat(Token::TOK_CPAREN);
@@ -278,13 +248,9 @@ std::vector<std::unique_ptr<AST>> Parser::parseCallParams()
             std::unique_ptr<AST> param = parseExpr();
             params.push_back(std::move(param));
             if (tok == Token::TOK_COMMA)
-            {
                 eat(Token::TOK_COMMA);
-            }
             else
-            {
                 break;
-            }
         }
     }
     eat(Token::TOK_CPAREN);
@@ -394,7 +360,6 @@ std::unique_ptr<ForAST> Parser::parseForStmt()
     eat(Token::TOK_CPAREN);
     std::unique_ptr<CompoundAST> body = parseCompound();
     return std::make_unique<ForAST>(std::move(expr), std::move(gen), std::move(body));
-    // throw NotImplementedError(fp, "For loop parsing.", SourceLocation(0,0));
 }
 
 std::unique_ptr<ArrayAST> Parser::parseIntArrayGen()
@@ -437,9 +402,7 @@ std::unique_ptr<ArrayAST> Parser::parseIntArrayGen()
     }
     std::vector<std::unique_ptr<AST>> values;
     for (int i = start; i < stop; i += step)
-    {
         values.push_back(std::make_unique<NumberAST>(i));
-    }
 
     return std::make_unique<ArrayAST>(Type::eInt, std::move(values));
 }
@@ -463,13 +426,9 @@ std::unique_ptr<AST> Parser::parseIdTerm()
     // check if function call
     if (tok.type == Token::TOK_OPAREN)
     {
-        // if (!st.contains(id))
-        //     throw ReferenceError(fp, fmt::format("unknown function name '{}'", id), underlineTok(tmpIdTok), tmpIdTok.loc);
         auto callAST = std::make_unique<CallAST>(tmpIdTok.value, parseCallParams());
         return callAST;
     }
-    // if (!st.contains(id))
-    //     throw ReferenceError(fp, fmt::format("unknown variable name '{}'", id), underlineTok(tmpIdTok), tmpIdTok.loc);
     auto varAST = std::make_unique<VariableAST>(tmpIdTok.value, tmpIdTok.loc);
     return varAST;
 }
@@ -510,10 +469,8 @@ std::unique_ptr<AST> Parser::parseOperand()
         case Token::TOK_OSQUARE:
             return parseArray();
         case Token::TOK_SCOLON:
-            {
-                // specific error message
-                throw SyntaxError("expected expression", underlineTok(tok), tok.loc);
-            }
+            // specific error message
+            throw SyntaxError("expected expression", underlineTok(tok), tok.loc);
         case Token::TOK_KWD:
             if (tok.value == "true")
             {
@@ -571,10 +528,10 @@ std::unique_ptr<AST> Parser::parseSubExpr(std::unique_ptr<AST> L, int prec)
         while ((nextOp > currOp) || ((currOp == nextOp) && (nextOp.getAssoc() == Operator::A_RIGHT)))
         {
             auto RHS = std::unique_ptr<AST>(R->clone());
-            if (currOp.getAssoc() == Operator::A_RIGHT)
-                R = parseSubExpr(std::move(RHS), currOp.getPrec());
-            else
-                R = parseSubExpr(std::move(RHS), currOp.getPrec()+1);
+            int nextPrec = currOp.getPrec();
+            if (currOp.getAssoc() == Operator::A_LEFT)
+                nextPrec++;
+            R = parseSubExpr(std::move(RHS), nextPrec);
             nextOp = tok.toOperator();
         }
         auto LHS = std::unique_ptr<AST>(L->clone());
@@ -588,7 +545,6 @@ bool Parser::eat(Token::token_type expectedType)
     bool badToken = (tok.type != expectedType);
     if (badToken)
     {
-        setErrState(1);
         std::string msg;
         if (tok.type == Token::TOK_EOF)
         {
@@ -632,16 +588,6 @@ void Parser::getToken()
         std::string msg = fmt::format("encountered unknown character '{}'", tok.value);
         throw SyntaxError(msg, underlineTok(tok), tok.loc);
     }
-}
-
-int Parser::getErrState()
-{
-    return errState;
-}
-
-void Parser::setErrState(int errState) 
-{
-    this->errState = errState;
 }
 
 std::string Parser::underlineTok(Token tok)

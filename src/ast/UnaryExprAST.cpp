@@ -29,7 +29,6 @@ bool UnaryExprAST::isInc()
 
 bool UnaryExprAST::isDec()
 {
-
     return op == Operator::OP_DEC;
 }
 

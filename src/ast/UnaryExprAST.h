@@ -11,10 +11,12 @@
 class UnaryExprAST : public AST
 {
     public:
-        enum unary_type {
+        enum unary_type
+        {
             UNARY_PRE,
             UNARY_POST,
         };
+
         std::unique_ptr<AST> operand;
         Operator::op_type op;
 
