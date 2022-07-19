@@ -25,11 +25,11 @@ class ExpressionAST : public AST
 
         ExpressionAST(std::unique_ptr<AST> LHS, std::unique_ptr<AST> RHS, Operator::op_type op);
         ExpressionAST(const ExpressionAST& other);
-        virtual Type accept(ASTValidator& vd) override;
-        virtual llvm::Value* accept(ASTCodegenner& cg) override;
-        virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
+        Type accept(ASTValidator& vd) override;
+        llvm::Value* accept(ASTCodegenner& cg) override;
+        std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:
-        virtual ExpressionAST* cloneImpl() override;
+        ExpressionAST* cloneImpl() override;
 };
 
 #endif

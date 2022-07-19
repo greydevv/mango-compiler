@@ -20,11 +20,11 @@ class ForAST : public AST
 
         ForAST(std::unique_ptr<ExpressionAST> expr, std::unique_ptr<ArrayAST> iter, std::unique_ptr<CompoundAST> body);
         ForAST(const ForAST& other);
-        virtual Type accept(ASTValidator& vd) override;
-        virtual llvm::Value* accept(ASTCodegenner& cg) override;
-        virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
+        Type accept(ASTValidator& vd) override;
+        llvm::Value* accept(ASTCodegenner& cg) override;
+        std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:
-        virtual ForAST* cloneImpl() override;
+        ForAST* cloneImpl() override;
 };
 
 #endif

@@ -80,8 +80,7 @@ Type ASTValidator::validate(VariableAST* ast)
             if (st.contains(ast->id))
             {
                 throw ReferenceError(fmt::format("variable '{}' was already defined", ast->id), ast->loc);
-            } else
-            {
+            } else {
                 st.insert(ast->id, ast->type);
                 return ast->type;
             }

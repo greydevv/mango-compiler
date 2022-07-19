@@ -124,8 +124,7 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
             namedValues[varAst->id] = varAlloca;
             // store value at current insert point
             builder->CreateStore(rhs, varAlloca);
-        } else
-        {
+        } else {
             // otherwise, it's a redefinition
             llvm::Value* var = namedValues[varAst->id];
             if (!var)
@@ -180,7 +179,7 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
             return builder->CreateAnd(L, R, "andtmp");
         default:
             {
-                // TODO: need to capture the operator's value
+                // TODO(greydevv): need to capture the operator's value
                 throw SyntaxError("invalid binary operator", "LINE NOT IMPLEMENTED", SourceLocation(0, 0, 0));
             }
     }
@@ -333,7 +332,7 @@ llvm::Value* ASTCodegenner::codegen(CallAST* ast)
     }
     if (callee->arg_size() != ast->params.size())
     {
-        // TODO: make new error for this (Python uses TypeError)
+        // TODO(greydevv): make new error for this (Python uses TypeError)
         std::string msg = fmt::format("function received {} arguments but expected {} arguments", callee->arg_size(), ast->params.size());
         throw SyntaxError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0, 0, 0));
     }
@@ -377,15 +376,13 @@ llvm::Value* ASTCodegenner::codegen(IfAST* ast, llvm::BasicBlock* parentMergeBlo
             insertFuncBlock(func, falseBlock);
             // recur
             codegen(dynamic_cast<IfAST*>(ast->other->clone()), localMergeBlock);
-        } else
-        {
+        } else {
             // 'else' block encountered
             insertFuncBlock(func, falseBlock);
             createRetOrBr(std::move(ast->other->body), localMergeBlock);
             falseBlock = builder->GetInsertBlock();
         }
-    } else
-    {
+    } else {
         // implicit 'else' block, need to generate one
         insertFuncBlock(func, falseBlock);
         builder->CreateBr(localMergeBlock);
@@ -397,7 +394,7 @@ llvm::Value* ASTCodegenner::codegen(IfAST* ast, llvm::BasicBlock* parentMergeBlo
         // merge the merge, lol
         builder->CreateBr(parentMergeBlock);
 
-    // TODO: implement PHI node functionality. Currently just inserting ret or
+    // TODO(greydevv): implement PHI node functionality. Currently just inserting ret or
     // br without PHI
 
     // if (!thenV || !elseV)
@@ -491,13 +488,11 @@ void ASTCodegenner::debugPrint(IfAST* ast)
             // if statement with an else if after it
             std::cout << "true block, cond block\n";
             debugPrint(ast->other.get());
-        } else
-        {
+        } else {
             std::cout << "true block, false block\n";
             // if statement with an else after it
         }
-    } else
-    {
+    } else {
         // if statement without else
         std::cout << "true block, br block\n";
     }

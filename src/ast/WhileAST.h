@@ -17,12 +17,12 @@ class WhileAST : public AST
 
         WhileAST(std::unique_ptr<AST> expr, std::unique_ptr<CompoundAST> body);
         WhileAST(const WhileAST& other);
-        virtual Type accept(ASTValidator& cg) override;
-        virtual llvm::Value* accept(ASTCodegenner& cg) override;
-        virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
+        Type accept(ASTValidator& cg) override;
+        llvm::Value* accept(ASTCodegenner& cg) override;
+        std::string accept(ASTStringifier& sf, int tabs = 0) override;
 
     protected:
-        virtual WhileAST* cloneImpl() override;
+        WhileAST* cloneImpl() override;
 };
 
 #endif

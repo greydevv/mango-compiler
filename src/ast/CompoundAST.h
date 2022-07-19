@@ -23,11 +23,11 @@ class CompoundAST : public AST
         void addChild(std::unique_ptr<AST> child);
         bool hasRetStmt();
         void setRetStmt(std::unique_ptr<ReturnAST> retStmt);
-        virtual Type accept(ASTValidator& vd) override;
-        virtual llvm::Value* accept(ASTCodegenner& cg) override;
-        virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
+        Type accept(ASTValidator& vd) override;
+        llvm::Value* accept(ASTCodegenner& cg) override;
+        std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:
-        virtual CompoundAST* cloneImpl() override;
+        CompoundAST* cloneImpl() override;
 };
 
 #endif

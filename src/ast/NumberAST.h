@@ -16,11 +16,11 @@ class NumberAST : public AST
         NumberAST(double val, Type type);
         NumberAST(double val);
         NumberAST(const NumberAST& other);
-        virtual Type accept(ASTValidator& vd) override;
-        virtual llvm::Value* accept(ASTCodegenner& cg) override;
-        virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
+        Type accept(ASTValidator& vd) override;
+        llvm::Value* accept(ASTCodegenner& cg) override;
+        std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:
-        virtual NumberAST* cloneImpl() override;
+        NumberAST* cloneImpl() override;
 };
 
 #endif
