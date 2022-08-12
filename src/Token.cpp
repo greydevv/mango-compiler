@@ -21,7 +21,7 @@ Token::Token(token_type type, SourceLocation loc)
 Token::Token(token_type type, const std::string& value, SourceLocation loc)
     : type(type), value(value), loc(loc) {}
 
-Operator Token::toOperator() 
+Operator Token::toOperator()
 {
     switch (type)
     {

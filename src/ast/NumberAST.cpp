@@ -18,12 +18,12 @@ Type NumberAST::accept(ASTValidator& vd)
     return vd.validate(this);
 }
 
-llvm::Value* NumberAST::accept(ASTCodegenner& cg) 
+llvm::Value* NumberAST::accept(ASTCodegenner& cg)
 {
     return cg.codegen(this);
 }
 
-std::string NumberAST::accept(ASTStringifier& sf, int tabs) 
+std::string NumberAST::accept(ASTStringifier& sf, int tabs)
 {
     return sf.toString(this, tabs);
 }

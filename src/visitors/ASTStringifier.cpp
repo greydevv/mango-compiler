@@ -22,7 +22,7 @@
 ASTStringifier::ASTStringifier(bool simpleExpr)
     : simpleExpr(simpleExpr) {}
 
-std::string ASTStringifier::toString(ModuleAST* ast, int tabs) 
+std::string ASTStringifier::toString(ModuleAST* ast, int tabs)
 {
     std::ostringstream s;
     s << "ModuleAST(" << ast->fp.abspath << "):\n";
@@ -34,7 +34,7 @@ std::string ASTStringifier::toString(ModuleAST* ast, int tabs)
     return s.str();
 }
 
-std::string ASTStringifier::toString(ExpressionAST* ast, int tabs) 
+std::string ASTStringifier::toString(ExpressionAST* ast, int tabs)
 {
     std::ostringstream s;
     if (simpleExpr)
@@ -42,9 +42,7 @@ std::string ASTStringifier::toString(ExpressionAST* ast, int tabs)
         s << '(' << ast->LHS->accept(*this, tabs);
         s << ' ' << operatorValues.at(ast->op) << ' ';
         s << ast->RHS->accept(*this, tabs) << ')';
-    }
-    else
-    {
+    } else {
         s << "ExpressionAST(" << operatorValues.at(ast->op) << "):\n";
         s << indent(ast->LHS->accept(*this, tabs+1), tabs+1) << '\n';
         s << indent(ast->RHS->accept(*this, tabs+1), tabs+1);
@@ -61,11 +59,9 @@ std::string ASTStringifier::toString(UnaryExprAST* ast, int tabs)
         if (ast->isPrefix())
             s << operatorValues.at(ast->op) << ast->operand->accept(*this, tabs);
         else
-
+            s << ast->operand->accept(*this, tabs) << operatorValues.at(ast->op);
         s << ')';
-    }
-    else
-    {
+    } else {
         s << "UnaryExprAST(";
         s << operatorValues.at(ast->op) << ", ";
         s << (ast->isPrefix() ? "prefix" : "postfix") << "):\n";
@@ -81,23 +77,19 @@ std::string ASTStringifier::toString(VariableAST* ast, int tabs)
     if (simpleExpr)
     {
         s << ast->id;
-    }
-    else
-    {
+    } else {
         s << "VariableAST(" << ast->id << ", " << typeToString(ast->type) << ')';
     }
     return s.str();
 }
 
-std::string ASTStringifier::toString(NumberAST* ast, int tabs) 
+std::string ASTStringifier::toString(NumberAST* ast, int tabs)
 {
     std::ostringstream s;
     if (simpleExpr)
     {
         s << ast->val;
-    }
-    else
-    {
+    } else {
         s << "NumberAST(" << ast->val << ')';
     }
     return s.str();
@@ -116,9 +108,7 @@ std::string ASTStringifier::toString(ArrayAST* ast, int tabs)
                 s << ", ";
         }
         s << ']';
-    }
-    else
-    {
+    } else {
         s << "ArrayAST(" << ast->elements.size() << ", " << typeToString(ast->type) << "):\n";
         for (int i = 0; i < ast->elements.size(); i++)
         {
@@ -129,7 +119,7 @@ std::string ASTStringifier::toString(ArrayAST* ast, int tabs)
     return s.str();
 }
 
-std::string ASTStringifier::toString(CompoundAST* ast, int tabs) 
+std::string ASTStringifier::toString(CompoundAST* ast, int tabs)
 {
     std::ostringstream s;
     if (simpleExpr)
@@ -142,9 +132,7 @@ std::string ASTStringifier::toString(CompoundAST* ast, int tabs)
         if (ast->retStmt)
             s << indent(ast->retStmt->accept(*this, tabs+1), tabs+1) << '\n';
         s << "}";
-    }
-    else
-    {
+    } else {
         s << "CompoundAST:\n";
         for (int i = 0; i < ast->children.size(); i++)
         {
@@ -162,15 +150,13 @@ std::string ASTStringifier::toString(CompoundAST* ast, int tabs)
     return s.str();
 }
 
-std::string ASTStringifier::toString(FunctionAST* ast, int tabs) 
+std::string ASTStringifier::toString(FunctionAST* ast, int tabs)
 {
     std::ostringstream s;
     if (simpleExpr)
     {
         s << "function:" << ast->proto->accept(*this, tabs);
-    }
-    else
-    {
+    } else {
         s << "FunctionAST:\n";
         s << indent(ast->proto->accept(*this, tabs+1), tabs+1);
         s << indent(ast->body->accept(*this, tabs+1), tabs+1);
@@ -178,7 +164,7 @@ std::string ASTStringifier::toString(FunctionAST* ast, int tabs)
     return s.str();
 }
 
-std::string ASTStringifier::toString(PrototypeAST* ast, int tabs) 
+std::string ASTStringifier::toString(PrototypeAST* ast, int tabs)
 {
     std::ostringstream s;
     if (simpleExpr)
@@ -195,9 +181,7 @@ std::string ASTStringifier::toString(PrototypeAST* ast, int tabs)
             i++;
         }
         s << ") returns " << typeToString(ast->retType);
-    }
-    else
-    {
+    } else {
         s << "PrototypeAST(" << ast->name << ")\n";
         s << indent("Returns: ", tabs+1) << typeToString(ast->retType) << '\n';
         if (ast->params.size() > 0)
@@ -224,9 +208,7 @@ std::string ASTStringifier::toString(ReturnAST* ast, int tabs)
             s << "return " << ast->expr->accept(*this) << '\n';
         else
             s << "return void\n";
-    }
-    else
-    {
+    } else {
         s << "ReturnAST:\n";
         if (ast->hasExpr())
             s << indent(ast->expr->accept(*this, tabs+1), tabs+1);
@@ -253,9 +235,7 @@ std::string ASTStringifier::toString(CallAST* ast, int tabs)
             i++;
         }
         s << ')';
-    }
-    else
-    {
+    } else {
         s << "CallAST(" << ast->id << ")\n";
         if (ast->params.size() > 0)
             s << indent("Parameters: ", tabs+1) << '\n';
@@ -273,7 +253,6 @@ std::string ASTStringifier::toString(CallAST* ast, int tabs)
 
 std::string ASTStringifier::toString(IfAST* ast, int tabs)
 {
-
     std::ostringstream s;
     if (simpleExpr)
     {
@@ -281,9 +260,7 @@ std::string ASTStringifier::toString(IfAST* ast, int tabs)
             s << "if (" << ast->expr->accept(*this) << ") {\n" << ast->body->accept(*this) << "}\n";
         else
             s << "else {\n" << ast->body->accept(*this) << "\n}\n";
-    }
-    else
-    {
+    } else {
         s << "IfAST:\n";
         if (ast->expr)
             s << indent("Expression:\n", tabs+1) << indent(ast->expr->accept(*this, tabs+2), tabs+2);
@@ -316,9 +293,7 @@ std::string ASTStringifier::toString(ForAST* ast, int tabs)
     if (simpleExpr)
     {
         s << "for (" << ast->expr->accept(*this) << " in " << ast->iter->accept(*this) << ") {\n" << ast->body->accept(*this) << "\n}\n";
-    }
-    else
-    {
+    } else {
         s << "ForAST:\n";
         s << indent("Expression:\n", tabs+1) << indent(ast->expr->accept(*this, tabs+2), tabs+2) << '\n';
         s << indent("Iterable:\n", tabs+1) << indent(ast->iter->accept(*this, tabs+2), tabs+2) << '\n';
@@ -336,9 +311,7 @@ std::string ASTStringifier::toString(WhileAST* ast, int tabs)
     if (simpleExpr)
     {
         s << "while (" << ast->expr->accept(*this) << ") {\n" << ast->body->accept(*this) << "\n}\n";
-    }
-    else
-    {
+    } else {
         s << "WhileAST:\n";
         if (ast->expr)
             s << indent("Expression:\n", tabs+1) << indent(ast->expr->accept(*this, tabs+2), tabs+2);

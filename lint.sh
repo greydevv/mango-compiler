@@ -1,0 +1,10 @@
+cpplint \
+    --extensions=cpp \
+    --headers=h \
+    --exclude=src/**/*.o \
+    --linelength=80 \
+    --verbose=1 \
+    --counting=toplevel \
+    --root=src \
+    --filter=-legal,-runtime,-build/header_guard,-whitespace/braces,-whitespace/line_length,-whitespace/indent \
+    src/**/* \

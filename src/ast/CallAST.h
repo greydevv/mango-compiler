@@ -1,6 +1,7 @@
 #ifndef CALL_AST_H
 #define CALL_AST_H
 
+#include <string>
 #include <memory>
 #include <vector>
 #include "AST.h"
@@ -17,11 +18,11 @@ class CallAST : public AST
         CallAST(const std::string& id, std::vector<std::unique_ptr<AST>> param);
         CallAST(const CallAST& other);
         void addParam(std::unique_ptr<AST> param);
-        virtual Type accept(ASTValidator& vd) override;
-        virtual llvm::Value* accept(ASTCodegenner& cg) override;
-        virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
+        Type accept(ASTValidator& vd) override;
+        llvm::Value* accept(ASTCodegenner& cg) override;
+        std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:
-        virtual CallAST* cloneImpl() override;
+        CallAST* cloneImpl() override;
 };
 
 #endif

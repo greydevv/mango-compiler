@@ -1,4 +1,6 @@
+#include <string>
 #include <memory>
+#include <utility>
 #include <vector>
 #include "AST.h"
 #include "CompoundAST.h"

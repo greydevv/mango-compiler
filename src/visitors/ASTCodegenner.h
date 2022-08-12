@@ -2,10 +2,11 @@
 #define CODEGEN_H
 
 #include <string>
+#include <memory>
+#include <map>
 #include "../ContextManager.h"
 #include "../Types.h"
 #include "../Operator.h"
-#include "llvm/IR/Value.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/Instructions.h"
 #include "llvm/IR/Value.h"

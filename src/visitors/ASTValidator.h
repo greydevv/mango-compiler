@@ -2,6 +2,8 @@
 #define AST_VALIDATOR_H
 
 #include <string>
+#include <memory>
+#include <vector>
 #include "../Types.h"
 #include "../ContextManager.h"
 #include "../SymbolTable.h"
@@ -45,7 +47,7 @@ class ASTValidator
         std::shared_ptr<ModuleAST> ast;
         ContextManager& ctx;
         SymbolTable<Type> st;
-        SymbolTable<std::vector<Type>> fst; // function symbol table
+        SymbolTable<std::vector<Type>> fst;  // function symbol table
 
         void validateBoolExpr(Type exprType);
 };

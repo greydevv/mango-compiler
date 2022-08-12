@@ -1,5 +1,6 @@
-#include <iostream>
+#include <utility>
 #include <memory>
+#include <iostream>
 #include "ModuleAST.h"
 #include "../path.h"
 #include "../io.h"
@@ -19,7 +20,7 @@ ModuleAST::ModuleAST(const ModuleAST& other)
     }
 }
 
-void ModuleAST::addChild(std::unique_ptr<AST> child) 
+void ModuleAST::addChild(std::unique_ptr<AST> child)
 {
     children.push_back(std::move(child));
 }
@@ -34,12 +35,12 @@ Type ModuleAST::accept(ASTValidator& vd)
     return vd.validate(this);
 }
 
-llvm::Value* ModuleAST::accept(ASTCodegenner& cg) 
+llvm::Value* ModuleAST::accept(ASTCodegenner& cg)
 {
     return cg.codegen(this);
 }
 
-std::string ModuleAST::accept(ASTStringifier& sf, int tabs) 
+std::string ModuleAST::accept(ASTStringifier& sf, int tabs)
 {
     return sf.toString(this, tabs);
 }

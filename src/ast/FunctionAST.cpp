@@ -1,3 +1,4 @@
+#include <utility>
 #include "FunctionAST.h"
 #include "CompoundAST.h"
 #include "PrototypeAST.h"
@@ -7,7 +8,7 @@
 #include "llvm/IR/Value.h"
 
 FunctionAST::FunctionAST(std::unique_ptr<PrototypeAST> proto, std::unique_ptr<CompoundAST> body)
-    : proto(std::move(proto)), body(std::move(body)) 
+    : proto(std::move(proto)), body(std::move(body))
 {
     // set return statement to void if none was given
     if (!this->body->hasRetStmt())
@@ -23,12 +24,12 @@ Type FunctionAST::accept(ASTValidator& vd)
     return vd.validate(this);
 }
 
-llvm::Value* FunctionAST::accept(ASTCodegenner& cg) 
+llvm::Value* FunctionAST::accept(ASTCodegenner& cg)
 {
     return cg.codegen(this);
 }
 
-std::string FunctionAST::accept(ASTStringifier& sf, int tabs) 
+std::string FunctionAST::accept(ASTStringifier& sf, int tabs)
 {
     return sf.toString(this, tabs);
 }

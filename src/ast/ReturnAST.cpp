@@ -1,3 +1,6 @@
+#include <string>
+#include <memory>
+#include <utility>
 #include "AST.h"
 #include "ReturnAST.h"
 #include "../visitors/ASTValidator.h"
@@ -5,7 +8,7 @@
 #include "../visitors/ASTStringifier.h"
 #include "llvm/IR/Value.h"
 
-ReturnAST::ReturnAST(std::unique_ptr<AST> expr) 
+ReturnAST::ReturnAST(std::unique_ptr<AST> expr)
     : expr(std::move(expr)) {}
 
 ReturnAST::ReturnAST(const ReturnAST& other)
@@ -26,12 +29,12 @@ Type ReturnAST::accept(ASTValidator& vd)
     return vd.validate(this);
 }
 
-llvm::Value* ReturnAST::accept(ASTCodegenner& cg) 
+llvm::Value* ReturnAST::accept(ASTCodegenner& cg)
 {
     return cg.codegen(this);
 }
 
-std::string ReturnAST::accept(ASTStringifier& sf, int tabs) 
+std::string ReturnAST::accept(ASTStringifier& sf, int tabs)
 {
     return sf.toString(this, tabs);
 }

@@ -1,6 +1,7 @@
 #ifndef MODULE_AST_H
 #define MODULE_AST_H
 
+#include <string>
 #include <memory>
 #include <vector>
 #include "AST.h"
@@ -19,11 +20,11 @@ class ModuleAST : public AST
         ModuleAST(const ModuleAST& other);
         void addChild(std::unique_ptr<AST> child);
         void print();
-        virtual Type accept(ASTValidator& vd) override;
-        virtual llvm::Value* accept(ASTCodegenner& cg) override;
-        virtual std::string accept(ASTStringifier& sf, int tabs = 0) override;
+        Type accept(ASTValidator& vd) override;
+        llvm::Value* accept(ASTCodegenner& cg) override;
+        std::string accept(ASTStringifier& sf, int tabs = 0) override;
     protected:
-        virtual ModuleAST* cloneImpl() override;
+        ModuleAST* cloneImpl() override;
 };
 
 #endif

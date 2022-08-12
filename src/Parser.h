@@ -22,14 +22,12 @@ class Parser
     public:
         Parser(FilePath fp, ContextManager& ctx);
         std::unique_ptr<ModuleAST> parse();
-        int getErrState();
         
     private:
         const FilePath fp;
         ContextManager& ctx;
         Lexer lexer;
         Token tok;
-        int errState;
 
         std::unique_ptr<AST> parsePrimary();
         std::unique_ptr<ExpressionAST> parseVarDef();
@@ -64,7 +62,6 @@ class Parser
         bool eat(Token::token_type expected_type);
         bool eat();
         void getToken();
-        void setErrState(int errState);
         std::string underlineTok(Token tok);
 };
 
