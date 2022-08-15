@@ -12,9 +12,9 @@ IfAST::IfAST(std::shared_ptr<AST> expr, std::unique_ptr<CompoundAST> body, std::
       other(std::move(other)) {}
 
 IfAST::IfAST(const IfAST& other)
-    : expr(std::shared_ptr<AST>(other.expr->clone())),
-      body(std::shared_ptr<CompoundAST>(dynamic_cast<CompoundAST*>(other.body->clone()))),
-      other(std::shared_ptr<IfAST>(dynamic_cast<IfAST*>(other.other->clone()))) {}
+    : expr(other.expr ? std::shared_ptr<AST>(other.expr->clone()) : nullptr),
+      body(other.body ? std::shared_ptr<CompoundAST>(dynamic_cast<CompoundAST*>(other.body->clone())) : nullptr),
+      other(other.other ? std::shared_ptr<IfAST>(dynamic_cast<IfAST*>(other.other->clone())) : nullptr) {}
 
 Type IfAST::accept(ASTValidator& vd)
 {
