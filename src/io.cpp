@@ -56,14 +56,14 @@ int rtrim(std::string& str)
 CompileArgs parseArgs(std::vector<std::string> argv)
 {
     CompileArgs args;
-    for (auto arge : argv)
+    for (auto arg : argv)
     {
-        if (arge == "-debug")
+        if (arg == "-debug")
             args.debug = true;
-        else if (arge == "-emit")
+        else if (arg == "-emit")
             args.emit = true;
-        else if (arge[0] != '-')
-            args.paths.push_back(FilePath(arge));
+        else if (arg[0] != '-')
+            args.paths.push_back(FilePath(arg));
     }
     return args;
 }
