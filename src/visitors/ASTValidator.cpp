@@ -87,6 +87,8 @@ Type ASTValidator::validate(VariableAST* ast)
         }
         case VarCtx::eParam:
         {
+            if (st.contains(ast->id))
+              throw ReferenceError(fmt::format("'{}' is a duplicated parameter", ast->id, typeToString(ast->type)), ast->loc);
             st.insert(ast->id, ast->type);
             return ast->type;
         }
@@ -94,9 +96,7 @@ Type ASTValidator::validate(VariableAST* ast)
         case VarCtx::eStore:
         {
             if (!st.contains(ast->id))
-            {
                 throw ReferenceError(fmt::format("reference to unknown variable '{}'", ast->id), ast->loc);
-            }
             // give AST node the type as it is unknown during syntax analysis
             // (parser) but known during semantic analysis (here)
             Type varType = st.lookup(ast->id);
