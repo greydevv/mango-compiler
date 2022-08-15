@@ -31,7 +31,6 @@ class Parser
 
         std::unique_ptr<AST> parsePrimary();
         std::unique_ptr<ExpressionAST> parseVarDef();
-        std::unique_ptr<ExpressionAST> parseVarStore();
         std::unique_ptr<ExpressionAST> createVarAssignExpr(std::unique_ptr<VariableAST> var);
         std::unique_ptr<AST> parseKwd();
         std::unique_ptr<AST> parseId();
@@ -62,7 +61,7 @@ class Parser
         bool eat(Token::token_type expected_type);
         bool eat();
         void getToken();
-        std::string underlineTok(Token tok);
+        std::string getTokenLine(Token tok);
 };
 
 std::unique_ptr<ModuleAST> getAstFromFile(const FilePath& fp, ContextManager& ctx);

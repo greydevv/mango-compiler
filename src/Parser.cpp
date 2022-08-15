@@ -85,14 +85,6 @@ std::unique_ptr<ExpressionAST> Parser::parseVarDef()
     return createVarAssignExpr(std::move(allocVar));
 }
 
-std::unique_ptr<ExpressionAST> Parser::parseVarStore()
-{
-    std::string id = tok.value;
-    auto storeVar = std::make_unique<VariableAST>(id, VarCtx::eStore, tok.loc);
-    eat(Token::TOK_ID);
-    return createVarAssignExpr(std::move(storeVar));
-}
-
 std::unique_ptr<ExpressionAST> Parser::createVarAssignExpr(std::unique_ptr<VariableAST> var)
 {
     eat(Token::TOK_EQUALS);
@@ -126,8 +118,6 @@ std::unique_ptr<AST> Parser::parseKwd()
 
 std::unique_ptr<AST> Parser::parseId()
 {
-    if (lexer.peekToken().type == Token::TOK_EQUALS)
-        return parseVarStore();
     std::unique_ptr<AST> expr = parseExpr();
     eat(Token::TOK_SCOLON);
     return expr;
@@ -175,7 +165,7 @@ std::unique_ptr<ModuleAST> Parser::parseIncludeStmt()
     std::unique_ptr<ModuleAST> incAST = getAstFromFile(includeFp, ctx);
     if (!incAST)
         // need to add quotes back for correct underlining
-        throw FileNotFoundError(includeFp, underlineTok(includeTok), includeTok.loc);
+        throw FileNotFoundError(includeFp, getTokenLine(includeTok), includeTok.loc);
     ctx.pop();
     return incAST;
 }
@@ -318,7 +308,7 @@ std::unique_ptr<IfAST> Parser::parseIfStmt()
     eat(Token::TOK_KWD);
     eat(Token::TOK_OPAREN);
     if (tok.type == Token::TOK_CPAREN)
-        throw SyntaxError("expected expression", underlineTok(tok), tok.loc);
+        throw SyntaxError("expected expression", getTokenLine(tok), tok.loc);
     std::unique_ptr<AST> expr = parseExpr();
     eat(Token::TOK_CPAREN);
     std::unique_ptr<CompoundAST> body = parseCompound();
@@ -341,7 +331,7 @@ std::unique_ptr<ForAST> Parser::parseForStmt()
     eat(Token::TOK_KWD);
     eat(Token::TOK_OPAREN);
     if (tok.type == Token::TOK_CPAREN)
-        throw SyntaxError("expected expression", underlineTok(tok), tok.loc);
+        throw SyntaxError("expected expression", getTokenLine(tok), tok.loc);
     std::unique_ptr<VariableAST> var;
     if (tok.isType())
     {
@@ -412,7 +402,7 @@ std::unique_ptr<WhileAST> Parser::parseWhileStmt()
     eat(Token::TOK_KWD);
     eat(Token::TOK_OPAREN);
     if (tok.type == Token::TOK_CPAREN)
-        throw SyntaxError("expected expression", underlineTok(tok), tok.loc);
+        throw SyntaxError("expected expression", getTokenLine(tok), tok.loc);
     std::unique_ptr<AST> expr = parseExpr();
     eat(Token::TOK_CPAREN);
     std::unique_ptr<CompoundAST> body = parseCompound();
@@ -461,7 +451,7 @@ std::unique_ptr<AST> Parser::parseOperand()
             {
                 eat(Token::TOK_OPAREN);
                 if (tok.type == Token::TOK_CPAREN)
-                    throw SyntaxError("expected expression", underlineTok(tok), tok.loc);
+                    throw SyntaxError("expected expression", getTokenLine(tok), tok.loc);
                 std::unique_ptr<AST> expr = parseExpr();
                 eat(Token::TOK_CPAREN);
                 return expr;
@@ -470,7 +460,7 @@ std::unique_ptr<AST> Parser::parseOperand()
             return parseArray();
         case Token::TOK_SCOLON:
             // specific error message
-            throw SyntaxError("expected expression", underlineTok(tok), tok.loc);
+            throw SyntaxError("expected expression", getTokenLine(tok), tok.loc);
         case Token::TOK_KWD:
             if (tok.value == "true")
             {
@@ -487,7 +477,7 @@ std::unique_ptr<AST> Parser::parseOperand()
         default:
             {
                 std::string msg = fmt::format("'{}' is not a valid operand", tok.value);
-                throw SyntaxError(msg, underlineTok(tok), tok.loc);
+                throw SyntaxError(msg, getTokenLine(tok), tok.loc);
             }
     }
 
@@ -567,7 +557,7 @@ bool Parser::eat(Token::token_type expectedType)
                     break;
             }
         }
-        throw SyntaxError(msg, underlineTok(tok), tok.loc);
+        throw SyntaxError(msg, getTokenLine(tok), tok.loc);
     }
     getToken();
     return badToken;
@@ -582,28 +572,16 @@ bool Parser::eat()
 void Parser::getToken()
 {
     tok = lexer.nextToken();
-    // std::cout << tok << '\n';
     if (tok.type == Token::TOK_UND)
     {
         std::string msg = fmt::format("encountered unknown character '{}'", tok.value);
-        throw SyntaxError(msg, underlineTok(tok), tok.loc);
+        throw SyntaxError(msg, getTokenLine(tok), tok.loc);
     }
 }
 
-std::string Parser::underlineTok(Token tok)
+std::string Parser::getTokenLine(Token tok)
 {
-    int len = tok.value.size();
-    if (tok.type == Token::TOK_EOF)
-        // set len to 1, real value is 'EOF' but we don't need to underline
-        // that
-        len = 1;
-    else if (tok.type == Token::TOK_STR)
-        // because value of TOK_STR is stored w/o quotes, we need to add 2 to
-        // include the quotes in the underline
-        len+=2;
-
-    // helper method for io/underlineError
-    return underlineError(lexer.getLine(tok.loc.y), tok.loc.x, len);
+    return lexer.getLine(tok.loc.y);
 }
 
 std::unique_ptr<ModuleAST> getAstFromFile(const FilePath& fp, ContextManager& ctx)

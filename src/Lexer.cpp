@@ -8,40 +8,49 @@
 Lexer::Lexer(const FilePath& fp, ContextManager& ctx)
     : is(fp.abspath), c('\0'), loc()
 {
+    // prime lexer by getting first character and skipping any whitespace at
+    // beginning of file
     is.get(c);
+    skipGarbage();
+}
+
+void Lexer::debugRead()
+{
+    Token tok = nextToken();
+    while (tok.type != Token::TOK_EOF)
+    {
+      std::cout << tok << '\n';
+      tok = nextToken();
+    }
 }
 
 Token Lexer::peekToken()
 {
     FileLocation prevLoc = loc;
+    int fLoc = is.tellg();
     Token tok = nextToken();
 
-    // seek back to original position need to make value negative because it
-    // moves relative to the current position. Also need to subtract one so
-    // that the 'next()' call consumes the correct character and sets the
-    // pointer at the right position
-    is.seekg(-tok.value.size()-1, std::ios_base::cur);
-    next();
+    // reset cursor position. need to subtract 1 so next call to is.get()
+    // consumes the correct character
+    is.seekg(fLoc-1, std::ios_base::beg);
+    is.get(c);
     loc = prevLoc;
     return tok;
 }
 
 Token Lexer::nextToken()
 {
+  Token tok = getNextToken();
+  skipGarbage();
+  return tok;
+}
+
+Token Lexer::getNextToken()
+{
     if (is.eof())
-        return Token(Token::TOK_EOF, "EOF", SourceLocation(loc, 1));
-    else if (isspace(c))
-    {
-        // remove whitespace
-        skipWhitespace();
-        return nextToken();
-    }
-    else if (c == '/' && peek() == '/')
-    {
-        // remove comments
-        skipComment();
-        return nextToken();
-    }
+        // TODO: For EOF scenario, need to get position of last token and set x
+        // to be 1 space after that token
+        return Token(Token::TOK_EOF, "EOF", SourceLocation(loc.x, loc.y-1, 1));
     else if (isalpha(c) || c == '_')
         return lexAlpha();
     else if (isnumber(c))
@@ -64,11 +73,13 @@ Token Lexer::lexAlpha()
         next();
     }
 
-    Token::token_type type = Token::TOK_ID;
+    Token::token_type type;
     if (isKwd(s))
         type = Token::TOK_KWD;
     else if (isType(s))
         type = Token::TOK_TYPE;
+    else
+        type = Token::TOK_ID;
     return Token(type, s, SourceLocation(tmpLoc, s.size()));
 }
 
@@ -111,10 +122,9 @@ Token Lexer::lexOther()
         value = c;
     else
         value = tokenValues.at(type);
-    // have to subtract length to get correct start position
+    // have to subtract length to get correct starting position of token
     SourceLocation tokLoc(loc.x-(value.size()-1), loc.y, value.size());
     Token tok = Token(type, value, tokLoc);
-    assert(tok.value.size() > 0);
     next();
     return tok;
 }
@@ -262,7 +272,13 @@ bool Lexer::isType(const std::string& s)
 
 void Lexer::next()
 {
-    loc.x++;
+    if (eol())
+    {
+        loc.y++;
+        loc.x = 1;
+    } else {
+        loc.x++;
+    }
     is.get(c);
 }
 
@@ -271,27 +287,36 @@ char Lexer::peek()
     return is.peek();
 }
 
+void Lexer::skipGarbage()
+{
+    skipWhitespace();
+    if (c == '/' && peek() == '/')
+    {
+      skipComment();
+      skipWhitespace();
+    }
+}
+
 void Lexer::skipWhitespace()
 {
-    while (!is.eof() && isspace(c))
-    {
-        if (c == '\n')
-        {
-            loc.y++;
-            loc.x = 0;
-        }
+    while (!eof() && isspace(c))
         next();
-    }
 }
 
 void Lexer::skipComment()
 {
-    while (!is.eof() && c != '\n')
+    while (!eol())
         next();
-    loc.y++;
-    loc.x = 0;
-    if (isspace(c))
-        skipWhitespace();
+}
+
+bool Lexer::eol()
+{
+    return eof() || c == '\n';
+}
+
+bool Lexer::eof()
+{
+    return is.eof();
 }
 
 std::string Lexer::getLine(int lineNo)
