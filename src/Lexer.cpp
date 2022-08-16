@@ -8,10 +8,10 @@
 Lexer::Lexer(const FilePath& fp, ContextManager& ctx)
     : is(fp.abspath), c('\0'), loc()
 {
-    // prime lexer by getting first character and skipping any whitespace at
+    // prime lexer by getting first character and skipping any junk at
     // beginning of file
     is.get(c);
-    skipGarbage();
+    skipJunk();
 }
 
 void Lexer::debugRead()
@@ -27,12 +27,12 @@ void Lexer::debugRead()
 Token Lexer::peekToken()
 {
     FileLocation prevLoc = loc;
-    int fLoc = is.tellg();
+    int prevPos = is.tellg();
     Token tok = nextToken();
 
-    // reset cursor position. need to subtract 1 so next call to is.get()
-    // consumes the correct character
-    is.seekg(fLoc-1, std::ios_base::beg);
+    // reset cursor position
+    // subtract 1 so next call to is.get() consumes the correct character
+    is.seekg(prevPos-1, std::ios_base::beg);
     is.get(c);
     loc = prevLoc;
     return tok;
@@ -41,7 +41,7 @@ Token Lexer::peekToken()
 Token Lexer::nextToken()
 {
   Token tok = getNextToken();
-  skipGarbage();
+  skipJunk();
   return tok;
 }
 
@@ -100,15 +100,13 @@ Token Lexer::lexString()
 {
     std::string s;
     FileLocation tmpLoc = loc;
-    // external 'next' calls are for skipping the quotes. If encountering
-    // "hello world", we only want to store hello world without the quotes
-    next();
+    next();  // skip opening quotes
     while (c != '"')
     {
         s += c;
         next();
     }
-    next();
+    next(); // skip closing quotes
     return Token(Token::TOK_STR, s, SourceLocation(tmpLoc, s.size()));
 }
 
@@ -287,7 +285,7 @@ char Lexer::peek()
     return is.peek();
 }
 
-void Lexer::skipGarbage()
+void Lexer::skipJunk()
 {
     skipWhitespace();
     if (c == '/' && peek() == '/')

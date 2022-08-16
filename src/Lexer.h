@@ -28,7 +28,7 @@ class Lexer
         bool isType(const std::string& s);
         char peek();
         void next();
-        void skipGarbage();
+        void skipJunk();
         void skipWhitespace();
         void skipComment();
         bool eol();
