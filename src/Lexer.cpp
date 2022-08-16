@@ -291,7 +291,7 @@ void Lexer::skipJunk()
     if (c == '/' && peek() == '/')
     {
       skipComment();
-      skipWhitespace();
+      skipJunk();
     }
 }
 
