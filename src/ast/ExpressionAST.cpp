@@ -11,9 +11,12 @@
 ExpressionAST::ExpressionAST(std::unique_ptr<AST> LHS, std::unique_ptr<AST> RHS, Operator::op_type op)
     : LHS(std::move(LHS)), RHS(std::move(RHS)), op(op) {}
 
+ExpressionAST::ExpressionAST(std::unique_ptr<AST> LHS)
+    : LHS(std::move(LHS)), RHS(nullptr), op(Operator::OP_NOP) {}
+
 ExpressionAST::ExpressionAST(const ExpressionAST& other)
     : LHS(std::unique_ptr<AST>(other.LHS->clone())),
-      RHS(std::unique_ptr<AST>(other.RHS->clone())),
+      RHS(other.RHS ? std::unique_ptr<AST>(other.RHS->clone()) : nullptr),
       op(other.op) {}
 
 llvm::Value* ExpressionAST::accept(ASTCodegenner& cg)

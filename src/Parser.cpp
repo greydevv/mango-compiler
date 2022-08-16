@@ -58,7 +58,7 @@ std::unique_ptr<AST> Parser::parsePrimary()
             return parseVarDef();
         default:
         {
-            std::unique_ptr<AST> exprAST = parseExpr();
+            std::unique_ptr<ExpressionAST> exprAST = parseExpr();
             eat(Token::TOK_SCOLON);
             return exprAST;
         }
@@ -118,7 +118,7 @@ std::unique_ptr<AST> Parser::parseKwd()
 
 std::unique_ptr<AST> Parser::parseId()
 {
-    std::unique_ptr<AST> expr = parseExpr();
+    std::unique_ptr<ExpressionAST> expr = parseExpr();
     eat(Token::TOK_SCOLON);
     return expr;
 }
@@ -190,7 +190,9 @@ std::unique_ptr<PrototypeAST> Parser::parseFuncProto()
 {
     std::string name = tok.value;
     eat(Token::TOK_ID);
+    eat(Token::TOK_OPAREN);
     std::vector<std::unique_ptr<VariableAST>> params = parseFuncParams();
+    eat(Token::TOK_CPAREN);
     Type retType = Type::eVoid;
     if (tok == Token::TOK_RARROW)
     {
@@ -205,7 +207,6 @@ std::vector<std::unique_ptr<VariableAST>> Parser::parseFuncParams()
 {
     // TODO: refactor this and parseFuncParams into a method like parseCsv
     std::vector<std::unique_ptr<VariableAST>> params;
-    eat(Token::TOK_OPAREN);
     if (tok.type != Token::TOK_CPAREN)
     {
         while (true)
@@ -222,7 +223,6 @@ std::vector<std::unique_ptr<VariableAST>> Parser::parseFuncParams()
                 break;
         }
     }
-    eat(Token::TOK_CPAREN);
     return params;
 }
 
@@ -235,7 +235,7 @@ std::vector<std::unique_ptr<AST>> Parser::parseCallParams()
     {
         while (true)
         {
-            std::unique_ptr<AST> param = parseExpr();
+            std::unique_ptr<ExpressionAST> param = parseExpr();
             params.push_back(std::move(param));
             if (tok == Token::TOK_COMMA)
                 eat(Token::TOK_COMMA);
@@ -298,7 +298,7 @@ std::unique_ptr<ReturnAST> Parser::parseReturnStmt()
         eat(Token::TOK_SCOLON);
         return ReturnAST::retVoid();
     }
-    std::unique_ptr<AST> expr = parseExpr();
+    std::unique_ptr<ExpressionAST> expr = parseExpr();
     eat(Token::TOK_SCOLON);
     return std::make_unique<ReturnAST>(std::move(expr));
 }
@@ -309,7 +309,7 @@ std::unique_ptr<IfAST> Parser::parseIfStmt()
     eat(Token::TOK_OPAREN);
     if (tok.type == Token::TOK_CPAREN)
         throw SyntaxError("expected expression", getTokenLine(tok), tok.loc);
-    std::unique_ptr<AST> expr = parseExpr();
+    std::unique_ptr<ExpressionAST> expr = parseExpr();
     eat(Token::TOK_CPAREN);
     std::unique_ptr<CompoundAST> body = parseCompound();
     std::unique_ptr<IfAST> other = nullptr;
@@ -403,7 +403,7 @@ std::unique_ptr<WhileAST> Parser::parseWhileStmt()
     eat(Token::TOK_OPAREN);
     if (tok.type == Token::TOK_CPAREN)
         throw SyntaxError("expected expression", getTokenLine(tok), tok.loc);
-    std::unique_ptr<AST> expr = parseExpr();
+    std::unique_ptr<ExpressionAST> expr = parseExpr();
     eat(Token::TOK_CPAREN);
     std::unique_ptr<CompoundAST> body = parseCompound();
     return std::make_unique<WhileAST>(std::move(expr), std::move(body));
@@ -452,7 +452,7 @@ std::unique_ptr<AST> Parser::parseOperand()
                 eat(Token::TOK_OPAREN);
                 if (tok.type == Token::TOK_CPAREN)
                     throw SyntaxError("expected expression", getTokenLine(tok), tok.loc);
-                std::unique_ptr<AST> expr = parseExpr();
+                std::unique_ptr<ExpressionAST> expr = parseExpr();
                 eat(Token::TOK_CPAREN);
                 return expr;
             }
@@ -501,12 +501,12 @@ bool Parser::isTokUnary()
     return (tok.type == Token::TOK_DPLUS || tok.type == Token::TOK_DMINUS);
 }
 
-std::unique_ptr<AST> Parser::parseExpr()
+std::unique_ptr<ExpressionAST> Parser::parseExpr()
 {  
-    return parseSubExpr(parseTerm());
+  return parseSubExpr(std::make_unique<ExpressionAST>(parseTerm()));
 }
 
-std::unique_ptr<AST> Parser::parseSubExpr(std::unique_ptr<AST> L, int prec)
+std::unique_ptr<ExpressionAST> Parser::parseSubExpr(std::unique_ptr<ExpressionAST> L, int prec)
 {
     Operator nextOp = tok.toOperator();
     while (nextOp >= prec)
@@ -521,11 +521,17 @@ std::unique_ptr<AST> Parser::parseSubExpr(std::unique_ptr<AST> L, int prec)
             int nextPrec = currOp.getPrec();
             if (currOp.getAssoc() == Operator::A_LEFT)
                 nextPrec++;
-            R = parseSubExpr(std::move(RHS), nextPrec);
+            R = parseSubExpr(std::make_unique<ExpressionAST>(std::move(RHS)), nextPrec);
             nextOp = tok.toOperator();
         }
-        auto LHS = std::unique_ptr<AST>(L->clone());
-        L = std::make_unique<ExpressionAST>(std::move(LHS), std::move(R), currOp.getType());
+        if (L->RHS)
+        {
+          L->RHS = std::move(R);
+          L->op = currOp.getType();
+        } else {
+          auto LHS = std::unique_ptr<AST>(L->clone());
+          L = std::make_unique<ExpressionAST>(std::move(LHS), std::move(R), currOp.getType());
+        }
     }
     return L;
 }

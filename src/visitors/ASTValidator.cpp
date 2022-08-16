@@ -50,15 +50,18 @@ Type ASTValidator::validate(ExpressionAST* ast)
         throw TypeError("expression is not assignable", "N/A", SourceLocation(0, 0, 0));
 
     Type lType = ast->LHS->accept(*this);
-    Type rType = ast->RHS->accept(*this);
-
-    // check if types are compatible with one another
-    if (!typeCompat(lType, rType))
+    if (ast->op != Operator::OP_NOP)
     {
-        if (ast->op == Operator::OP_EQL)
-            throw TypeError(fmt::format("cannot initialize {} with a value of {}", typeValues[lType], typeValues[rType]), "N/A", SourceLocation(0, 0, 0));
-        else
-            throw TypeError(fmt::format("{} and {} are not compatible in binary expression", typeValues[lType], typeValues[rType]), "N/A", SourceLocation(0, 0, 0));
+      Type rType = ast->RHS->accept(*this);
+
+      // check if types are compatible with one another
+      if (!typeCompat(lType, rType))
+      {
+          if (ast->op == Operator::OP_EQL)
+              throw TypeError(fmt::format("cannot initialize {} with a value of {}", typeValues[lType], typeValues[rType]), "N/A", SourceLocation(0, 0, 0));
+          else
+              throw TypeError(fmt::format("{} and {} are not compatible in binary expression", typeValues[lType], typeValues[rType]), "N/A", SourceLocation(0, 0, 0));
+      }
     }
     return lType;
 }

@@ -45,7 +45,8 @@ std::string ASTStringifier::toString(ExpressionAST* ast, int tabs)
     } else {
         s << "ExpressionAST(" << operatorValues.at(ast->op) << "):\n";
         s << indent(ast->LHS->accept(*this, tabs+1), tabs+1) << '\n';
-        s << indent(ast->RHS->accept(*this, tabs+1), tabs+1);
+        if (ast->RHS)
+          s << indent(ast->RHS->accept(*this, tabs+1), tabs+1);
     }
     return s.str();
 }

@@ -55,8 +55,8 @@ class Parser
         std::unique_ptr<AST> parseOperand();
         std::unique_ptr<AST> parseTerm();
         bool isTokUnary();
-        std::unique_ptr<AST> parseExpr();
-        std::unique_ptr<AST> parseSubExpr(std::unique_ptr<AST> L, int prec = 0);
+        std::unique_ptr<ExpressionAST> parseExpr();
+        std::unique_ptr<ExpressionAST> parseSubExpr(std::unique_ptr<ExpressionAST> L, int prec = 0);
 
         bool eat(Token::token_type expected_type);
         bool eat();

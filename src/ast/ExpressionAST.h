@@ -24,6 +24,7 @@ class ExpressionAST : public AST
         Operator::op_type op;
 
         ExpressionAST(std::unique_ptr<AST> LHS, std::unique_ptr<AST> RHS, Operator::op_type op);
+        ExpressionAST(std::unique_ptr<AST> LHS);
         ExpressionAST(const ExpressionAST& other);
         Type accept(ASTValidator& vd) override;
         llvm::Value* accept(ASTCodegenner& cg) override;

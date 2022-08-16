@@ -3,7 +3,7 @@
 
 #include <string>
 #include <memory>
-#include "AST.h"
+#include "ExpressionAST.h"
 #include "CompoundAST.h"
 #include "../visitors/ASTValidator.h"
 #include "../visitors/ASTCodegenner.h"
@@ -13,11 +13,11 @@
 class IfAST : public AST
 {
     public:
-        std::shared_ptr<AST> expr;
+        std::shared_ptr<ExpressionAST> expr;
         std::shared_ptr<CompoundAST> body;
         std::shared_ptr<IfAST> other;  // else if, else
 
-        IfAST(std::shared_ptr<AST> expr, std::unique_ptr<CompoundAST> body, std::unique_ptr<IfAST> other);
+        IfAST(std::shared_ptr<ExpressionAST> expr, std::unique_ptr<CompoundAST> body, std::unique_ptr<IfAST> other);
         IfAST(const IfAST& other);
         Type accept(ASTValidator& cg) override;
         llvm::Value* accept(ASTCodegenner& cg) override;
