@@ -22,6 +22,7 @@ struct SourceLocation
     int y; // character on line
     int len;
 
+    SourceLocation();
     SourceLocation(int x, int y, int len);
     SourceLocation(const FileLocation& fLoc, int len);
 };
