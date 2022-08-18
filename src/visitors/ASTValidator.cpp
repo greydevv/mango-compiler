@@ -22,6 +22,9 @@
 #include "../ast/UnaryExprAST.h"
 #include "../Exception.h"
 
+ParamSymbol::ParamSymbol(const std::string& id, Type type)
+    : id(id), type(type) {}
+
 ASTValidator::ASTValidator(std::shared_ptr<ModuleAST> ast, ContextManager& ctx)
     : ast(ast), ctx(ctx), st(Type::eNot), fst({})
 {
@@ -46,21 +49,21 @@ Type ASTValidator::validate(ModuleAST* ast)
 
 Type ASTValidator::validate(ExpressionAST* ast)
 {
-    if (ast->op == Operator::OP_EQL && !ast->LHS->isAssignable())
-        throw TypeError("expression is not assignable", "N/A", SourceLocation(0, 0, 0));
+    if (ast->op == Operator::OP_EQL && !ast->getLhs()->isAssignable())
+        throw TypeError("expression is not assignable", ast->getLhs()->loc);
 
-    Type lType = ast->LHS->accept(*this);
+    Type lType = ast->getLhs()->accept(*this);
     if (ast->op != Operator::OP_NOP)
     {
-      Type rType = ast->RHS->accept(*this);
+      Type rType = ast->getRhs()->accept(*this);
 
       // check if types are compatible with one another
       if (!typeCompat(lType, rType))
       {
           if (ast->op == Operator::OP_EQL)
-              throw TypeError(fmt::format("cannot initialize {} with a value of {}", typeValues[lType], typeValues[rType]), "N/A", SourceLocation(0, 0, 0));
+              throw TypeError(fmt::format("cannot initialize {} with a value of {}", typeValues[lType], typeValues[rType]), ast->getRhs()->loc);
           else
-              throw TypeError(fmt::format("{} and {} are not compatible in binary expression", typeValues[lType], typeValues[rType]), "N/A", SourceLocation(0, 0, 0));
+              throw TypeError(fmt::format("{} and {} are not compatible in binary expression", typeValues[lType], typeValues[rType]), ast->loc);
       }
     }
     return lType;
@@ -69,7 +72,7 @@ Type ASTValidator::validate(ExpressionAST* ast)
 Type ASTValidator::validate(UnaryExprAST* ast)
 {
     if (!ast->operand->isAssignable())
-        throw TypeError("expression is not assignable", "N/A", SourceLocation(0, 0, 0));
+        throw TypeError("expression is not assignable", ast->loc);
 
     return ast->operand->accept(*this);
 }
@@ -134,7 +137,10 @@ Type ASTValidator::validate(FunctionAST* ast)
     // actual return type
     Type actualType = ast->body->accept(*this);
     if (actualType != expectedType)
-        throw TypeError(fmt::format("returning {} but expected {}", typeValues[actualType], typeValues[expectedType]), "N/A", SourceLocation(0, 0, 0));
+    {
+        if (ast->body->retStmt)
+          throw TypeError(fmt::format("returning {} but expected {}", typeValues[actualType], typeValues[expectedType]), ast->body->retStmt->expr->loc);
+    }
     st.clear();
     return expectedType;
 }
@@ -142,16 +148,16 @@ Type ASTValidator::validate(FunctionAST* ast)
 Type ASTValidator::validate(PrototypeAST* ast)
 {
     if (fst.contains(ast->name))
-        throw ReferenceError(fmt::format("function '{}' was already defined", ast->name), "N/A", SourceLocation(0, 0, 0));
-    std::vector<Type> params;
+        throw ReferenceError(fmt::format("function '{}' was already defined", ast->name), ast->loc);
+    ProtoSymbol symb;
+    std::vector<ParamSymbol> params;
     for (auto& param : ast->params)
     {
-        params.push_back(param->type);
+        symb.params.push_back(ParamSymbol(param->id, param->type));
         param->accept(*this);
     }
-    // put return type as last element in vector
-    params.push_back(ast->retType);
-    fst.insert(ast->name, params);
+    symb.retType = ast->retType;
+    fst.insert(ast->name, symb);
     return ast->retType;
 }
 
@@ -165,30 +171,53 @@ Type ASTValidator::validate(ReturnAST* ast)
 Type ASTValidator::validate(CallAST* ast)
 {
     if (!fst.contains(ast->id))
+        throw ReferenceError(fmt::format("reference to unknown function '{}'", ast->id), ast->loc);
+    ProtoSymbol symb = fst.lookup(ast->id);
+    std::vector<ParamSymbol> expectedTypes = symb.params;
+    int numExpected = expectedTypes.size();
+    int numReceived = ast->params.size();
+
+    if (numReceived != numExpected)
     {
-        throw ReferenceError(fmt::format("reference to unknown function '{}'", ast->id), "N/A", SourceLocation(0, 0, 0));
+        SourceLocation errLoc;
+        if (numReceived == 0) {
+            errLoc = ast->paramsStartLoc;
+        } else if (numReceived > numExpected) {
+            // underline all extra params
+            errLoc = ast->params[numExpected]->loc;
+            errLoc.len = (ast->params.back()->loc.x + ast->params.back()->loc.len) - errLoc.x;
+        } else {
+            // numReceived < numExpected
+            // point to len of all params + 1
+            errLoc.x = ast->params.back()->loc.x + ast->params.back()->loc.len;
+            errLoc.y = ast->params.back()->loc.y;
+            errLoc.len = 1;
+        }
+        
+        std::string argumentVerbiage = numExpected == 1 ? "argument" : "arguments";
+        std::string expectedVerbiage = numExpected == 0 ? "no" : std::to_string(numExpected);
+        std::string receivedVerbiage = numReceived == 0 ? "none" : std::to_string(numReceived);
+
+        throw TypeError(fmt::format("'{}' expects {} {} but received {}", ast->id, expectedVerbiage, argumentVerbiage, receivedVerbiage), errLoc);
     }
-    std::vector expectedTypes = fst.lookup(ast->id);
-    // expectedTypes.size()-1 because last entry in vector is always return
-    // type, others are params
-    if (ast->params.size() != expectedTypes.size()-1)
-        throw TypeError(fmt::format("function '{}' expected {} arguments but received {}", ast->id, expectedTypes.size()-1, ast->params.size()), "N/A", SourceLocation(0, 0, 0));
 
     for (int i = 0; i < ast->params.size(); i++)
     {
         Type pType = ast->params[i]->accept(*this);
-        if (pType != expectedTypes[i])
-            throw TypeError(fmt::format("no matching call to function {}", ast->id), "N/A", SourceLocation(0, 0, 0));
+        if (pType != expectedTypes[i].type)
+        {
+            throw TypeError(fmt::format("'{}' expects {} argument but received {} for argument '{}'", ast->id, typeValues[expectedTypes[i].type], typeValues[pType], expectedTypes[i].id), ast->params[i]->loc);
+        }
     }
     // return return type of function
-    return expectedTypes[expectedTypes.size()-1];
+    return symb.retType;
 }
 
 Type ASTValidator::validate(IfAST* ast)
 {
     if (ast->expr)
         // could be 'else' statement w/ no expr
-        validateBoolExpr(ast->expr->accept(*this));
+        validateBoolExpr(ast->expr);
 
     return ast->body->accept(*this);
 }
@@ -200,19 +229,20 @@ Type ASTValidator::validate(ForAST* ast)
 
 Type ASTValidator::validate(WhileAST* ast)
 {
-    validateBoolExpr(ast->expr->accept(*this));
+    validateBoolExpr(ast->expr);
 
     return ast->body->accept(*this);
 }
 
-void ASTValidator::validateBoolExpr(Type exprType)
+void ASTValidator::validateBoolExpr(std::shared_ptr<ExpressionAST> expr)
 {
+    Type exprType = expr->accept(*this);
     switch (exprType)
     {
         case Type::eInt:
         case Type::eBool:
             break;
         default:
-            throw TypeError(fmt::format("cannot convert {} to bool", typeValues[exprType]), "N/A", SourceLocation(0, 0, 0));
+            throw TypeError(fmt::format("expected boolean expression but got {}", typeValues[exprType]), expr->loc);
     }
 }
