@@ -205,7 +205,7 @@ Type ASTValidator::validate(CallAST* ast)
         Type pType = ast->params[i]->accept(*this);
         if (pType != expectedTypes[i].type)
         {
-            throw TypeError(fmt::format("'{}' expects {} argument but received {} for argument '{}'", ast->id, typeValues[expectedTypes[i].type], typeValues[pType], expectedTypes[i].id), ast->params[i]->loc);
+            throw TypeError(fmt::format("'{}' expects {} for argument '{}' but received {}", ast->id, typeValues[expectedTypes[i].type], expectedTypes[i].id, typeValues[pType]), ast->params[i]->loc);
         }
     }
     // return return type of function
@@ -238,7 +238,6 @@ void ASTValidator::validateBoolExpr(std::shared_ptr<ExpressionAST> expr)
     Type exprType = expr->accept(*this);
     switch (exprType)
     {
-        case Type::eInt:
         case Type::eBool:
             break;
         default:
