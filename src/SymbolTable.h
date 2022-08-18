@@ -3,6 +3,21 @@
 
 #include <string>
 #include <map>
+#include "Types.h"
+
+struct ParamSymbol
+{
+    std::string id;
+    Type type;
+
+    ParamSymbol(const std::string& id, Type type);
+};
+
+struct ProtoSymbol
+{
+    std::vector<ParamSymbol> params;
+    Type retType;
+};
 
 template <typename V> 
 class SymbolTable
