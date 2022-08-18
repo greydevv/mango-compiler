@@ -22,7 +22,6 @@ class VariableAST : public AST
         std::string id;
         Type type;
         VarCtx ctx;
-        SourceLocation loc;
 
         VariableAST(const std::string& id, Type type, VarCtx ctx, SourceLocation loc);
         VariableAST(const std::string& id, VarCtx ctx, SourceLocation loc);

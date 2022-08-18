@@ -7,10 +7,11 @@
 #include "../visitors/ASTStringifier.h"
 #include "llvm/IR/Value.h"
 
-PrototypeAST::PrototypeAST(const std::string& name, Type retType, std::vector<std::unique_ptr<VariableAST>> params)
-    : name(name), retType(retType), params(std::move(params)) {}
+PrototypeAST::PrototypeAST(const std::string& name, Type retType, std::vector<std::unique_ptr<VariableAST>> params, SourceLocation loc)
+    : AST(loc), name(name), retType(retType), params(std::move(params)) {}
 
 PrototypeAST::PrototypeAST(const PrototypeAST& other)
+    : AST(other.loc), retType(other.retType)
 {
     // TODO(greydevv): test this method - not sure if below is totally safe
     for (auto& param : other.params)

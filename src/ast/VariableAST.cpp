@@ -5,16 +5,16 @@
 #include "../visitors/ASTStringifier.h"
 
 VariableAST::VariableAST(const std::string& id, Type type, VarCtx ctx, SourceLocation loc)
-    : id(id), type(type), ctx(ctx), loc(loc) {}
+    : AST(loc), id(id), type(type), ctx(ctx) {}
 
 VariableAST::VariableAST(const std::string& id, VarCtx ctx, SourceLocation loc)
-    : id(id), type(Type::eUnd), ctx(ctx), loc(loc) {}
+    : AST(loc), id(id), type(Type::eUnd), ctx(ctx) {}
 
 VariableAST::VariableAST(const std::string& id, SourceLocation loc)
-    : id(id), type(Type::eUnd), ctx(VarCtx::eReference), loc(loc) {}
+    : AST(loc), id(id), type(Type::eUnd), ctx(VarCtx::eReference) {}
 
 VariableAST::VariableAST(const VariableAST& other)
-    : id(other.id), type(other.type), ctx(other.ctx), loc(other.loc) {}
+    : AST(other.loc), id(other.id), type(other.type), ctx(other.ctx) {}
 
 bool VariableAST::isAssignable()
 {
