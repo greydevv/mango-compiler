@@ -115,8 +115,9 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
     if (ast->op == Operator::OP_EQL)
     {
         // should only be using equals when variable is LHS
-        auto varAst = dynamic_cast<VariableAST*>(ast->LHS->clone());
-        llvm::Value* rhs = ast->RHS->accept(*this);
+        auto lhs = dynamic_cast<ExpressionAST*>(ast->getLhs()->clone());
+        auto varAst = dynamic_cast<VariableAST*>(lhs->getLhs()->clone());
+        llvm::Value* rhs = ast->getRhs()->accept(*this);
         if (varAst->ctx == VarCtx::eAlloc)
         {
             // make all allocations in entry block of function
@@ -136,14 +137,14 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
         }
         return rhs;
     }
-    llvm::Value* L = ast->LHS->accept(*this);
+    llvm::Value* L = ast->getLhs()->accept(*this);
     if (!L)
         return nullptr;
     if (ast->op == Operator::OP_NOP)
     {
       return L;
     } else {
-      llvm::Value* R = ast->RHS->accept(*this);
+      llvm::Value* R = ast->getRhs()->accept(*this);
       if (!R)
           return nullptr;
       /*
