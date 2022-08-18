@@ -35,8 +35,8 @@ class ExpressionAST : public AST
     protected:
         ExpressionAST* cloneImpl() override;
     private:
-        std::shared_ptr<AST> LHS;
-        std::shared_ptr<AST> RHS;
+        std::shared_ptr<AST> lhs;
+        std::shared_ptr<AST> rhs;
 
         void calculateLoc();
 };
