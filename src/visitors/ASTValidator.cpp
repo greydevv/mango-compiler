@@ -193,7 +193,6 @@ Type ASTValidator::validate(CallAST* ast)
             errLoc.y = ast->params.back()->loc.y;
             errLoc.len = 1;
         }
-        
         std::string argumentVerbiage = numExpected == 1 ? "argument" : "arguments";
         std::string expectedVerbiage = numExpected == 0 ? "no" : std::to_string(numExpected);
         std::string receivedVerbiage = numReceived == 0 ? "none" : std::to_string(numReceived);

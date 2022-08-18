@@ -15,7 +15,7 @@ ExpressionAST::ExpressionAST(std::unique_ptr<AST> LHS, std::unique_ptr<AST> RHS,
 }
 
 ExpressionAST::ExpressionAST(std::unique_ptr<AST> LHS)
-    : AST(LHS->loc), op(Operator::OP_NOP), opLoc(SourceLocation(0,0,0)), LHS(std::move(LHS)), RHS(nullptr)
+    : AST(LHS->loc), op(Operator::OP_NOP), opLoc(SourceLocation(-1, -1, -1)), LHS(std::move(LHS)), RHS(nullptr)
 {
     calculateLoc();
 }
