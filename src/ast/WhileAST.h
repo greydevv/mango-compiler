@@ -12,10 +12,10 @@
 class WhileAST : public AST
 {
     public:
-        std::unique_ptr<ExpressionAST> expr;
+        std::shared_ptr<ExpressionAST> expr;
         std::unique_ptr<CompoundAST> body;
 
-        WhileAST(std::unique_ptr<ExpressionAST> expr, std::unique_ptr<CompoundAST> body);
+        WhileAST(std::shared_ptr<ExpressionAST> expr, std::unique_ptr<CompoundAST> body);
         WhileAST(const WhileAST& other);
         Type accept(ASTValidator& cg) override;
         llvm::Value* accept(ASTCodegenner& cg) override;
