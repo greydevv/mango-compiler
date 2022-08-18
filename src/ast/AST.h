@@ -2,6 +2,7 @@
 #define AST_H
 
 #include <string>
+#include "../Token.h"
 #include "llvm/IR/Value.h"
 #include "../visitors/ASTValidator.h"
 #include "../visitors/ASTCodegenner.h"
@@ -10,6 +11,10 @@
 class AST
 {
     public:
+        SourceLocation loc;
+
+        AST() {};
+        AST(SourceLocation loc);
         virtual ~AST() {};
         virtual bool isAssignable();
         virtual Type accept(ASTValidator& vd) = 0;

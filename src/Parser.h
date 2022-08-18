@@ -30,9 +30,6 @@ class Parser
         Token tok;
 
         std::unique_ptr<AST> parsePrimary();
-        std::unique_ptr<ExpressionAST> parseVarDef();
-        std::unique_ptr<ExpressionAST> parseVarStore();
-        std::unique_ptr<ExpressionAST> createVarAssignExpr(std::unique_ptr<VariableAST> var);
         std::unique_ptr<AST> parseKwd();
         std::unique_ptr<AST> parseId();
         std::unique_ptr<NumberAST> parseNum();
@@ -43,7 +40,7 @@ class Parser
         std::unique_ptr<FunctionAST> parseFuncDef();
         std::unique_ptr<PrototypeAST> parseFuncProto();
         std::vector<std::unique_ptr<VariableAST>> parseFuncParams();
-        std::vector<std::unique_ptr<AST>> parseCallParams();
+        std::vector<std::unique_ptr<ExpressionAST>> parseCallParams();
         std::unique_ptr<CompoundAST> parseCompound();
         std::unique_ptr<ReturnAST> parseReturnStmt();
         std::unique_ptr<IfAST> parseIfStmt();
@@ -56,13 +53,13 @@ class Parser
         std::unique_ptr<AST> parseOperand();
         std::unique_ptr<AST> parseTerm();
         bool isTokUnary();
-        std::unique_ptr<AST> parseExpr();
-        std::unique_ptr<AST> parseSubExpr(std::unique_ptr<AST> L, int prec = 0);
+        std::unique_ptr<ExpressionAST> parseExpr();
+        std::unique_ptr<ExpressionAST> parseSubExpr(std::unique_ptr<ExpressionAST> L, int prec = 0);
 
         bool eat(Token::token_type expected_type);
         bool eat();
         void getToken();
-        std::string underlineTok(Token tok);
+        std::string getTokenLine(Token tok);
 };
 
 std::unique_ptr<ModuleAST> getAstFromFile(const FilePath& fp, ContextManager& ctx);

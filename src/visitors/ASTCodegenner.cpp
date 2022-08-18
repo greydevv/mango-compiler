@@ -34,7 +34,7 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/Host.h"
 #include "llvm/Support/raw_ostream.h"
-#include "llvm/Support/TargetRegistry.h"
+#include "llvm/MC/TargetRegistry.h"
 #include "llvm/Support/TargetSelect.h"
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/Target/TargetOptions.h"
@@ -115,8 +115,9 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
     if (ast->op == Operator::OP_EQL)
     {
         // should only be using equals when variable is LHS
-        auto varAst = dynamic_cast<VariableAST*>(ast->LHS->clone());
-        llvm::Value* rhs = ast->RHS->accept(*this);
+        auto lhs = dynamic_cast<ExpressionAST*>(ast->getLhs()->clone());
+        auto varAst = dynamic_cast<VariableAST*>(lhs->getLhs()->clone());
+        llvm::Value* rhs = ast->getRhs()->accept(*this);
         if (varAst->ctx == VarCtx::eAlloc)
         {
             // make all allocations in entry block of function
@@ -136,52 +137,58 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
         }
         return rhs;
     }
-    llvm::Value* L = ast->LHS->accept(*this);
-    llvm::Value* R = ast->RHS->accept(*this);
-    if (!L || !R)
+    llvm::Value* L = ast->getLhs()->accept(*this);
+    if (!L)
         return nullptr;
-
-    /*
-     * CreateOp Notes:
-     * ===============
-     *
-     * NSW = No Signed Wrap
-     * NUS = No Unsigned Wrap
-     *
-     * NEVER DELETE THIS LINK LOL:
-     * https://stackoverflow.com/questions/61207663/how-to-use-llvmirbuilder-create-add-sub-mul-div
-     *
-     */
-
-    switch (ast->op)
+    if (ast->op == Operator::OP_NOP)
     {
-        case Operator::OP_ADD:
-            return builder->CreateNSWAdd(L, R, "addtmp");
-        case Operator::OP_SUB:
-            return builder->CreateNSWSub(L, R, "subtmp");
-        case Operator::OP_MUL:
-            return builder->CreateNSWMul(L, R, "multmp");
-        case Operator::OP_BOOL_NEQL:
-            return builder->CreateICmpNE(L, R, "neqtmp");
-        case Operator::OP_BOOL_EQL:
-            return builder->CreateICmpEQ(L, R, "eqtmp");
-        case Operator::OP_BOOL_LT:
-            return builder->CreateICmpSLT(L, R, "lttmp");
-        case Operator::OP_BOOL_LTE:
-            return builder->CreateICmpSLE(L, R, "ltetmp");
-        case Operator::OP_BOOL_GT:
-            return builder->CreateICmpSGT(L, R, "lttmp");
-        case Operator::OP_BOOL_GTE:
-            return builder->CreateICmpSGE(L, R, "gtetmp");
-        case Operator::OP_BOOL_OR:
-            return builder->CreateOr(L, R, "ortmp");
-        case Operator::OP_BOOL_AND:
-            return builder->CreateAnd(L, R, "andtmp");
-        default:
-            {
-                // TODO(greydevv): need to capture the operator's value
-                throw SyntaxError("invalid binary operator", "LINE NOT IMPLEMENTED", SourceLocation(0, 0, 0));
-            }
+      return L;
+    } else {
+      llvm::Value* R = ast->getRhs()->accept(*this);
+      if (!R)
+          return nullptr;
+      /*
+       * CreateOp Notes:
+       * ===============
+       *
+       * NSW = No Signed Wrap
+       * NUS = No Unsigned Wrap
+       *
+       * NEVER DELETE THIS LINK LOL:
+       * https://stackoverflow.com/questions/61207663/how-to-use-llvmirbuilder-create-add-sub-mul-div
+       *
+       */
+
+      switch (ast->op)
+      {
+          case Operator::OP_ADD:
+              return builder->CreateNSWAdd(L, R, "addtmp");
+          case Operator::OP_SUB:
+              return builder->CreateNSWSub(L, R, "subtmp");
+          case Operator::OP_MUL:
+              return builder->CreateNSWMul(L, R, "multmp");
+          case Operator::OP_BOOL_NEQL:
+              return builder->CreateICmpNE(L, R, "neqtmp");
+          case Operator::OP_BOOL_EQL:
+              return builder->CreateICmpEQ(L, R, "eqtmp");
+          case Operator::OP_BOOL_LT:
+              return builder->CreateICmpSLT(L, R, "lttmp");
+          case Operator::OP_BOOL_LTE:
+              return builder->CreateICmpSLE(L, R, "ltetmp");
+          case Operator::OP_BOOL_GT:
+              return builder->CreateICmpSGT(L, R, "lttmp");
+          case Operator::OP_BOOL_GTE:
+              return builder->CreateICmpSGE(L, R, "gtetmp");
+          case Operator::OP_BOOL_OR:
+              return builder->CreateOr(L, R, "ortmp");
+          case Operator::OP_BOOL_AND:
+              return builder->CreateAnd(L, R, "andtmp");
+          default:
+              {
+                  // TODO(greydevv): need to capture the operator's value
+                  throw SyntaxError("invalid binary operator", "LINE NOT IMPLEMENTED", SourceLocation(0, 0, 0));
+              }
+      }
     }
 }
 
@@ -388,6 +395,7 @@ llvm::Value* ASTCodegenner::codegen(IfAST* ast, llvm::BasicBlock* parentMergeBlo
         builder->CreateBr(localMergeBlock);
         falseBlock = builder->GetInsertBlock();
     }
+
 
     insertFuncBlock(func, localMergeBlock);
     if (parentMergeBlock)

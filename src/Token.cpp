@@ -9,6 +9,9 @@ FileLocation::FileLocation()
 FileLocation::FileLocation(int x, int y)
     : x(x), y(y) {}
 
+SourceLocation::SourceLocation()
+    : x(-1), y(-1), len(-1) {}
+
 SourceLocation::SourceLocation(int x, int y, int len)
     : x(x), y(y), len(len) {}
 

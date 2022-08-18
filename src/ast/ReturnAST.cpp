@@ -1,18 +1,18 @@
 #include <string>
 #include <memory>
 #include <utility>
-#include "AST.h"
+#include "ExpressionAST.h"
 #include "ReturnAST.h"
 #include "../visitors/ASTValidator.h"
 #include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 #include "llvm/IR/Value.h"
 
-ReturnAST::ReturnAST(std::unique_ptr<AST> expr)
+ReturnAST::ReturnAST(std::unique_ptr<ExpressionAST> expr)
     : expr(std::move(expr)) {}
 
 ReturnAST::ReturnAST(const ReturnAST& other)
-    : expr(std::unique_ptr<AST>(other.expr->clone())) {}
+    : expr(std::unique_ptr<ExpressionAST>(dynamic_cast<ExpressionAST*>(other.expr->clone()))) {}
 
 std::unique_ptr<ReturnAST> ReturnAST::retVoid()
 {

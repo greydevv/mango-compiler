@@ -3,7 +3,7 @@
 
 #include <string>
 #include <memory>
-#include "AST.h"
+#include "ExpressionAST.h"
 #include "../visitors/ASTValidator.h"
 #include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
@@ -12,9 +12,9 @@
 class ReturnAST : public AST
 {
     public:
-        std::unique_ptr<AST> expr;
+        std::unique_ptr<ExpressionAST> expr;
 
-        ReturnAST(std::unique_ptr<AST> expr);
+        ReturnAST(std::unique_ptr<ExpressionAST> expr);
         ReturnAST(const ReturnAST& other);
         static std::unique_ptr<ReturnAST> retVoid();
         bool hasExpr();

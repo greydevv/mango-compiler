@@ -64,4 +64,4 @@ std::map<std::string, V> SymbolTable<V>::getSt() const
 }
 
 template class SymbolTable<Type>;
-template class SymbolTable<std::vector<Type>>;
+template class SymbolTable<ProtoSymbol>;

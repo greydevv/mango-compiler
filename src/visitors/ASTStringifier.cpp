@@ -2,6 +2,7 @@
 #include <sstream>
 #include <memory>
 #include <string>
+#include "ASTStringifier.h"
 #include "../ast/AST.h"
 #include "../ast/ModuleAST.h"
 #include "../ast/ExpressionAST.h"
@@ -17,7 +18,6 @@
 #include "../ast/ForAST.h"
 #include "../ast/WhileAST.h"
 #include "../ast/UnaryExprAST.h"
-#include "ASTStringifier.h"
 
 ASTStringifier::ASTStringifier(bool simpleExpr)
     : simpleExpr(simpleExpr) {}
@@ -39,13 +39,19 @@ std::string ASTStringifier::toString(ExpressionAST* ast, int tabs)
     std::ostringstream s;
     if (simpleExpr)
     {
-        s << '(' << ast->LHS->accept(*this, tabs);
-        s << ' ' << operatorValues.at(ast->op) << ' ';
-        s << ast->RHS->accept(*this, tabs) << ')';
+        s << '(' << ast->getLhs()->accept(*this, tabs);
+        if (ast->op != Operator::OP_NOP)
+            s << ' ' << operatorValues.at(ast->op) << ' ';
+        if (ast->getRhs())
+            s << ast->getRhs()->accept(*this, tabs);
+        s << ')';
     } else {
-        s << "ExpressionAST(" << operatorValues.at(ast->op) << "):\n";
-        s << indent(ast->LHS->accept(*this, tabs+1), tabs+1) << '\n';
-        s << indent(ast->RHS->accept(*this, tabs+1), tabs+1);
+        s << "ExpressionAST";
+        if (ast->op != Operator::OP_NOP)
+            s <<  '(' << operatorValues.at(ast->op) << ')';
+        s << ":" << "\n" << indent(ast->getLhs()->accept(*this, tabs+1), tabs+1);
+        if (ast->getRhs())
+            s << '\n' << indent(ast->getRhs()->accept(*this, tabs+1), tabs+1);
     }
     return s.str();
 }

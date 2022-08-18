@@ -37,17 +37,33 @@ std::string underlineError(const std::string& fname, SourceLocation loc)
     return "THIS IS A LINE";
 }
 
+int ltrim(std::string& str)
+{
+  std::string whitespace = " \t\n\r\f\v";
+  int to = str.find_first_not_of(whitespace);
+  str.erase(0, to);
+  return to;
+}
+
+int rtrim(std::string& str)
+{
+  std::string whitespace = " \t\n\r\f\v";
+  int start = str.find_last_not_of(whitespace)+1;
+  str.erase(start);
+  return start;
+}
+
 CompileArgs parseArgs(std::vector<std::string> argv)
 {
     CompileArgs args;
-    for (auto arge : argv)
+    for (auto arg : argv)
     {
-        if (arge == "-debug")
+        if (arg == "-debug")
             args.debug = true;
-        else if (arge == "-emit")
+        else if (arg == "-emit")
             args.emit = true;
-        else if (arge[0] != '-')
-            args.paths.push_back(FilePath(arge));
+        else if (arg[0] != '-')
+            args.paths.push_back(FilePath(arg));
     }
     return args;
 }

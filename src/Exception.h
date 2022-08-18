@@ -72,6 +72,7 @@ class TypeError : public BaseSourceException
 {
     public:
         TypeError(const std::string& msg, const std::string& line, SourceLocation loc);
+        TypeError(const std::string& msg, SourceLocation loc);
         virtual std::string getExcName() const override;
 };
 

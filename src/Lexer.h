@@ -11,12 +11,14 @@ class Lexer
         Token peekToken();
         Token nextToken();
         std::string getLine(int lineNo);
+        void debugRead();
 
     private:
         std::ifstream is;
         char c;
         FileLocation loc;
 
+        Token getNextToken();
         Token lexAlpha();
         Token lexNum();
         Token lexString();
@@ -26,8 +28,11 @@ class Lexer
         bool isType(const std::string& s);
         char peek();
         void next();
+        void skipJunk();
         void skipWhitespace();
         void skipComment();
+        bool eol();
+        bool eof();
 };
 
 #endif

@@ -19,7 +19,7 @@ class PrototypeAST : public AST
         Type retType;
         std::vector<std::unique_ptr<VariableAST>> params;
 
-        PrototypeAST(const std::string& name, Type ret_type, std::vector<std::unique_ptr<VariableAST>> params);
+        PrototypeAST(const std::string& name, Type ret_type, std::vector<std::unique_ptr<VariableAST>> params, SourceLocation loc);
         PrototypeAST(const PrototypeAST& other);
         void addParam(std::unique_ptr<VariableAST> param);
         Type accept(ASTValidator& vd) override;

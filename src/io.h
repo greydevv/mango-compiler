@@ -16,6 +16,8 @@ std::string readFile(std::ifstream& in);
 std::string stringify(ModuleAST* ast);
 std::string underlineError(const std::string& line, int x, int len);
 std::string underlineError(const std::string& fname, SourceLocation loc);
+int ltrim(std::string& str);
+int rtrim(std::string& str);
 
 struct CompileArgs
 {
