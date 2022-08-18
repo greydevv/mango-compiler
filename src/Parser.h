@@ -30,8 +30,6 @@ class Parser
         Token tok;
 
         std::unique_ptr<AST> parsePrimary();
-        std::unique_ptr<ExpressionAST> parseVarDef();
-        std::unique_ptr<ExpressionAST> createVarAssignExpr(std::unique_ptr<VariableAST> var);
         std::unique_ptr<AST> parseKwd();
         std::unique_ptr<AST> parseId();
         std::unique_ptr<NumberAST> parseNum();
@@ -42,7 +40,7 @@ class Parser
         std::unique_ptr<FunctionAST> parseFuncDef();
         std::unique_ptr<PrototypeAST> parseFuncProto();
         std::vector<std::unique_ptr<VariableAST>> parseFuncParams();
-        std::vector<std::unique_ptr<AST>> parseCallParams();
+        std::vector<std::unique_ptr<ExpressionAST>> parseCallParams();
         std::unique_ptr<CompoundAST> parseCompound();
         std::unique_ptr<ReturnAST> parseReturnStmt();
         std::unique_ptr<IfAST> parseIfStmt();

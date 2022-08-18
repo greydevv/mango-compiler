@@ -50,12 +50,10 @@ std::unique_ptr<AST> Parser::parsePrimary()
     {
         case Token::TOK_KWD:
             return parseKwd();
+        case Token::TOK_TYPE:
         case Token::TOK_ID:
             // either variable redefinition, reference
             return parseId();
-        case Token::TOK_TYPE:
-            // assuming variable declaration
-            return parseVarDef();
         default:
         {
             std::unique_ptr<ExpressionAST> exprAST = parseExpr();
@@ -63,34 +61,6 @@ std::unique_ptr<AST> Parser::parsePrimary()
             return exprAST;
         }
     }
-}
-
-std::unique_ptr<ExpressionAST> Parser::parseVarDef()
-{
-    Type allocType = typeFromString(tok.value);
-    eat(Token::TOK_TYPE);
-    if (isArrayType(allocType))
-    {
-        throw NotImplementedError("parsing of ArrayAST");
-        // need to eat second type that denotes the type of the elements
-        // eat(Token::TOK_LT);
-        // Type eleType = typeFromString(tok.value);
-        // eat(Token::TOK_TYPE);
-        // eat(Token::TOK_GT);
-    }
-
-    std::string id = tok.value;
-    auto allocVar = std::make_unique<VariableAST>(tok.value, allocType, VarCtx::eAlloc, tok.loc);
-    eat(Token::TOK_ID);
-    return createVarAssignExpr(std::move(allocVar));
-}
-
-std::unique_ptr<ExpressionAST> Parser::createVarAssignExpr(std::unique_ptr<VariableAST> var)
-{
-    eat(Token::TOK_EQUALS);
-    auto expr = std::make_unique<ExpressionAST>(std::move(var), parseExpr(), Operator::OP_EQL);
-    eat(Token::TOK_SCOLON);
-    return expr;
 }
 
 std::unique_ptr<AST> Parser::parseKwd()
@@ -125,7 +95,7 @@ std::unique_ptr<AST> Parser::parseId()
 
 std::unique_ptr<NumberAST> Parser::parseNum() 
 {
-    auto numAST = std::make_unique<NumberAST>(std::stod(tok.value));
+    auto numAST = std::make_unique<NumberAST>(std::stod(tok.value), tok.loc);
     eat(Token::TOK_NUM);
     return numAST;
 }
@@ -189,6 +159,7 @@ std::unique_ptr<FunctionAST> Parser::parseFuncDef()
 std::unique_ptr<PrototypeAST> Parser::parseFuncProto()
 {
     std::string name = tok.value;
+    SourceLocation nameLoc = tok.loc;
     eat(Token::TOK_ID);
     eat(Token::TOK_OPAREN);
     std::vector<std::unique_ptr<VariableAST>> params = parseFuncParams();
@@ -200,7 +171,7 @@ std::unique_ptr<PrototypeAST> Parser::parseFuncProto()
         retType = tok.toType();
         eat(Token::TOK_TYPE);
     }
-    return std::make_unique<PrototypeAST>(name, retType, std::move(params));
+    return std::make_unique<PrototypeAST>(name, retType, std::move(params), nameLoc);
 }
 
 std::vector<std::unique_ptr<VariableAST>> Parser::parseFuncParams()
@@ -226,24 +197,20 @@ std::vector<std::unique_ptr<VariableAST>> Parser::parseFuncParams()
     return params;
 }
 
-std::vector<std::unique_ptr<AST>> Parser::parseCallParams()
+std::vector<std::unique_ptr<ExpressionAST>> Parser::parseCallParams()
 {
-    // TODO: refactor this and parseFuncParams into a method like parseCsv
-    std::vector<std::unique_ptr<AST>> params;
-    eat(Token::TOK_OPAREN);
+    std::vector<std::unique_ptr<ExpressionAST>> params;
     if (tok.type != Token::TOK_CPAREN)
     {
         while (true)
         {
-            std::unique_ptr<ExpressionAST> param = parseExpr();
-            params.push_back(std::move(param));
+            params.push_back(parseExpr());
             if (tok == Token::TOK_COMMA)
                 eat(Token::TOK_COMMA);
             else
                 break;
         }
     }
-    eat(Token::TOK_CPAREN);
     return params;
 }
 
@@ -328,28 +295,29 @@ std::unique_ptr<IfAST> Parser::parseIfStmt()
 
 std::unique_ptr<ForAST> Parser::parseForStmt()
 {
-    eat(Token::TOK_KWD);
-    eat(Token::TOK_OPAREN);
-    if (tok.type == Token::TOK_CPAREN)
-        throw SyntaxError("expected expression", getTokenLine(tok), tok.loc);
-    std::unique_ptr<VariableAST> var;
-    if (tok.isType())
-    {
-        Type varType = tok.toType();
-        eat(Token::TOK_TYPE);
-        var = std::make_unique<VariableAST>(tok.value, varType, VarCtx::eAlloc, tok.loc);
-    }
-    else
-    {
-        var = std::make_unique<VariableAST>(tok.value, tok.loc);
-    }
-    eat(Token::TOK_ID);
-    eat(Token::TOK_KWD);
-    std::unique_ptr<ArrayAST> gen = parseIntArrayGen();
-    auto expr = std::make_unique<ExpressionAST>(std::move(var), std::unique_ptr<AST>(gen->elements[0]->clone()), Operator::OP_EQL);
-    eat(Token::TOK_CPAREN);
-    std::unique_ptr<CompoundAST> body = parseCompound();
-    return std::make_unique<ForAST>(std::move(expr), std::move(gen), std::move(body));
+    // eat(Token::TOK_KWD);
+    // eat(Token::TOK_OPAREN);
+    // if (tok.type == Token::TOK_CPAREN)
+    //     throw SyntaxError("expected expression", getTokenLine(tok), tok.loc);
+    // std::unique_ptr<VariableAST> var;
+    // if (tok.isType())
+    // {
+    //     Type varType = tok.toType();
+    //     eat(Token::TOK_TYPE);
+    //     var = std::make_unique<VariableAST>(tok.value, varType, VarCtx::eAlloc, tok.loc);
+    // }
+    // else
+    // {
+    //     var = std::make_unique<VariableAST>(tok.value, tok.loc);
+    // }
+    // eat(Token::TOK_ID);
+    // eat(Token::TOK_KWD);
+    // std::unique_ptr<ArrayAST> gen = parseIntArrayGen();
+    // auto expr = std::make_unique<ExpressionAST>(std::move(var), std::unique_ptr<AST>(gen->elements[0]->clone()), Operator::OP_EQL);
+    // eat(Token::TOK_CPAREN);
+    // std::unique_ptr<CompoundAST> body = parseCompound();
+    // return std::make_unique<ForAST>(std::move(expr), std::move(gen), std::move(body));
+    throw NotImplementedError("parsing of ForAST");
 }
 
 std::unique_ptr<ArrayAST> Parser::parseIntArrayGen()
@@ -375,26 +343,27 @@ std::unique_ptr<ArrayAST> Parser::parseIntArrayGen()
      *
      *
      */
-    int start, stop;
-    int step = 1;
-    start = std::stoi(tok.value);
-    eat(Token::TOK_NUM);
-    eat(Token::TOK_PERIOD);
-    eat(Token::TOK_PERIOD);
-    stop = std::stoi(tok.value);
-    eat(Token::TOK_NUM);
-    if (tok.type == Token::TOK_PERIOD)
-    {
-        eat(Token::TOK_PERIOD);
-        eat(Token::TOK_PERIOD);
-        step = std::stoi(tok.value);
-        eat(Token::TOK_NUM);
-    }
-    std::vector<std::unique_ptr<AST>> values;
-    for (int i = start; i < stop; i += step)
-        values.push_back(std::make_unique<NumberAST>(i));
-
-    return std::make_unique<ArrayAST>(Type::eInt, std::move(values));
+    // int start, stop;
+    // int step = 1;
+    // start = std::stoi(tok.value);
+    // eat(Token::TOK_NUM);
+    // eat(Token::TOK_PERIOD);
+    // eat(Token::TOK_PERIOD);
+    // stop = std::stoi(tok.value);
+    // eat(Token::TOK_NUM);
+    // if (tok.type == Token::TOK_PERIOD)
+    // {
+    //     eat(Token::TOK_PERIOD);
+    //     eat(Token::TOK_PERIOD);
+    //     step = std::stoi(tok.value);
+    //     eat(Token::TOK_NUM);
+    // }
+    // std::vector<std::unique_ptr<AST>> values;
+    // for (int i = start; i < stop; i += step)
+    //     values.push_back(std::make_unique<NumberAST>(i));
+    //
+    // return std::make_unique<ArrayAST>(Type::eInt, std::move(values));
+    throw NotImplementedError("parsing of intArrayGen");
 }
 
 std::unique_ptr<WhileAST> Parser::parseWhileStmt()
@@ -403,24 +372,45 @@ std::unique_ptr<WhileAST> Parser::parseWhileStmt()
     eat(Token::TOK_OPAREN);
     if (tok.type == Token::TOK_CPAREN)
         throw SyntaxError("expected expression", getTokenLine(tok), tok.loc);
-    std::unique_ptr<ExpressionAST> expr = parseExpr();
+    auto expr = std::make_shared<ExpressionAST>(parseExpr());
     eat(Token::TOK_CPAREN);
     std::unique_ptr<CompoundAST> body = parseCompound();
-    return std::make_unique<WhileAST>(std::move(expr), std::move(body));
+    return std::make_unique<WhileAST>(expr, std::move(body));
 }
 
 std::unique_ptr<AST> Parser::parseIdTerm() 
 {
+    bool isAlloc = tok.type == Token::TOK_TYPE;
+    Type allocType = Type::eNot;
+    if (isAlloc)
+    {
+        allocType = typeFromString(tok.value);
+        eat(Token::TOK_TYPE);
+    }
+
     Token tmpIdTok = tok;
     eat(Token::TOK_ID);
     // check if function call
     if (tok.type == Token::TOK_OPAREN)
     {
-        auto callAST = std::make_unique<CallAST>(tmpIdTok.value, parseCallParams());
+        if (isAlloc)
+            // force a syntax error
+            eat(Token::TOK_EQUALS); 
+        SourceLocation paramsStartLoc = SourceLocation(tok.loc.x + 1, tok.loc.y, tok.loc.len);
+        eat(Token::TOK_OPAREN);
+        auto callAST = std::make_unique<CallAST>(tmpIdTok.value, parseCallParams(), tmpIdTok.loc, paramsStartLoc);
+        eat(Token::TOK_CPAREN);
         return callAST;
     }
-    auto varAST = std::make_unique<VariableAST>(tmpIdTok.value, tmpIdTok.loc);
-    return varAST;
+    if (isAlloc && tok.type != Token::TOK_EQUALS)
+      throw SyntaxError("expected assignment expression", getTokenLine(tok), tok.loc);
+
+    std::unique_ptr<VariableAST> varAst;
+    if (isAlloc)
+      varAst = std::make_unique<VariableAST>(tmpIdTok.value, allocType, VarCtx::eAlloc, tmpIdTok.loc);
+    else
+      varAst = std::make_unique<VariableAST>(tmpIdTok.value, tmpIdTok.loc);
+    return varAst;
 }
 
 std::unique_ptr<UnaryExprAST> Parser::parsePreUnaryExpr()
@@ -445,6 +435,7 @@ std::unique_ptr<AST> Parser::parseOperand()
     {
         case Token::TOK_NUM:
             return parseNum();
+        case Token::TOK_TYPE:
         case Token::TOK_ID:
             return parseIdTerm();
         case Token::TOK_OPAREN:
@@ -462,17 +453,20 @@ std::unique_ptr<AST> Parser::parseOperand()
             // specific error message
             throw SyntaxError("expected expression", getTokenLine(tok), tok.loc);
         case Token::TOK_KWD:
-            if (tok.value == "true")
             {
+              SourceLocation numLoc = tok.loc;
+              if (tok.value == "true")
+              {
                 eat(Token::TOK_KWD);
                 // TODO: NumberAST creates 32-bit ints, but we need 1-bit for
                 // bool type
-                return std::make_unique<NumberAST>(1);
-            }
-            else if (tok.value == "false")
-            {
+                return std::make_unique<NumberAST>(1, numLoc);
+              }
+              else if (tok.value == "false")
+              {
                 eat(Token::TOK_KWD);
-                return std::make_unique<NumberAST>(0);
+                return std::make_unique<NumberAST>(0, numLoc);
+              }
             }
         default:
             {
@@ -509,6 +503,7 @@ std::unique_ptr<ExpressionAST> Parser::parseExpr()
 std::unique_ptr<ExpressionAST> Parser::parseSubExpr(std::unique_ptr<ExpressionAST> L, int prec)
 {
     Operator nextOp = tok.toOperator();
+    SourceLocation opLoc = tok.loc;
     while (nextOp >= prec)
     {
         Operator currOp = nextOp;
@@ -523,14 +518,15 @@ std::unique_ptr<ExpressionAST> Parser::parseSubExpr(std::unique_ptr<ExpressionAS
                 nextPrec++;
             R = parseSubExpr(std::make_unique<ExpressionAST>(std::move(RHS)), nextPrec);
             nextOp = tok.toOperator();
+            opLoc = tok.loc;
         }
-        if (L->RHS)
+        if (L->getRhs())
         {
-          L->RHS = std::move(R);
+          L->setRhs(std::move(R));
           L->op = currOp.getType();
         } else {
           auto LHS = std::unique_ptr<AST>(L->clone());
-          L = std::make_unique<ExpressionAST>(std::move(LHS), std::move(R), currOp.getType());
+          L = std::make_unique<ExpressionAST>(std::move(LHS), std::move(R), currOp.getType(), opLoc);
         }
     }
     return L;
