@@ -3,10 +3,10 @@
 #include "Exception.h"
 #include "ContextManager.h"
 #include "Token.h"
-#include "fmt/color.h"
 #include "path.h"
 #include "io.h"
 #include "Lexer.h"
+#include "fmt/color.h"
 
 BaseException::BaseException(const std::string& msg)
     : msg(msg) {}
@@ -35,20 +35,47 @@ BaseSourceException::BaseSourceException(const std::string& msg, SourceLocation 
 
 std::string BaseSourceException::getMsg(ContextManager& ctx) const
 {
-    // use relative path for shorter/readable error message
-    std::string tmpLine = line;
-    // FilePath object of file that contained the error
+    // TODO: handle underlines that might span multiple lines
+
+    // error should be raised from file at top of stack, i.e. file that is
+    // currently being compiled
     const FilePath& fp = ctx.peek();
-    if (line.empty())
+    std::string errLine = line;
+    if (errLine.empty())
     {
+        // if line was not supplied, initialize a lexer to retrieve it
         Lexer lexer(fp, ctx);
-        tmpLine = underlineError(lexer.getLine(loc.y), loc.x, loc.len);
+        errLine = lexer.getLine(loc.y);
     }
+    // trim leading and trailing whitespace
+    rtrim(errLine);
+    int leadingTrimmed = ltrim(errLine); 
+    std::string underline;
+    
+    // create error underline
+    if (loc.x-leadingTrimmed-1 < 0 || loc.len-1 < 0)
+    {
+      // temporary fix for errors without lines
+      underline = "";
+    } else {
+      underline = fmt::format("{}^{}",
+          std::string(loc.x-leadingTrimmed-1, ' '),
+          std::string(loc.len-1, '~')  // subtract 1 because '^' was inserted
+      );
+    }
+
     std::ostringstream s;
-    s << fmt::format(fmt::emphasis::bold, "{}:{}:{}: ", fp.relpath, loc.y, loc.x);
-    s << fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::orange_red), getExcName());
+    // get blank spaces to span # of literal characters in line #, e.g. 2 if
+    // line # is 13
+    std::string lineNoSpace = std::string(std::to_string(loc.y).length(), ' ');
+    // use relative path for shorter error location (fp.relpath)
+    s << fmt::format(fmt::emphasis::bold, fp.relpath);
+    s << fmt::format(" -> [{},{}]\n", loc.y, loc.x);
+    s << fmt::format("{} |\n", lineNoSpace);
+    s << fmt::format("{} | {}\n", loc.y, errLine);
+    s << fmt::format("{} | {}\n", lineNoSpace, underline);
+    s << fmt::format(fmt::emphasis::bold | fmt::fg(fmt::color::orange_red), "{}", getExcName());
     s << fmt::format(fmt::emphasis::bold, ": {}\n", msg);
-    s << tmpLine << '\n';
     return s.str();
 }
 
@@ -82,5 +109,8 @@ std::string ReferenceError::getExcName() const {return "ReferenceError";}
 
 TypeError::TypeError(const std::string& msg, const std::string& line, SourceLocation loc)
     : BaseSourceException(msg, line, loc) {}
+
+TypeError::TypeError(const std::string& msg, SourceLocation loc)
+    : BaseSourceException(msg, loc) {}
 
 std::string TypeError::getExcName() const {return "TypeError";}
