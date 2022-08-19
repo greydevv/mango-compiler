@@ -520,14 +520,8 @@ std::unique_ptr<ExpressionAST> Parser::parseSubExpr(std::unique_ptr<ExpressionAS
             nextOp = tok.toOperator();
             opLoc = tok.loc;
         }
-        if (L->getRhs())
-        {
-          L->setRhs(std::move(R));
-          L->op = currOp.getType();
-        } else {
-          auto LHS = std::unique_ptr<AST>(L->clone());
-          L = std::make_unique<ExpressionAST>(std::move(LHS), std::move(R), currOp.getType(), opLoc);
-        }
+        auto LHS = std::unique_ptr<AST>(L->clone());
+        L = std::make_unique<ExpressionAST>(std::move(LHS), std::move(R), currOp.getType(), opLoc);
     }
     return L;
 }
