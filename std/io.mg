@@ -1,1 +1,1 @@
-extern func print(int n);
+extern func print(i32 n);
