@@ -93,7 +93,6 @@ static const std::vector<std::string> operatorStrings = {
     "OP_DEC",
     "OP_INC",
     // "OP_EXP",
-    "OP_NOP",
     "OP_BOOL_GT",
     "OP_BOOL_LT",
     "OP_BOOL_GTE",
@@ -102,6 +101,7 @@ static const std::vector<std::string> operatorStrings = {
     "OP_BOOL_NEQL",
     "OP_BOOL_OR",
     "OP_BOOL_AND",
+    "OP_NOP",
 };
 
 static const std::map<Operator::op_type, std::string> operatorValues = {
