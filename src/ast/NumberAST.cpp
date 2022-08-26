@@ -5,26 +5,14 @@
 #include "../visitors/ASTCodegenner.h"
 #include "../visitors/ASTStringifier.h"
 
-
-// #include <iostream>
 NumberAST::NumberAST(double val, Type type, SourceLocation loc)
-    : AST(loc), val(val), type(type)
-{
-  // std::cout << loc.y << "<---(" << val << ")\n";
-}
+    : AST(loc), val(val), width(widthFromType(type)), type(type) {}
 
 NumberAST::NumberAST(double val, SourceLocation loc)
-    : AST(loc), val(val), type(Type::eInt)
-{
-  // std::cout << loc.y << "<---(" << val << ")\n";
-}
+    : AST(loc), val(val), width(32), type(Type::eInt32) {}
 
 NumberAST::NumberAST(const NumberAST& other)
-    : AST(other.loc), val(other.val), type(other.type)
-{
-  // std::cout << other.loc.y << "<---(copy" << "(" << other.val << ")" << ")\n";
-  // std::cout << loc.y << "<---(copy" << "(" << val << ")" << ")\n";
-}
+    : AST(other.loc), val(other.val), type(other.type) {}
 
 Type NumberAST::accept(ASTValidator& vd)
 {

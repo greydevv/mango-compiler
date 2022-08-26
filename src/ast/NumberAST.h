@@ -11,7 +11,8 @@
 class NumberAST : public AST
 {
     public:
-        double val;
+        long double val;
+        int width;
         Type type;
 
         NumberAST(double val, Type type, SourceLocation loc);
