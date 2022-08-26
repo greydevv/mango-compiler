@@ -145,6 +145,7 @@ std::unique_ptr<PrototypeAST> Parser::parseExternStmt()
     eat(Token::TOK_KWD);
     eat(Token::TOK_KWD);
     std::unique_ptr<PrototypeAST> proto = parseFuncProto();
+    proto->isExtern = true;
     eat(Token::TOK_SCOLON);
     return proto;
 }
@@ -458,14 +459,12 @@ std::unique_ptr<AST> Parser::parseOperand()
               if (tok.value == "true")
               {
                 eat(Token::TOK_KWD);
-                // TODO: NumberAST creates 32-bit ints, but we need 1-bit for
-                // bool type
-                return std::make_unique<NumberAST>(1, numLoc);
+                return std::make_unique<NumberAST>(1, Type::eBool, numLoc);
               }
               else if (tok.value == "false")
               {
                 eat(Token::TOK_KWD);
-                return std::make_unique<NumberAST>(0, numLoc);
+                return std::make_unique<NumberAST>(0, Type::eBool, numLoc);
               }
             }
         default:

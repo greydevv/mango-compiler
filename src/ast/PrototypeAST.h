@@ -18,6 +18,7 @@ class PrototypeAST : public AST
         std::string name;
         Type retType;
         std::vector<std::unique_ptr<VariableAST>> params;
+        bool isExtern;
 
         PrototypeAST(const std::string& name, Type ret_type, std::vector<std::unique_ptr<VariableAST>> params, SourceLocation loc);
         PrototypeAST(const PrototypeAST& other);

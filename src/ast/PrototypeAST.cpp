@@ -8,10 +8,10 @@
 #include "llvm/IR/Value.h"
 
 PrototypeAST::PrototypeAST(const std::string& name, Type retType, std::vector<std::unique_ptr<VariableAST>> params, SourceLocation loc)
-    : AST(loc), name(name), retType(retType), params(std::move(params)) {}
+    : AST(loc), name(name), retType(retType), params(std::move(params)), isExtern(false) {}
 
 PrototypeAST::PrototypeAST(const PrototypeAST& other)
-    : AST(other.loc), retType(other.retType)
+    : AST(other.loc), retType(other.retType), isExtern(false)
 {
     // TODO(greydevv): test this method - not sure if below is totally safe
     for (auto& param : other.params)
