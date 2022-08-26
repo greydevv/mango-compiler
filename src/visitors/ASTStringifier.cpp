@@ -96,7 +96,7 @@ std::string ASTStringifier::toString(NumberAST* ast, int tabs)
     {
         s << ast->val;
     } else {
-        s << "NumberAST(" << ast->val << ')';
+        s << "NumberAST(" << ast->val << ", " << typeToString(ast->type) << ')';
     }
     return s.str();
 }
@@ -161,7 +161,8 @@ std::string ASTStringifier::toString(FunctionAST* ast, int tabs)
     std::ostringstream s;
     if (simpleExpr)
     {
-        s << "function:" << ast->proto->accept(*this, tabs);
+        s << "\n\nfunction:" << ast->proto->accept(*this, tabs) << '\n';
+        s << "body: "  << ast->body->accept(*this, tabs);
     } else {
         s << "FunctionAST:\n";
         s << indent(ast->proto->accept(*this, tabs+1), tabs+1);
@@ -188,7 +189,10 @@ std::string ASTStringifier::toString(PrototypeAST* ast, int tabs)
         }
         s << ") returns " << typeToString(ast->retType);
     } else {
-        s << "PrototypeAST(" << ast->name << ")\n";
+        s << "PrototypeAST(";
+        if (ast->isExtern)
+          s << "extern:";
+        s << ast->name << ")\n";
         s << indent("Returns: ", tabs+1) << typeToString(ast->retType) << '\n';
         if (ast->params.size() > 0)
             s << indent("Parameters: ", tabs+1) << '\n';
@@ -211,9 +215,9 @@ std::string ASTStringifier::toString(ReturnAST* ast, int tabs)
     if (simpleExpr)
     {
         if (ast->hasExpr())
-            s << "return " << ast->expr->accept(*this) << '\n';
+            s << "return " << ast->expr->accept(*this);
         else
-            s << "return void\n";
+            s << "return void";
     } else {
         s << "ReturnAST:\n";
         if (ast->hasExpr())
