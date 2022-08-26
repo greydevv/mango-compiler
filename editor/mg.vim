@@ -22,6 +22,7 @@ syntax keyword mgKwds return if else for while in extern include
 
 " Types
 syntax keyword mgTypes int bool void
+syntax match mgIntTypes '\(u\|i\|f\)\(8\|16\|32\|64\|128\)\ze\($\|\s\)'
 
 " Numeric literals
 syntax match mgNums '\d\+\.\?\d*'
@@ -40,6 +41,7 @@ highlight default link mgFuncIds Function
 highlight default link mgFuncKwd Keyword
 highlight default link mgKwds Keyword
 highlight default link mgTypes Type
+highlight default link mgIntTypes Type
 highlight default link mgNums Number
 highlight default link mgBools Number
 highlight default link mgTodos Todo
