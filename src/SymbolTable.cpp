@@ -37,8 +37,8 @@ std::pair<bool, std::string>  SymbolTable<V>::overwrites(const SymbolTable<V>& o
     {
         if (other.contains(id))
         {
-            conflict.first=true;
-            conflict.second=id;
+            conflict.first = true;
+            conflict.second = id;
             break;
         }
     }
