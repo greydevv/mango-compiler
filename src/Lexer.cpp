@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <regex>
 #include "io.h"
 #include "Token.h"
 #include "Lexer.h"
@@ -262,7 +263,8 @@ bool Lexer::isKwd(const std::string& s)
 
 bool Lexer::isType(const std::string& s)
 {
-    return (s == "int"
+    std::regex intRegex("(?:u|i|f)(?:8|16|32|64|128)");
+    return (std::regex_match(s, intRegex)
             || s == "bool"
             || s == "void"
             || s == "array");

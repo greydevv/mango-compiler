@@ -65,25 +65,12 @@ Operator Token::toOperator()
 
 Type Token::toType()
 {
-    if (value == "void")
-    {
-        return Type::eVoid;
-    }
-    else if (value == "int")
-    {
-        return Type::eInt;
-    }
-    else
-    {
-        return Type::eUnd;
-    }
+    return typeFromString(value);
 }
 
 bool Token::isType()
 {
-    return (value == "int"
-            || value == "return"
-            || value == "func");
+    return typeFromString(value) != Type::eUnd;
 }
 
 Token::token_type Token::typeFromChar(char c)
@@ -114,13 +101,9 @@ Token::token_type Token::typeFromChar(char c)
 std::ostream& operator<<(std::ostream& os, const Token& tok)
 {
     if (tok.type == Token::TOK_EOF)
-    {
         os << '<' << tokenStrings[tok.type] << " (line: " << tok.loc.y << ": " << tok.loc.x << ")>";
-    }
     else
-    {
         os << '<' << tokenStrings[tok.type] << ": " << tok.value << " (line: " << tok.loc.y << ": " << tok.loc.x << ")>";
-    }
     return os;
 }
 
