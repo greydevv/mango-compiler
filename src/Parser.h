@@ -56,6 +56,7 @@ class Parser
         std::unique_ptr<ExpressionAST> parseExpr();
         std::unique_ptr<ExpressionAST> parseSubExpr(std::unique_ptr<ExpressionAST> L, int prec = 0);
 
+        int getInvalidNumLiteralPos(std::string& numStr);
         bool eat(Token::token_type expected_type);
         bool eat();
         void getToken();

@@ -2,6 +2,7 @@
 #include <fstream>
 #include <memory>
 #include <vector>
+#include <regex>
 #include "Parser.h"
 #include "ContextManager.h"
 #include "Token.h"
@@ -95,6 +96,19 @@ std::unique_ptr<AST> Parser::parseId()
 
 std::unique_ptr<NumberAST> Parser::parseNum() 
 {
+    
+    std::regex intRegex("^\\d{1,3}(?:_?\\d{3})*$");
+    if (!std::regex_match(tok.value, intRegex))
+    {
+      // if it's not a valid integer literal, find the offending element of it
+      // for underlining it in the error message
+      SourceLocation badCharLoc(tok.loc.x + getInvalidNumLiteralPos(tok.value), tok.loc.y, 1);
+      throw SyntaxError(fmt::format("{} is not a valid integer literal", tok.value), getTokenLine(tok), badCharLoc);
+    }
+
+    std::string numStr = std::regex_replace(tok.value, std::regex("_"), "");
+
+    tok.value = numStr;
     auto numAST = std::make_unique<NumberAST>(std::stod(tok.value), tok.loc);
     eat(Token::TOK_NUM);
     return numAST;
@@ -519,10 +533,49 @@ std::unique_ptr<ExpressionAST> Parser::parseSubExpr(std::unique_ptr<ExpressionAS
             nextOp = tok.toOperator();
             opLoc = tok.loc;
         }
-        auto LHS = std::unique_ptr<AST>(L->clone());
+        std::unique_ptr<AST> LHS;
+        if (L->op == Operator::OP_NOP && L->getRhs() == nullptr)
+          LHS = std::unique_ptr<AST>(L->getLhs()->clone());
+        else
+          LHS = std::unique_ptr<AST>(L->clone());
         L = std::make_unique<ExpressionAST>(std::move(LHS), std::move(R), currOp.getType(), opLoc);
     }
     return L;
+}
+
+int Parser::getInvalidNumLiteralPos(std::string& numStr)
+{
+    // 'str' should be an INVALID string representation of a valid integer
+    // this method returns the offending character that makes 'str' an invalid
+    // integer
+    int digitsSeen = 0;
+    bool firstDigits = true;
+    for (int i = 0; i < numStr.length(); i++)
+    {
+        char c = numStr[i];
+        if (isdigit(c))
+        {
+          digitsSeen++;
+        } else if (c == '_') {
+          // numeric literals can begin with 'n' digits, like '10_000' (so
+          // underscores in the beginning of the string do not have to follow a
+          // multiple of three digits)
+          if ((digitsSeen == 0 || digitsSeen % 3 != 0) && !firstDigits)
+          {
+            return i;
+          } else {
+            digitsSeen = 0;
+            firstDigits = false;
+          }
+        } else {
+          return i;
+        }
+    }
+
+    // just return the last character in the string - we know the litearl is
+    // invalid, so if the offending character wasn't anywhere in the string, we
+    // know it's at the end (assuming the above algorithm is bug-free)
+    return numStr.length()-1;
 }
 
 bool Parser::eat(Token::token_type expectedType)
