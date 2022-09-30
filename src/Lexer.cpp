@@ -89,7 +89,7 @@ Token Lexer::lexNum()
     // TODO: refactor below while loop into separate function
     std::string s;
     FileLocation tmpLoc = loc;
-    while (isalnum(c))
+    while (isalnum(c) || c == '_')
     {
         s += c;
         next();
@@ -263,8 +263,8 @@ bool Lexer::isKwd(const std::string& s)
 
 bool Lexer::isType(const std::string& s)
 {
-    std::regex intRegex("(?:u|i|f)(?:8|16|32|64|128)");
-    return (std::regex_match(s, intRegex)
+    std::regex intTyRegex("(?:u|i|f)(?:8|16|32|64|128)");
+    return (std::regex_match(s, intTyRegex)
             || s == "bool"
             || s == "void"
             || s == "array");
