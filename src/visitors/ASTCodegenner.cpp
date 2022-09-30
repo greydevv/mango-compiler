@@ -115,24 +115,15 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
     if (ast->op == Operator::OP_EQL)
     {
         // should only be using equals when variable is LHS
-        auto lhs = dynamic_cast<ExpressionAST*>(ast->getLhs()->clone());
-        auto varAst = dynamic_cast<VariableAST*>(lhs->getLhs()->clone());
+        auto varAst = dynamic_cast<VariableAST*>(ast->getLhs()->clone());
         llvm::Value* rhs = ast->getRhs()->accept(*this);
         if (varAst->ctx == VarCtx::eAlloc)
         {
-            // make all allocations in entry block of function
             llvm::AllocaInst* varAlloca = createEntryBlockAlloca(rhs);
             namedValues[varAst->id] = varAlloca;
-            // store value at current insert point
             builder->CreateStore(rhs, varAlloca);
         } else {
-            // otherwise, it's a redefinition
             llvm::Value* var = namedValues[varAst->id];
-            if (!var)
-            {
-                std::string msg = fmt::format("unknown variable '{}' (it was probably used in a nested function when defined outside. this is a compiler bug)", varAst->id);
-                throw ReferenceError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0, 0, 0));
-            }
             builder->CreateStore(rhs, var);
         }
         return rhs;
@@ -185,7 +176,7 @@ llvm::Value* ASTCodegenner::codegen(ExpressionAST* ast)
               return builder->CreateAnd(L, R, "andtmp");
           default:
               {
-                  // TODO(greydevv): need to capture the operator's value
+                  // TODO: need to capture the operator's value
                   throw SyntaxError("invalid binary operator", "LINE NOT IMPLEMENTED", SourceLocation(0, 0, 0));
               }
       }
@@ -241,7 +232,8 @@ llvm::Value* ASTCodegenner::codegen(VariableAST* ast)
 
 llvm::Value* ASTCodegenner::codegen(NumberAST* ast)
 {
-    return llvm::ConstantInt::get(*llvmCtx, llvm::APInt(32, ast->val));
+    llvm::Type* intTy = typeToLlvm(ast->type);
+    return llvm::ConstantInt::get(intTy, ast->val, isSigned(ast->type));
 }
 
 llvm::Value* ASTCodegenner::codegen(ArrayAST* ast)
@@ -307,17 +299,13 @@ llvm::Function* ASTCodegenner::codegen(PrototypeAST* ast)
 {
     std::vector<llvm::Type*> paramTypes;
     for (auto& param : ast->params)
-    {
         paramTypes.push_back(typeToLlvm(param->type));
-    }
     llvm::FunctionType *funcType = llvm::FunctionType::get(typeToLlvm(ast->retType), paramTypes, false);
     llvm::Function *func = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, ast->name, mainModule.get());
 
     int i = 0;
     for (auto& param : func->args())
-    {
         param.setName(ast->params[i++]->id);
-    }
     return func;
 }
 
@@ -339,7 +327,7 @@ llvm::Value* ASTCodegenner::codegen(CallAST* ast)
     }
     if (callee->arg_size() != ast->params.size())
     {
-        // TODO(greydevv): make new error for this (Python uses TypeError)
+        // TODO: make new error for this (Python uses TypeError)
         std::string msg = fmt::format("function received {} arguments but expected {} arguments", callee->arg_size(), ast->params.size());
         throw SyntaxError(msg, "LINE NOT IMPLEMENTED", SourceLocation(0, 0, 0));
     }
@@ -402,7 +390,7 @@ llvm::Value* ASTCodegenner::codegen(IfAST* ast, llvm::BasicBlock* parentMergeBlo
         // merge the merge, lol
         builder->CreateBr(parentMergeBlock);
 
-    // TODO(greydevv): implement PHI node functionality. Currently just inserting ret or
+    // TODO: implement PHI node functionality. Currently just inserting ret or
     // br without PHI
 
     // if (!thenV || !elseV)
@@ -552,8 +540,16 @@ llvm::Type* ASTCodegenner::typeToLlvm(Type type)
 {
     switch (type)
     {
-        case Type::eInt:
+        case Type::eInt8:
+            return llvm::Type::getInt8Ty(*llvmCtx);
+        case Type::eInt16:
+            return llvm::Type::getInt16Ty(*llvmCtx);
+        case Type::eInt32:
             return llvm::Type::getInt32Ty(*llvmCtx);
+        case Type::eInt64:
+            return llvm::Type::getInt64Ty(*llvmCtx);
+        case Type::eInt128:
+            return llvm::Type::getInt128Ty(*llvmCtx);
         case Type::eVoid:
             return llvm::Type::getVoidTy(*llvmCtx);
         default:
