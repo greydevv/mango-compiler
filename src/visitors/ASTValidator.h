@@ -49,6 +49,8 @@ class ASTValidator
         SymbolTable<Type> st;
         SymbolTable<ProtoSymbol> fst;  // function symbol table
 
+        Type expectedTy;
+
         void validateBoolExpr(std::shared_ptr<ExpressionAST> expr);
 };
 

@@ -26,7 +26,7 @@ ParamSymbol::ParamSymbol(const std::string& id, Type type)
     : id(id), type(type) {}
 
 ASTValidator::ASTValidator(std::shared_ptr<ModuleAST> ast, ContextManager& ctx)
-    : ast(ast), ctx(ctx), st(Type::eNot), fst({})
+    : ast(ast), ctx(ctx), st(Type::eNot), fst({}), expectedTy(Type::eUnd)
 {
     ctx.clear();
 }
@@ -53,9 +53,18 @@ Type ASTValidator::validate(ExpressionAST* ast)
         throw TypeError("expression is not assignable", ast->getLhs()->loc);
 
     Type lType = ast->getLhs()->accept(*this);
+
+    Type prevExpectedTy = expectedTy;
+    expectedTy = lType;
     if (ast->op != Operator::OP_NOP)
     {
       Type rType = ast->getRhs()->accept(*this);
+
+      if (dynamic_cast<NumberAST*>(ast->getLhs().get()) != nullptr && dynamic_cast<NumberAST*>(ast->getRhs().get()) != nullptr)
+      {
+        // this is bad
+        return lType;
+      }
 
       // check if types are compatible with one another
       if (!typeCompat(lType, rType))
@@ -65,14 +74,32 @@ Type ASTValidator::validate(ExpressionAST* ast)
           else
               throw TypeError(fmt::format("{} and {} are not compatible in binary expression", typeValues[lType], typeValues[rType]), ast->loc);
       }
+      switch (ast->op)
+      {
+          case Operator::OP_BOOL_GT:
+          case Operator::OP_BOOL_LT:
+          case Operator::OP_BOOL_GTE:
+          case Operator::OP_BOOL_LTE:
+          case Operator::OP_BOOL_EQL:
+          case Operator::OP_BOOL_NEQL:
+          case Operator::OP_BOOL_OR:
+          case Operator::OP_BOOL_AND:
+              {
+                  expectedTy = prevExpectedTy;
+                  return Type::eBool;
+              }
+          default: 
+              break;
+      }
     }
+    expectedTy = prevExpectedTy;
     return lType;
 }
 
 Type ASTValidator::validate(UnaryExprAST* ast)
 {
     if (!ast->operand->isAssignable())
-        throw TypeError("expression is not assignable", ast->loc);
+        throw TypeError("expression is not assignable", ast->operand->loc);
 
     return ast->operand->accept(*this);
 }
@@ -114,6 +141,42 @@ Type ASTValidator::validate(VariableAST* ast)
 
 Type ASTValidator::validate(NumberAST* ast)
 {
+    if (ast->type == Type::eBool)
+      return Type::eBool;
+    
+    switch (expectedTy)
+    {
+        case Type::eUnd:
+            return ast->type;
+        case Type::eBool:
+        case Type::eInt8:
+            if (ast->val <= INT8_MAX) // -127, 127
+            {
+              ast->type = Type::eInt8;
+              break;
+            }
+        case Type::eInt16:
+            if (ast->val <= INT16_MAX)
+            {
+                ast->type = Type::eInt16;
+                break;
+            }
+        case Type::eInt32:
+            if (ast->val <= INT32_MAX)
+            {
+                ast->type = Type::eInt32;
+                break;
+            }
+        case Type::eInt64:
+            if (ast->val <= (long double) INT64_MAX)
+            {
+                ast->type = Type::eInt64;
+                break;
+            }
+        default:
+          throw TypeError(fmt::format("numeric literal too large"), ast->loc);
+    }
+
     return ast->type;
 }
 
@@ -133,16 +196,19 @@ Type ASTValidator::validate(CompoundAST* ast)
 
 Type ASTValidator::validate(FunctionAST* ast)
 {
-    Type expectedType = ast->proto->accept(*this);
+    Type expectedRetTy = ast->proto->accept(*this);
+    Type prevExpectedTy = expectedTy;
+    expectedTy = expectedRetTy;
     // actual return type
-    Type actualType = ast->body->accept(*this);
-    if (actualType != expectedType)
+    Type actualRetTy = ast->body->accept(*this);
+    if (actualRetTy != expectedRetTy)
     {
         if (ast->body->retStmt)
-          throw TypeError(fmt::format("returning {} but expected {}", typeValues[actualType], typeValues[expectedType]), ast->body->retStmt->expr->loc);
+          throw TypeError(fmt::format("returning {} but expected {}", typeValues[actualRetTy], typeValues[expectedRetTy]), ast->body->retStmt->expr->loc);
     }
     st.clear();
-    return expectedType;
+    expectedTy = prevExpectedTy;
+    return expectedRetTy;
 }
 
 Type ASTValidator::validate(PrototypeAST* ast)
@@ -150,13 +216,15 @@ Type ASTValidator::validate(PrototypeAST* ast)
     if (fst.contains(ast->name))
         throw ReferenceError(fmt::format("function '{}' was already defined", ast->name), ast->loc);
     ProtoSymbol symb;
-    std::vector<ParamSymbol> params;
     for (auto& param : ast->params)
     {
         symb.params.push_back(ParamSymbol(param->id, param->type));
         param->accept(*this);
     }
     symb.retType = ast->retType;
+    if (ast->isExtern)
+      // clear the symbol table if it's an extern statement
+      st.clear();
     fst.insert(ast->name, symb);
     return ast->retType;
 }
@@ -200,14 +268,17 @@ Type ASTValidator::validate(CallAST* ast)
         throw TypeError(fmt::format("'{}' expects {} {} but received {}", ast->id, expectedVerbiage, argumentVerbiage, receivedVerbiage), errLoc);
     }
 
+    Type prevExpectedTy = expectedTy;
     for (int i = 0; i < ast->params.size(); i++)
     {
+        expectedTy = expectedTypes[i].type;
         Type pType = ast->params[i]->accept(*this);
         if (pType != expectedTypes[i].type)
         {
             throw TypeError(fmt::format("'{}' expects {} for argument '{}' but received {}", ast->id, typeValues[expectedTypes[i].type], expectedTypes[i].id, typeValues[pType]), ast->params[i]->loc);
         }
     }
+    expectedTy = prevExpectedTy;
     // return return type of function
     return symb.retType;
 }
@@ -235,6 +306,7 @@ Type ASTValidator::validate(WhileAST* ast)
 
 void ASTValidator::validateBoolExpr(std::shared_ptr<ExpressionAST> expr)
 {
+    expectedTy = Type::eBool;
     Type exprType = expr->accept(*this);
     switch (exprType)
     {
