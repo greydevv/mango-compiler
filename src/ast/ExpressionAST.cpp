@@ -36,6 +36,12 @@ void ExpressionAST::setRhs(std::unique_ptr<AST> rhs)
     calculateLoc();
 }
 
+void ExpressionAST::setLhs(std::unique_ptr<AST> lhs)
+{
+    this->lhs = std::move(lhs);
+    calculateLoc();
+}
+
 ExpressionAST::ExpressionAST(const ExpressionAST& other)
     : AST(other.loc),
       op(other.op),

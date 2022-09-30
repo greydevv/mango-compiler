@@ -16,6 +16,11 @@ enum class ExprCtx
     eReturn
 };
 
+/*
+ * Need an expectedType member on ExpressionAST. The ReturnAST would set the
+ * ExpressionAST expected type.
+ *
+ */
 class ExpressionAST : public AST
 {
     public:
@@ -28,6 +33,7 @@ class ExpressionAST : public AST
         std::shared_ptr<AST> getLhs();
         std::shared_ptr<AST> getRhs();
         void setRhs(std::unique_ptr<AST> rhs);
+        void setLhs(std::unique_ptr<AST> lhs);
         bool isAssignable() override;
         Type accept(ASTValidator& vd) override;
         llvm::Value* accept(ASTCodegenner& cg) override;
