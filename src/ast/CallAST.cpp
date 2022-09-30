@@ -14,7 +14,7 @@ CallAST::CallAST(const std::string& id, std::vector<std::unique_ptr<ExpressionAS
 CallAST::CallAST(const CallAST& other)
     : AST(other.loc), id(other.id)
 {
-    // TODO(greydevv): test this method - not sure if below is totally safe
+    // TODO: test this method - not sure if below is totally safe
     for (auto& param : other.params)
         addParam(std::unique_ptr<ExpressionAST>(dynamic_cast<ExpressionAST*>(param->clone())));
 }
