@@ -4,9 +4,14 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <cmath>
 #include "../Types.h"
 #include "../ContextManager.h"
 #include "../SymbolTable.h"
+
+#define UINT128_MAX (pow(2, 128) - 1)
+#define INT128_MAX (pow(2, 127) - 1)
+#define INT128_MIN (-1 * pow(2, 127))
 
 class ModuleAST;
 class ExpressionAST;

@@ -62,7 +62,6 @@ Type ASTValidator::validate(ExpressionAST* ast)
 
       if (dynamic_cast<NumberAST*>(ast->getLhs().get()) != nullptr && dynamic_cast<NumberAST*>(ast->getRhs().get()) != nullptr)
       {
-        // this is bad
         return lType;
       }
 
@@ -150,27 +149,63 @@ Type ASTValidator::validate(NumberAST* ast)
             return ast->type;
         case Type::eBool:
         case Type::eInt8:
-            if (ast->val <= INT8_MAX) // -127, 127
+            if (ast->val <= INT8_MAX && ast->val >= INT8_MIN)
             {
-              ast->type = Type::eInt8;
-              break;
+                ast->type = Type::eInt8;
+                break;
+            }
+        case Type::eUInt8:
+            if (ast->val <= UINT8_MAX && ast->val >= 0)
+            {
+                ast->type = Type::eUInt8;
+                break;
             }
         case Type::eInt16:
-            if (ast->val <= INT16_MAX)
+            if (ast->val <= INT16_MAX && ast->val >= INT16_MIN)
             {
                 ast->type = Type::eInt16;
                 break;
             }
+        case Type::eUInt16:
+            if (ast->val <= UINT16_MAX && ast->val >= 0)
+            {
+                ast->type = Type::eUInt16;
+                break;
+            }
         case Type::eInt32:
-            if (ast->val <= INT32_MAX)
+            if (ast->val <= INT32_MAX && ast->val >= INT32_MIN)
             {
                 ast->type = Type::eInt32;
                 break;
             }
+        case Type::eUInt32:
+            if (ast->val <= UINT32_MAX && ast->val >= 0)
+            {
+                ast->type = Type::eUInt32;
+                break;
+            }
         case Type::eInt64:
-            if (ast->val <= (long double) INT64_MAX)
+            if (ast->val <= (long double) INT64_MAX && ast->val >= INT64_MIN)
             {
                 ast->type = Type::eInt64;
+                break;
+            }
+        case Type::eUInt64:
+            if (ast->val <= (long double) UINT64_MAX && ast->val >= 0)
+            {
+                ast->type = Type::eUInt64;
+                break;
+            }
+        case Type::eInt128:
+            if (ast->val <= INT128_MAX && ast->val >= INT128_MIN)
+            {
+                ast->type = Type::eInt128;
+                break;
+            }
+        case Type::eUInt128:
+            if (ast->val <= UINT128_MAX && ast->val >= 0)
+            {
+                ast->type = Type::eUInt128;
                 break;
             }
         default:

@@ -541,14 +541,19 @@ llvm::Type* ASTCodegenner::typeToLlvm(Type type)
     switch (type)
     {
         case Type::eInt8:
+        case Type::eUInt8:
             return llvm::Type::getInt8Ty(*llvmCtx);
         case Type::eInt16:
+        case Type::eUInt16:
             return llvm::Type::getInt16Ty(*llvmCtx);
         case Type::eInt32:
+        case Type::eUInt32:
             return llvm::Type::getInt32Ty(*llvmCtx);
         case Type::eInt64:
+        case Type::eUInt64:
             return llvm::Type::getInt64Ty(*llvmCtx);
         case Type::eInt128:
+        case Type::eUInt128:
             return llvm::Type::getInt128Ty(*llvmCtx);
         case Type::eVoid:
             return llvm::Type::getVoidTy(*llvmCtx);
