@@ -56,10 +56,11 @@ TypeError: i8 and i16 are not compatible in binary expression
 	- [x] type-checking
 	- [x] symbol/reference table
 	- [ ] integer types (i8, i16, i32, i64, i128, u8, u16, u32, u64, u128)
+  - [ ] constant folding
 	- [ ] function overloading
 	- [ ] strings/arrays
 	- [ ] pointers (?)
-- [ ] IR
+- [ ] IR/Codegen
 	- [x] binary expressions (arithmetic, boolean, etc.)
 	- [x] conditional control flow (if/else if/else)
 	- [x] control flow (while loop)
